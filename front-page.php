@@ -73,13 +73,15 @@ $rates    = (int) yamaha_audio_opt( 'rates_count' );
 				<?php if ( $hero_cat ) : ?><span class="hx-eyebrow hx-eyebrow--muted"><?php echo esc_html( $hero_cat->name ); ?></span><?php endif; ?>
 				<h2 class="hx-spot__title"><a href="<?php echo esc_url( $hero->get_permalink() ); ?>"><?php echo esc_html( $hero->get_name() ); ?></a></h2>
 				<?php if ( $hero_lead ) : ?><p class="hx-spot__lead"><?php echo esc_html( $hero_lead ); ?></p><?php endif; ?>
-				<div class="hx-spot__price">
-					<span class="hx-spot__now"><?php echo esc_html( yamaha_audio_lei( yamaha_audio_active_price( $hero ) ) ); ?></span>
-					<?php if ( $hero->is_on_sale() && $hero_regular > yamaha_audio_active_price( $hero ) ) : ?><s><?php echo esc_html( yamaha_audio_lei( $hero_regular ) ); ?></s><?php endif; ?>
+				<div class="hx-spot__pricebox">
+					<div class="hx-spot__price">
+						<span class="hx-spot__now"><?php echo esc_html( yamaha_audio_lei( yamaha_audio_active_price( $hero ) ) ); ?></span>
+						<?php if ( $hero->is_on_sale() && $hero_regular > yamaha_audio_active_price( $hero ) ) : ?><s><?php echo esc_html( yamaha_audio_lei( $hero_regular ) ); ?></s><?php endif; ?>
+					</div>
+					<?php if ( $hero_rate ) : ?>
+						<span class="hx-spot__rate"><?php printf( esc_html__( 'sau %1$d × %2$s %3$s', 'yamaha-audio' ), $rates, esc_html( yamaha_audio_lei( $hero_rate ) ), esc_html( yamaha_audio_opt( 'rates_label' ) ) ); ?></span>
+					<?php endif; ?>
 				</div>
-				<?php if ( $hero_rate ) : ?>
-					<span class="hx-spot__rate"><?php printf( esc_html__( 'sau %1$d × %2$s %3$s', 'yamaha-audio' ), $rates, esc_html( yamaha_audio_lei( $hero_rate ) ), esc_html( yamaha_audio_opt( 'rates_label' ) ) ); ?></span>
-				<?php endif; ?>
 				<div class="hx-spot__ctas">
 					<?php yamaha_audio_loop_button( $hero ); ?>
 					<a class="hx-link" href="<?php echo esc_url( $hero->get_permalink() ); ?>"><?php esc_html_e( 'Detalii', 'yamaha-audio' ); ?> →</a>

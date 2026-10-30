@@ -37,7 +37,7 @@ fine (COD) — nothing leaves the box. Never migrate the staging DB to live. Nev
   band, blog), `page-promotii.php`, `page-contact.php`, `page-legal.php`, `woocommerce/*`. One CSS
   (`assets/css/main.css`; tokens `--hx-*`; accent as text `--hx-accent`, accent as surface `--hx-gold` + `--hx-on-accent`;
   light theme under `html[data-theme="light"]`), one JS (`assets/js/main.js`). Campaign mode keeps its own palette
-  (Black Edition 30 Oct → 2 Dec 2026 is the code default).
+  (Black Friday Sound Edition 30 Oct → 2 Dec 2026, neon style, is the code default).
 
 ## Done in the first redesign pass (2026-10-30)
 - Palette: exact logo violet #4b1e78 (light theme / surfaces), #5b2a93 surfaces + lavender text on dark; Manrope 800 headings;

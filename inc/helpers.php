@@ -686,7 +686,7 @@ function yamaha_audio_category_children_label( $term, $max = 3 ) {
 }
 
 /**
- * The active sale campaign (Black Edition, Winter Sales…) or null.
+ * The active sale campaign (Black Friday Sound Edition, Winter Sales…) or null.
  * Enabled in the Customizer, optionally fenced by start/end dates (site timezone).
  */
 function yamaha_audio_campaign() {
@@ -714,7 +714,7 @@ function yamaha_audio_campaign() {
 	$camp  = array(
 		'name'    => (string) yamaha_audio_opt( 'camp_name' ) ?: 'Sale',
 		'tagline' => (string) yamaha_audio_opt( 'camp_tagline' ),
-		'style'   => in_array( $style, array( 'black', 'winter', 'red' ), true ) ? $style : 'black',
+		'style'   => in_array( $style, array( 'neon', 'black', 'winter', 'red' ), true ) ? $style : 'neon',
 		'badge'   => (string) yamaha_audio_opt( 'camp_badge' ) ?: (string) yamaha_audio_opt( 'camp_name' ),
 		'end_ts'  => $end_ts,
 		'end_txt' => $end_ts ? wp_date( 'j F', $end_ts ) : '',

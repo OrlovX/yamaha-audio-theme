@@ -95,14 +95,14 @@ function yamaha_audio_option_defaults() {
 		'audio_cta_label'     => 'Vreau un sistem MusicCast',
 		'audio_cta2_label'    => 'Programează o audiție',
 
-		// Campaign / big sale mode (Black Edition, Winter Sales…).
-		// Black Edition 30 Oct → 2 Dec 2026 is baked in as the default, so deploying the theme files is enough
+		// Campaign / big sale mode (Black Friday Sound Edition, Winter Sales…).
+		// Black Friday Sound Edition 30 Oct → 2 Dec 2026 is baked in as the default, so deploying the theme files is enough
 		// to switch it on at the right time on a site whose Customizer hasn't been touched. The date fence turns
 		// it off by itself afterwards; the Customizer (Campanie / Sale) overrides all of this.
 		'camp_enabled'        => true,
-		'camp_name'           => 'Black Edition',
+		'camp_name'           => 'Black Friday Sound Edition',
 		'camp_tagline'        => 'Reduceri reale la Yamaha, doar câteva zile.',
-		'camp_style'          => 'black',
+		'camp_style'          => 'neon',
 		'camp_start'          => '2026-10-30',
 		'camp_end'            => '2026-12-02 23:59',
 		'camp_url'            => '',
@@ -132,7 +132,7 @@ add_action(
 			'hx_products' => 'Acasă: Categorii & produse',
 			'hx_bundle'   => 'Acasă: Pachet recomandat',
 			'hx_audio'    => 'Acasă: Bandă MusicCast / sistem complet',
-			'hx_campaign' => 'Campanie / Sale (Black Edition, Winter Sales…)',
+			'hx_campaign' => 'Campanie / Sale (Black Friday Sound Edition, Winter Sales…)',
 			'hx_footer'   => 'Footer',
 			'hx_company'  => 'Date firmă (footer & pagini legale)',
 		);
@@ -206,9 +206,9 @@ add_action(
 			array( 'hx_audio', 'audio_cta2_label', 'Link secundar: text (deschide WhatsApp; gol = ascuns)', 'text' ),
 
 			array( 'hx_campaign', 'camp_enabled', 'Campanie activă', 'checkbox' ),
-			array( 'hx_campaign', 'camp_name', 'Nume (ex. Black Edition, Winter Sales)', 'text' ),
+			array( 'hx_campaign', 'camp_name', 'Nume (ex. Black Friday Sound Edition, Winter Sales)', 'text' ),
 			array( 'hx_campaign', 'camp_tagline', 'Slogan scurt (bara de campanie, pagina Promoții, hero)', 'text' ),
-			array( 'hx_campaign', 'camp_style', 'Stil vizual', 'select', array( 'black' => 'Black Edition – negru & auriu', 'winter' => 'Winter Sales – alb glacial & albastru', 'red' => 'Red Days – roșu' ) ),
+			array( 'hx_campaign', 'camp_style', 'Stil vizual', 'select', array( 'neon' => 'Neon – negru & violet electric (LED)', 'black' => 'Black – negru & auriu', 'winter' => 'Winter Sales – alb glacial & albastru', 'red' => 'Red Days – roșu' ) ),
 			array( 'hx_campaign', 'camp_start', 'Început (AAAA-LL-ZZ, opțional – campania pornește singură)', 'text' ),
 			array( 'hx_campaign', 'camp_end', 'Sfârșit (AAAA-LL-ZZ HH:MM, opțional – numărătoare inversă și oprire automată)', 'text' ),
 			array( 'hx_campaign', 'camp_url', 'Link buton „Vezi ofertele” (gol = pagina Promoții)', 'url' ),
