@@ -42,7 +42,7 @@ function yamaha_audio_option_defaults() {
 		'company_capital'     => '',
 		'company_bank'        => '',
 		'company_iban'        => '',
-		'company_courier_fee' => '25 lei (TVA inclus) pentru primul kilogram + 1 leu pentru fiecare kilogram suplimentar',
+		'company_courier_fee' => '19 lei (TVA inclus)',
 		'legal_updated'       => '',
 		'og_image'            => 0,
 
