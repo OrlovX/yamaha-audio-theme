@@ -126,12 +126,7 @@ function yamaha_audio_nav_auto_desktop() {
 			echo '<div class="hx-mega" aria-hidden="true"><div class="hx-mega__inner"><ul class="hx-mega__cols">';
 			foreach ( $cols as $col ) {
 				$ct    = $col['term'];
-				$thumb = '';
-				$tid   = (int) get_term_meta( $ct->term_id, 'thumbnail_id', true );
-				if ( $tid ) {
-					$thumb = wp_get_attachment_image( $tid, 'thumbnail', false, array( 'class' => 'hx-mega__thumb', 'loading' => 'lazy', 'alt' => '' ) );
-				}
-				printf( '<li class="hx-mega__col"><a class="hx-mega__head" href="%s">%s<span>%s</span></a><ul class="hx-mega__links">', esc_url( get_term_link( $ct ) ), $thumb, esc_html( empty( $col['is_self'] ) ? $ct->name : sprintf( __( 'Toate: %s', 'yamaha-audio' ), $ct->name ) ) ); // phpcs:ignore
+				printf( '<li class="hx-mega__col"><a class="hx-mega__head" href="%s"><span>%s</span></a><ul class="hx-mega__links">', esc_url( get_term_link( $ct ) ), esc_html( empty( $col['is_self'] ) ? $ct->name : sprintf( __( 'Toate: %s', 'yamaha-audio' ), $ct->name ) ) );
 				foreach ( $col['children'] as $leaf ) {
 					printf( '<li><a class="hx-mega__link" href="%s">%s <small>%d</small></a></li>', esc_url( get_term_link( $leaf['term'] ) ), esc_html( $leaf['term']->name ), (int) $leaf['term']->count );
 				}

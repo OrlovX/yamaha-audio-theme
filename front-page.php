@@ -94,9 +94,7 @@ $rates    = (int) yamaha_audio_opt( 'rates_count' );
 <nav class="hx-wrap" aria-label="<?php esc_attr_e( 'Cumpără după tip', 'yamaha-audio' ); ?>">
 	<ul class="hx-types">
 		<?php foreach ( $chips as $chip ) : ?>
-			<?php $chip_img = yamaha_audio_category_image_id( $chip ); ?>
 			<li><a class="hx-types__item" href="<?php echo esc_url( get_term_link( $chip ) ); ?>">
-				<span class="hx-types__thumb" aria-hidden="true"><?php echo $chip_img ? wp_get_attachment_image( $chip_img, 'thumbnail', false, array( 'loading' => 'lazy', 'alt' => '' ) ) : yamaha_audio_icon( 'arrow', 16 ); ?></span>
 				<span><?php echo esc_html( $chip->name ); ?></span>
 				<span class="hx-types__count"><?php echo (int) $chip->count; ?></span>
 			</a></li>
