@@ -16,6 +16,7 @@ require YAMAHA_AUDIO_DIR . '/inc/assets.php';
 require YAMAHA_AUDIO_DIR . '/inc/helpers.php';
 require YAMAHA_AUDIO_DIR . '/inc/customizer.php';
 require YAMAHA_AUDIO_DIR . '/inc/menu-walker.php';
+require YAMAHA_AUDIO_DIR . '/inc/nav.php';
 require YAMAHA_AUDIO_DIR . '/inc/template-tags.php';
 require YAMAHA_AUDIO_DIR . '/inc/newsletter.php';
 require YAMAHA_AUDIO_DIR . '/inc/legal.php';

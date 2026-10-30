@@ -30,7 +30,9 @@ function yamaha_audio_option_defaults() {
 		'waze_url'            => '',
 
 		// Header menu: these items leave the category bar and form a separate group on the right.
-		'nav_extra'           => 'blog, promotii, contact',
+		'nav_auto'            => true,   // menu built from the product categories; off = the WordPress menu
+		'nav_links'           => "Promoții|/promotii/\nContact|/contact/",
+		'nav_extra'           => 'promotii, contact',
 
 		// Company (footer + legal pages).
 		'company_name'        => 'HIGH-END EXPERT S.R.L.',
@@ -155,7 +157,9 @@ add_action(
 			array( 'hx_contact', 'whatsapp', 'Număr WhatsApp (format internațional)', 'text' ),
 			array( 'hx_contact', 'showroom_directions', 'Cum ajungi la showroom (un rând pe linie: metrou, tramvai, parcare, reper)', 'textarea' ),
 			array( 'hx_contact', 'waze_url', 'Link Waze (opțional)', 'url' ),
-			array( 'hx_contact', 'nav_extra', 'Meniu: elemente afișate separat de categorii, în dreapta (slug-uri sau titluri, separate prin virgulă)', 'text' ),
+			array( 'hx_contact', 'nav_auto', 'Meniul principal se generează din categoriile de produse (dezactivează pentru a folosi meniul WordPress „Meniu principal”)', 'checkbox' ),
+			array( 'hx_contact', 'nav_links', 'Linkuri fixe după categorii, câte unul pe linie, format Etichetă|URL (ex. Promoții|/promotii/)', 'textarea' ),
+			array( 'hx_contact', 'nav_extra', 'Doar cu meniul WordPress: elemente afișate separat de categorii, în dreapta (slug-uri sau titluri, separate prin virgulă)', 'text' ),
 
 			array( 'hx_promises', 'free_shipping_min', 'Transport gratuit peste (lei)', 'number' ),
 			array( 'hx_promises', 'rates_enabled', 'Afișează rata lunară', 'checkbox' ),

@@ -232,16 +232,4 @@ $wa_system = yamaha_audio_whatsapp_url( __( 'Bună! Vreau un sistem Yamaha / Mus
 	</div>
 </section>
 
-<?php
-$posts = get_posts( array( 'numberposts' => 3, 'post_status' => 'publish' ) );
-if ( $posts ) :
-	?>
-	<section class="hx-section hx-wrap">
-		<?php yamaha_audio_section_head( __( 'Din blog', 'yamaha-audio' ), '', get_permalink( get_option( 'page_for_posts' ) ) ?: home_url( '/blog/' ), __( 'Toate articolele', 'yamaha-audio' ) ); ?>
-		<div class="hx-grid hx-grid--3">
-			<?php foreach ( $posts as $p ) { yamaha_audio_post_card( $p->ID ); } ?>
-		</div>
-	</section>
-<?php endif; ?>
-
 <?php get_footer(); ?>

@@ -20,7 +20,7 @@ add_action(
 	function () {
 		wp_enqueue_style(
 			'yamaha-audio-fonts',
-			'https://fonts.googleapis.com/css2?family=Manrope:wght@400..800&display=swap',
+			'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap',
 			array(),
 			null
 		);

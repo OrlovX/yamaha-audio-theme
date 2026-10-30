@@ -1,6 +1,6 @@
 <?php
 /**
- * Header: top bar (showroom / hours / e-mail), main bar with mega menu, search, actions.
+ * Header: one bar — logo, category navigation (built from the product categories), search, actions.
  *
  * @package yamaha-audio
  */
@@ -20,48 +20,21 @@ defined( 'ABSPATH' ) || exit;
 
 <?php
 $hx_address = yamaha_audio_opt( 'topbar_address' );
-$hx_hours   = yamaha_audio_opt( 'topbar_hours' );
 $hx_email   = yamaha_audio_opt( 'topbar_email' );
 $hx_wa      = yamaha_audio_whatsapp_url();
 $hx_phone   = yamaha_audio_opt( 'phone' );
-list( $hx_open, $hx_open_label ) = yamaha_audio_open_state();
-$hx_hours_json = wp_json_encode( array_map( function ( $r ) { return $r ?: null; }, yamaha_audio_hours_table() ) );
 ?>
-<div class="hx-topbar">
-	<div class="hx-wrap hx-topbar__inner" data-hx-ticker>
-		<a class="hx-topbar__item" href="<?php echo esc_url( yamaha_audio_opt( 'topbar_address_url' ) ); ?>" target="_blank" rel="noopener">
-			<?php echo yamaha_audio_icon( 'pin', 15 ); ?><strong><?php esc_html_e( 'Showroom', 'yamaha-audio' ); ?></strong> <span><?php echo esc_html( $hx_address ); ?></span>
-		</a>
-		<span class="hx-topbar__item hx-topbar__hours hx-open<?php echo $hx_open ? ' is-open' : ' is-closed'; ?>" data-hx-hours='<?php echo esc_attr( $hx_hours_json ); ?>' title="<?php echo esc_attr( $hx_hours ); ?>"><span class="hx-open__led" aria-hidden="true"></span><span class="hx-open__label"><?php echo esc_html( $hx_open_label ); ?></span></span>
-		<a class="hx-topbar__item hx-topbar__mail" href="mailto:<?php echo esc_attr( $hx_email ); ?>"><?php echo yamaha_audio_icon( 'mail', 15 ); ?><span><?php echo esc_html( $hx_email ); ?></span></a>
-		<?php if ( $hx_wa ) : ?>
-			<a class="hx-topbar__item hx-topbar__wa" href="<?php echo esc_url( $hx_wa ); ?>" target="_blank" rel="noopener"><?php echo yamaha_audio_icon( 'chat', 15 ); ?><span><?php echo esc_html( $hx_phone ); ?> · WhatsApp</span></a>
-		<?php endif; ?>
-		<?php
-		if ( has_nav_menu( 'topbar' ) ) {
-			wp_nav_menu(
-				array(
-					'theme_location' => 'topbar',
-					'container'      => 'nav',
-					'container_class'=> 'hx-topbar__nav',
-					'menu_class'     => 'hx-topbar__links',
-					'depth'          => 1,
-					'fallback_cb'    => false,
-				)
-			);
-		}
-		?>
-	</div>
-</div>
-
 <header class="hx-header" id="hx-header">
 	<div class="hx-wrap hx-header__inner">
 		<button class="hx-iconbtn hx-burger" type="button" aria-controls="hx-mnav" aria-expanded="false" aria-label="<?php esc_attr_e( 'Meniu', 'yamaha-audio' ); ?>"><?php echo yamaha_audio_icon( 'menu', 22 ); ?></button>
 		<?php yamaha_audio_logo(); ?>
 		<nav class="hx-nav" aria-label="<?php esc_attr_e( 'Categorii', 'yamaha-audio' ); ?>">
 			<?php
-			if ( has_nav_menu( 'primary' ) ) {
-				// Categories (mega menu) on the left…
+			if ( yamaha_audio_opt( 'nav_auto' ) || ! has_nav_menu( 'primary' ) ) {
+				// Built from the product categories (mega panels with the sub-categories) + the fixed links.
+				yamaha_audio_nav_auto_desktop();
+			} else {
+				// The WordPress menu: categories (mega menu) on the left…
 				wp_nav_menu(
 					array(
 						'theme_location' => 'primary',
@@ -73,7 +46,7 @@ $hx_hours_json = wp_json_encode( array_map( function ( $r ) { return $r ?: null;
 						'hx_group'       => 'cats',
 					)
 				);
-				// …and Blog / Promoții / Contact as a separate group on the right.
+				// …and the extra items (Promoții, Contact…) as a separate group on the right.
 				wp_nav_menu(
 					array(
 						'theme_location' => 'primary',
@@ -86,12 +59,6 @@ $hx_hours_json = wp_json_encode( array_map( function ( $r ) { return $r ?: null;
 						'hx_group'       => 'extra',
 					)
 				);
-			} elseif ( class_exists( 'WooCommerce' ) ) {
-				echo '<ul class="hx-nav__list">';
-				foreach ( yamaha_audio_home_categories( 7 ) as $term ) {
-					printf( '<li class="hx-nav__item"><a class="hx-nav__link" href="%s">%s</a></li>', esc_url( get_term_link( $term ) ), esc_html( $term->name ) );
-				}
-				echo '</ul>';
 			}
 			?>
 		</nav>
@@ -121,7 +88,9 @@ $hx_hours_json = wp_json_encode( array_map( function ( $r ) { return $r ?: null;
 	</div>
 	<div class="hx-mnav__search"><?php yamaha_audio_search_form(); ?></div>
 	<?php
-	if ( has_nav_menu( 'primary' ) ) {
+	if ( yamaha_audio_opt( 'nav_auto' ) || ! has_nav_menu( 'primary' ) ) {
+		yamaha_audio_nav_auto_mobile();
+	} else {
 		wp_nav_menu(
 			array(
 				'theme_location' => 'primary',

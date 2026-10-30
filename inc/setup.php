@@ -49,7 +49,6 @@ add_action(
 		register_nav_menus(
 			array(
 				'primary'     => __( 'Meniu principal (mega menu)', 'yamaha-audio' ),
-				'topbar'      => __( 'Bară de sus (linkuri mici: Blog, Promoții, Contact…)', 'yamaha-audio' ),
 				'footer-shop' => __( 'Footer: Magazin', 'yamaha-audio' ),
 				'footer-info' => __( 'Footer: Informații utile', 'yamaha-audio' ),
 			)
