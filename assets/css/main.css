@@ -1910,11 +1910,14 @@ html[data-theme="light"] .dgwt-wcas-overlay-mobile .dgwt-wcas-sf-wrapp::before {
 .hx .wc_payment_methods { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .hx .wc_payment_method { margin: 0; border: 1px solid var(--hx-line); border-radius: 14px; background: var(--hx-surface-2); transition: border-color .15s, background .15s; }
 .hx .wc_payment_method:has(input:checked) { border-color: var(--hx-gold); background: rgba(var(--hx-accent-rgb), .06); }
-.hx .wc_payment_method > label { display: flex; align-items: center; gap: 12px; padding: 14px 16px; font-size: 15px; font-weight: 600; color: var(--hx-text); cursor: pointer; margin: 0; }
+.hx .wc_payment_method > label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 14px 16px; font-size: 15px; font-weight: 600; color: var(--hx-text); cursor: pointer; margin: 0; min-width: 0; }
 .hx .wc_payment_method > input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; }
 .hx .wc_payment_method > label::before { content: ""; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--hx-line-strong); background: var(--hx-surface); flex: none; transition: border-color .15s, box-shadow .15s; }
 .hx .wc_payment_method:has(input:checked) > label::before { border-color: var(--hx-gold); box-shadow: inset 0 0 0 4px var(--hx-gold); }
-.hx .wc_payment_method > label img { height: 24px; width: auto; max-width: 120px; margin-left: auto; }
+/* gateway logos (NETOPIA prints one or more): keep proportions, align right, wrap under the title when the column is narrow */
+.hx .wc_payment_method > label img { display: block; height: 26px; width: auto; max-width: 100%; object-fit: contain; object-position: right center; margin: 0; flex: none; }
+.hx .wc_payment_method > label img:first-of-type { margin-left: auto; }
+.hx .wc_payment_method > label a { display: inline-flex; align-items: center; margin-left: 6px; font-size: 12px; font-weight: 500; color: var(--hx-faint); }
 .hx .wc_payment_method .payment_box { margin: 0 16px 14px; padding: 12px 14px; border-radius: 10px; background: var(--hx-surface); border: 1px solid var(--hx-line); font-size: 13.5px; line-height: 1.5; color: var(--hx-text-2); }
 .hx .wc_payment_method .payment_box p { margin: 0; }
 .hx .wc_payment_method .payment_box fieldset { border: 0; padding: 0; margin: 0; }
