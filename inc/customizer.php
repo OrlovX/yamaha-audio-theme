@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
 function yamaha_audio_option_defaults() {
 	return array(
 		// Logo / top bar (kept from the current site).
-		'theme_mode'          => 'dark',
+		'theme_mode'          => 'light',   // Yamaha white; the header switch still offers dark
 		'theme_switch'        => true,
 		'logo_invert'         => true,   // the violet PNG logo is shown white on the dark theme, as is on the light one
 		'logo_viewbox'        => '',
@@ -23,7 +23,7 @@ function yamaha_audio_option_defaults() {
 		'hours_weekday'       => '10:00-17:00',
 		'hours_saturday'      => '10:00-14:00',
 		'hours_sunday'        => '',
-		'topbar_email'        => 'office@yamaha-audio.ro',   // TODO confirm with the owner
+		'topbar_email'        => 'contact@yamaha-audio.ro',
 		'phone'               => '0758 818 181',
 		'whatsapp'            => '+40758818181',
 		'showroom_directions' => "Metrou: M1 Eroilor sau Petrache Poenaru, apoi 7 minute pe jos pe Bd. Eroii Sanitari\nTramvai 41 / autobuze pe Bd. Eroii Sanitari, stația Universitatea de Medicină\nParcare: pe Bd. Eroii Sanitari și străzile adiacente (zonă cu plată în timpul zilei)\nIntrarea este la stradă, lângă Universitatea de Medicină „Carol Davila”",
@@ -140,7 +140,7 @@ add_action(
 
 		$fields = array(
 			// section => [ key, label, type, extra ]
-			array( 'hx_contact', 'theme_mode', 'Temă implicită', 'select', array( 'dark' => 'Întunecată (implicit)', 'light' => 'Luminoasă', 'auto' => 'După setarea dispozitivului' ) ),
+			array( 'hx_contact', 'theme_mode', 'Temă implicită', 'select', array( 'light' => 'Luminoasă (implicit)', 'dark' => 'Întunecată', 'auto' => 'După setarea dispozitivului' ) ),
 			array( 'hx_contact', 'theme_switch', 'Afișează comutatorul luminos / întunecat în header', 'checkbox' ),
 			array( 'hx_contact', 'logo_invert', 'Logo‑ul este închis la culoare: afișează‑l în alb pe fundalul întunecat', 'checkbox' ),
 			array( 'hx_contact', 'logo_viewbox', 'Decupaj logo SVG (viewBox: x y lățime înălțime; gol = fișierul original)', 'text' ),

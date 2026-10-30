@@ -111,8 +111,9 @@ add_action(
 // (localStorage "hx-theme" wins, then the Customizer default; "auto" follows the device setting).
 add_action( 'wp_head', function () {
 	$mode = (string) yamaha_audio_opt( 'theme_mode' );
-	$mode = in_array( $mode, array( 'dark', 'light', 'auto' ), true ) ? $mode : 'dark';
-	echo '<meta name="theme-color" content="#121212" data-hx-dark="#121212" data-hx-light="#f5f3ee">' . "\n";
+	$mode = in_array( $mode, array( 'dark', 'light', 'auto' ), true ) ? $mode : 'light';
+	// the browser chrome takes the violet top bar's colour in both themes
+	echo '<meta name="theme-color" content="#4b1e78" data-hx-dark="#5b2a93" data-hx-light="#4b1e78">' . "\n";
 	echo '<script>(function(){var m="' . esc_js( $mode ) . '",t=null;try{t=localStorage.getItem("hx-theme")}catch(e){}'
 		. 'if(t!=="light"&&t!=="dark"){t=m==="auto"?(window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"):m}'
 		. 'var h=document.documentElement;h.setAttribute("data-theme",t);'

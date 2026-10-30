@@ -30,6 +30,7 @@ $wa       = yamaha_audio_whatsapp_url( __( 'Bună! Aș vrea să programez o audi
 $rates    = (int) yamaha_audio_opt( 'rates_count' );
 ?>
 
+<div class="hx-herowrap">
 <section class="hx-hero hx-wrap" id="top">
 	<div class="hx-hero__copy">
 		<?php if ( yamaha_audio_campaign() ) : ?>
@@ -88,10 +89,26 @@ $rates    = (int) yamaha_audio_opt( 'rates_count' );
 		</div>
 	<?php endif; ?>
 </section>
+<?php $chips = yamaha_audio_type_chips( 10 ); ?>
+<?php if ( $chips ) : ?>
+<nav class="hx-wrap" aria-label="<?php esc_attr_e( 'Cumpără după tip', 'yamaha-audio' ); ?>">
+	<ul class="hx-types">
+		<?php foreach ( $chips as $chip ) : ?>
+			<?php $chip_img = yamaha_audio_category_image_id( $chip ); ?>
+			<li><a class="hx-types__item" href="<?php echo esc_url( get_term_link( $chip ) ); ?>">
+				<span class="hx-types__thumb" aria-hidden="true"><?php echo $chip_img ? wp_get_attachment_image( $chip_img, 'thumbnail', false, array( 'loading' => 'lazy', 'alt' => '' ) ) : yamaha_audio_icon( 'arrow', 16 ); ?></span>
+				<span><?php echo esc_html( $chip->name ); ?></span>
+				<span class="hx-types__count"><?php echo (int) $chip->count; ?></span>
+			</a></li>
+		<?php endforeach; ?>
+	</ul>
+</nav>
+<?php endif; ?>
+</div>
 
 <?php if ( $cats ) : ?>
 <section class="hx-section hx-wrap">
-	<?php yamaha_audio_section_head( __( 'Cumpără după categorie', 'yamaha-audio' ), '', wc_get_page_permalink( 'shop' ), __( 'Tot magazinul', 'yamaha-audio' ) ); ?>
+	<?php yamaha_audio_section_head( __( 'Explorează gama Yamaha', 'yamaha-audio' ), '', wc_get_page_permalink( 'shop' ), __( 'Tot magazinul', 'yamaha-audio' ) ); ?>
 	<div class="hx-cats">
 		<?php foreach ( $cats as $term ) : ?>
 			<?php $img_id = yamaha_audio_category_image_id( $term ); ?>

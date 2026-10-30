@@ -611,6 +611,33 @@ function yamaha_audio_home_categories( $limit = 6 ) {
 }
 
 /**
+ * "Shop by type" chips for the home page: second-level product categories with products, most
+ * populated first (accessories and the excluded categories left out). [ term, … ]
+ */
+function yamaha_audio_type_chips( $limit = 10 ) {
+	$exclude = array_filter( array_map( 'trim', explode( ',', (string) yamaha_audio_opt( 'home_categories_exclude' ) ) ) );
+	$terms   = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => true, 'orderby' => 'count', 'order' => 'DESC' ) );
+	if ( is_wp_error( $terms ) ) {
+		return array();
+	}
+	$out = array();
+	foreach ( $terms as $t ) {
+		if ( ! $t->parent || in_array( $t->slug, $exclude, true ) || 0 === strpos( $t->slug, 'accesorii' ) ) {
+			continue;
+		}
+		$parent = get_term( $t->parent, 'product_cat' );
+		if ( $parent && ! is_wp_error( $parent ) && ( in_array( $parent->slug, $exclude, true ) || 0 === strpos( $parent->slug, 'accesorii' ) ) ) {
+			continue;
+		}
+		$out[] = $t;
+		if ( count( $out ) >= $limit ) {
+			break;
+		}
+	}
+	return $out;
+}
+
+/**
  * Image for a category tile: the category's own thumbnail, else the best-selling in-stock
  * product's image in that category.
  */

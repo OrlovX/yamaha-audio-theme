@@ -40,7 +40,12 @@ fine (COD) — nothing leaves the box. Never migrate the staging DB to live. Nev
   (Black Edition 30 Oct → 2 Dec 2026 is the code default).
 
 ## Done in the first redesign pass (2026-10-30)
-- Palette: Yamaha violet as accent surface, lavender as accent text on dark; Manrope; cool greys. Logo white on dark.
+- Palette: exact logo violet #4b1e78 (light theme / surfaces), #5b2a93 surfaces + lavender text on dark; Manrope 800 headings;
+  **light theme is the default** (`theme_mode`), dark via the header switch. Logo white on dark, original on light.
+- Layout: violet top strip, wordmark logo in the bar (no hanging badge), flush violet tab underline, squared buttons
+  (violet primary), tinted hero stage with the product on a white disc, "shop by type" chip strip of sub-categories
+  (`yamaha_audio_type_chips()`), light category tiles with the photo on top, solid violet MusicCast band, footer with a
+  violet rule. Static preview of the home page: `server/../docs` has no copy; rebuild from `assets/css/main.css` if needed.
 - All `hifiexpert` identifiers renamed; brand pages/rails/filters/labels, the music inquiry flow and the consignment
   clauses removed; home rows by product category; facets from WooCommerce attributes; SEO on Yoast hooks.
 - Customizer defaults written for a Yamaha dealer (hero, offers, MusicCast band, menu, campaign tagline).
@@ -50,7 +55,8 @@ fine (COD) — nothing leaves the box. Never migrate the staging DB to live. Nev
    — confirm the legal entity and phone/e-mail) **before** running "Pagini legale → Instalează".
 2. **Menu + home rows**: set `home_rows` to the real category slugs (`wp term list product_cat`), build the primary menu
    by product type, pick the hero product and a Yamaha-only bundle (prices!) — then enable `bundle_enabled`.
-3. **Exact brand violet** from the logo file (current `#5a2d8c` is from memory).
+3. Campaign bar (Black Edition) still uses the gold-on-black campaign palette next to the violet header — keep as a
+   deliberate "sale" contrast or restyle the `.hx-camp--black` tokens to violet/black.
 4. **404**: the `all-404-redirect-to-homepage` plugin redirects every 404 to home; the theme has `404.php`. Recommend
    deactivating the plugin on go-live (and the `ErrorDocument` line in `.htaccess` goes with it).
 6. **Catalog**: ordering (in stock → priced → bestselling → newest) carries over.
