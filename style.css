@@ -1,0 +1,16 @@
+/*
+Theme Name: Yamaha Audio
+Theme URI: https://yamaha-audio.ro
+Author: Yamaha Audio
+Description: Temă WooCommerce dedicată yamaha-audio.ro (magazin Yamaha), derivată din tema HiFi Expert: întunecată, rapidă, construită pentru conversie. Pagina principală, categoriile și paginile de produs sunt redate direct din datele WooCommerce, fără page builder.
+Version: 0.2.0
+Requires at least: 6.5
+Tested up to: 7.1
+Requires PHP: 8.1
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: hifiexpert
+Tags: e-commerce, dark, one-column, custom-menu, custom-logo, featured-images, translation-ready
+*/
+
+/* Stilurile reale sunt în assets/css/main.css (încărcat din inc/assets.php). */

@@ -1,0 +1,31 @@
+<?php
+/**
+ * HiFi Expert theme bootstrap.
+ *
+ * @package hifiexpert
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+define( 'HIFIEXPERT_VERSION', '0.1.1' );
+define( 'HIFIEXPERT_DIR', get_template_directory() );
+define( 'HIFIEXPERT_URI', get_template_directory_uri() );
+
+require HIFIEXPERT_DIR . '/inc/setup.php';
+require HIFIEXPERT_DIR . '/inc/assets.php';
+require HIFIEXPERT_DIR . '/inc/helpers.php';
+require HIFIEXPERT_DIR . '/inc/customizer.php';
+require HIFIEXPERT_DIR . '/inc/menu-walker.php';
+require HIFIEXPERT_DIR . '/inc/template-tags.php';
+require HIFIEXPERT_DIR . '/inc/newsletter.php';
+require HIFIEXPERT_DIR . '/inc/legal.php';
+require HIFIEXPERT_DIR . '/inc/seo.php';
+
+if ( class_exists( 'WooCommerce' ) ) {
+	require HIFIEXPERT_DIR . '/inc/woocommerce.php';
+	require HIFIEXPERT_DIR . '/inc/filters.php';
+	require HIFIEXPERT_DIR . '/inc/awards.php';
+	if ( is_admin() ) {
+		require HIFIEXPERT_DIR . '/inc/brand-admin.php';
+	}
+}
