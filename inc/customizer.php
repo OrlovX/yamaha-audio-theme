@@ -67,13 +67,13 @@ function yamaha_audio_option_defaults() {
 		'hero_cta2_url'       => '#showroom',
 
 		// Categories + products.
-		'home_categories_exclude' => '',
+		'home_categories_exclude' => 'uncategorized',
 		'home_products_title' => 'Oferte Yamaha în stoc acum',
 		'home_products_text'  => 'Prețuri reduse față de recomandarea Yamaha. Livrare gratuită din București, în 24h.',
 		'home_products_source'=> 'sale',
 		'home_products_count' => 8,
-		'home_exclude_cats'   => '',
-		'home_rows'           => '',   // product-category rows, e.g. "receivere-av|Receivere AV: de la 5.1 la Dolby Atmos" — set once the category slugs are known
+		'home_exclude_cats'   => 'uncategorized',
+		'home_rows'           => "receivere|Receivere: stereo și surround\nboxe-yamaha-experienta-traditie-eleganta|Boxe: raft, podea, active, soundbar\namplificare|Amplificare: integrate, putere, streaming\ncasti|Căști: over‑ear, in‑ear",
 
 		// Bundle block.
 		'bundle_enabled'      => false,   // enable once a Yamaha-only bundle with current prices is configured
