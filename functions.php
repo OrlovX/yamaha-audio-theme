@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'HIFIEXPERT_VERSION', '0.1.1' );
+define( 'HIFIEXPERT_VERSION', '0.2.0' ); // keep in step with style.css; bumping re-runs the one-time logo pick
 define( 'HIFIEXPERT_DIR', get_template_directory() );
 define( 'HIFIEXPERT_URI', get_template_directory_uri() );
 
