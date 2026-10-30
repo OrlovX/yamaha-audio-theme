@@ -351,7 +351,7 @@ function yamaha_audio_trust_strip() {
 		array( 'truck', __( 'Livrare gratuită', 'yamaha-audio' ), sprintf( __( 'La comenzi peste %d lei. Expediem din București în aceeași zi.', 'yamaha-audio' ), $min ) ),
 		array( 'card', sprintf( __( '%d rate fără dobândă', 'yamaha-audio' ), $rates ), __( 'Cu Card Avantaj. Plată online sau ramburs la curier.', 'yamaha-audio' ) ),
 		array( 'pin', __( 'Ascultă înainte să cumperi', 'yamaha-audio' ), sprintf( __( 'Showroom în %s. Programează o audiție.', 'yamaha-audio' ), yamaha_audio_opt( 'topbar_address' ) ) ),
-		array( 'chat', __( 'Un expert, pe WhatsApp', 'yamaha-audio' ), __( 'Răspundem în câteva minute, în programul showroom-ului. Sfaturi reale, nu scripturi.', 'yamaha-audio' ) ),
+		array( 'chat', __( 'Un expert, pe WhatsApp', 'yamaha-audio' ), __( 'Răspundem în câteva minute, în programul showroom‑ului. Sfaturi reale, nu scripturi.', 'yamaha-audio' ) ),
 	);
 	echo '<div class="hx-trust" id="showroom">';
 	foreach ( $items as $i ) {

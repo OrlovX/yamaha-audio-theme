@@ -210,3 +210,17 @@ add_filter( 'body_class', function ( $classes ) {
 	}
 	return $classes;
 } );
+
+/**
+ * Romanian fixes for strings that come from WooCommerce / plugin translations, not from the theme:
+ * the negative imperative of "a fi" is "nu fi" (one i); "nu fii" is a frequent mistake in community translations.
+ */
+add_filter( 'gettext', 'yamaha_audio_fix_ro_gettext', 20 );
+add_filter( 'gettext_with_context', 'yamaha_audio_fix_ro_gettext', 20 );
+add_filter( 'ngettext', 'yamaha_audio_fix_ro_gettext', 20 );
+function yamaha_audio_fix_ro_gettext( $text ) {
+	if ( is_string( $text ) && false !== stripos( $text, 'fii' ) ) {
+		$text = preg_replace( '/\b([Nn]u)\s+fii\b/u', '$1 fi', $text );
+	}
+	return $text;
+}

@@ -62,7 +62,7 @@ if ( preg_match( '/\[contact-form-7[^\]]*\]/', $content, $m ) ) {
 						<?php endforeach; ?>
 					</div></li>
 					<?php if ( $phone ) : ?><li><?php echo yamaha_audio_icon( 'chat', 18 ); ?><div><a href="tel:<?php echo esc_attr( $tel ); ?>"><strong><?php echo esc_html( $phone ); ?></strong></a><span><?php esc_html_e( 'telefon și WhatsApp', 'yamaha-audio' ); ?></span></div></li><?php endif; ?>
-					<li><?php echo yamaha_audio_icon( 'mail', 18 ); ?><div><a href="mailto:<?php echo esc_attr( $email ); ?>"><strong><?php echo esc_html( $email ); ?></strong></a><span><?php esc_html_e( 'comenzi, garanții, consignație', 'yamaha-audio' ); ?></span></div></li>
+					<li><?php echo yamaha_audio_icon( 'mail', 18 ); ?><div><a href="mailto:<?php echo esc_attr( $email ); ?>"><strong><?php echo esc_html( $email ); ?></strong></a><span><?php esc_html_e( 'comenzi, garanții, service', 'yamaha-audio' ); ?></span></div></li>
 				</ul>
 				<div class="hx-contact__ctas">
 					<?php if ( $wa ) : ?><a class="hx-btn hx-btn--gold hx-btn--sm" href="<?php echo esc_url( $wa ); ?>" target="_blank" rel="noopener"><?php echo yamaha_audio_icon( 'chat', 16 ); ?><?php esc_html_e( 'Scrie‑ne pe WhatsApp', 'yamaha-audio' ); ?></a><?php endif; ?>
