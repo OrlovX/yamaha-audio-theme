@@ -2,7 +2,7 @@
 /**
  * Theme setup: supports, menus, image sizes, cleanup.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 add_action(
 	'after_setup_theme',
 	function () {
-		load_theme_textdomain( 'hifiexpert', HIFIEXPERT_DIR . '/languages' );
+		load_theme_textdomain( 'yamaha-audio', YAMAHA_AUDIO_DIR . '/languages' );
 
 		add_theme_support( 'title-tag' );
 		add_theme_support( 'post-thumbnails' );
@@ -48,16 +48,16 @@ add_action(
 
 		register_nav_menus(
 			array(
-				'primary'     => __( 'Meniu principal (mega menu)', 'hifiexpert' ),
-				'topbar'      => __( 'Bară de sus (linkuri mici: Blog, Branduri, Consignație…)', 'hifiexpert' ),
-				'footer-shop' => __( 'Footer: Magazin', 'hifiexpert' ),
-				'footer-info' => __( 'Footer: Informații utile', 'hifiexpert' ),
+				'primary'     => __( 'Meniu principal (mega menu)', 'yamaha-audio' ),
+				'topbar'      => __( 'Bară de sus (linkuri mici: Blog, Promoții, Contact…)', 'yamaha-audio' ),
+				'footer-shop' => __( 'Footer: Magazin', 'yamaha-audio' ),
+				'footer-info' => __( 'Footer: Informații utile', 'yamaha-audio' ),
 			)
 		);
 
-		add_image_size( 'hifiexpert-card', 600, 600, false );
-		add_image_size( 'hifiexpert-hero', 1400, 1000, false );
-		add_image_size( 'hifiexpert-post', 900, 600, true );
+		add_image_size( 'yamaha-audio-card', 600, 600, false );
+		add_image_size( 'yamaha-audio-hero', 1400, 1000, false );
+		add_image_size( 'yamaha-audio-post', 900, 600, true );
 	}
 );
 
@@ -66,9 +66,9 @@ add_action(
 	function () {
 		register_sidebar(
 			array(
-				'name'          => __( 'Filtre magazin (coloana din stânga)', 'hifiexpert' ),
+				'name'          => __( 'Filtre magazin (coloana din stânga)', 'yamaha-audio' ),
 				'id'            => 'shop-filters',
-				'description'   => __( 'Adaugă aici widget-urile WooCommerce de filtrare (atribute, preț). Filtrul de brand și „În stoc” sunt deja incluse de temă.', 'hifiexpert' ),
+				'description'   => __( 'Adaugă aici widget-urile WooCommerce de filtrare (atribute, preț). Filtrele pe atribute, preț și „În stoc” sunt deja incluse de temă.', 'yamaha-audio' ),
 				'before_widget' => '<div id="%1$s" class="hx-filter %2$s">',
 				'after_widget'  => '</div>',
 				'before_title'  => '<h3 class="hx-filter__title">',
@@ -105,7 +105,7 @@ add_action(
  * the file the previous theme used). Runs once per theme version; the Customizer can change it afterwards.
  */
 add_action( 'init', function () {
-	if ( get_option( 'hifiexpert_logo_migrated' ) === HIFIEXPERT_VERSION ) {
+	if ( get_option( 'yamaha_audio_logo_migrated' ) === YAMAHA_AUDIO_VERSION ) {
 		return;
 	}
 	if ( ! (int) get_theme_mod( 'custom_logo' ) ) {
@@ -114,12 +114,12 @@ add_action( 'init', function () {
 			set_theme_mod( 'custom_logo', (int) $png[0] );
 		}
 	}
-	update_option( 'hifiexpert_logo_migrated', HIFIEXPERT_VERSION, false );
+	update_option( 'yamaha_audio_logo_migrated', YAMAHA_AUDIO_VERSION, false );
 } );
 
-// The "brands" and "promotii" pages get their templates automatically (their old content is Flatsome shortcodes).
+// The "promotii" and "contact" pages get their templates automatically (their old content is page-builder shortcodes).
 add_filter( 'template_include', function ( $template ) {
-	$map = array( 'brands' => 'page-brands.php', 'branduri' => 'page-brands.php', 'promotii' => 'page-promotii.php', 'promotii-2' => 'page-promotii.php', 'oferte' => 'page-promotii.php', 'contact' => 'page-contact.php' );
+	$map = array( 'promotii' => 'page-promotii.php', 'promotii-2' => 'page-promotii.php', 'oferte' => 'page-promotii.php', 'contact' => 'page-contact.php' );
 	if ( is_page() ) {
 		$slug = get_queried_object() ? get_queried_object()->post_name : '';
 		if ( isset( $map[ $slug ] ) && ( 'page-promotii.php' !== $map[ $slug ] || class_exists( 'WooCommerce' ) ) ) {
@@ -135,50 +135,46 @@ add_filter( 'template_include', function ( $template ) {
 /**
  * WooCommerce pages carry English titles from the old install: show Romanian ones.
  */
-function hifiexpert_page_title_override( $id, $title ) {
+function yamaha_audio_page_title_override( $id, $title ) {
 	if ( ! $id || ! class_exists( 'WooCommerce' ) ) {
 		return $title;
 	}
 	static $map = null;
 	if ( null === $map ) {
 		$map = array(
-			(int) wc_get_page_id( 'cart' )      => __( 'Coșul tău', 'hifiexpert' ),
-			(int) wc_get_page_id( 'checkout' )  => __( 'Finalizare comandă', 'hifiexpert' ),
-			(int) wc_get_page_id( 'myaccount' ) => __( 'Contul meu', 'hifiexpert' ),
-			(int) wc_get_page_id( 'shop' )      => __( 'Magazin', 'hifiexpert' ),
+			(int) wc_get_page_id( 'cart' )      => __( 'Coșul tău', 'yamaha-audio' ),
+			(int) wc_get_page_id( 'checkout' )  => __( 'Finalizare comandă', 'yamaha-audio' ),
+			(int) wc_get_page_id( 'myaccount' ) => __( 'Contul meu', 'yamaha-audio' ),
+			(int) wc_get_page_id( 'shop' )      => __( 'Magazin', 'yamaha-audio' ),
 		);
 		$wl = get_page_by_path( 'wishlist' );
 		if ( $wl ) {
-			$map[ (int) $wl->ID ] = __( 'Lista de dorințe', 'hifiexpert' );
-		}
-		$br = get_page_by_path( 'brands' );
-		if ( $br ) {
-			$map[ (int) $br->ID ] = __( 'Branduri', 'hifiexpert' );
+			$map[ (int) $wl->ID ] = __( 'Lista de dorințe', 'yamaha-audio' );
 		}
 		$pr = get_page_by_path( 'promotii' );
 		if ( $pr ) {
-			$map[ (int) $pr->ID ] = __( 'Promoții', 'hifiexpert' );
+			$map[ (int) $pr->ID ] = __( 'Promoții', 'yamaha-audio' );
 		}
 		unset( $map[0], $map[-1] );
 	}
-	if ( isset( $map[ (int) $id ] ) && preg_match( '/^(cart|checkout|my account|shop|wishlist|brands|promotii)$/i', trim( (string) $title ) ) ) {
+	if ( isset( $map[ (int) $id ] ) && preg_match( '/^(cart|checkout|my account|shop|wishlist|promotii)$/i', trim( (string) $title ) ) ) {
 		return $map[ (int) $id ];
 	}
 	return $title;
 }
 add_filter( 'the_title', function ( $title, $id = 0 ) {
-	return is_admin() ? $title : hifiexpert_page_title_override( (int) $id, $title );
+	return is_admin() ? $title : yamaha_audio_page_title_override( (int) $id, $title );
 }, 10, 2 );
 // <title> too (WordPress and Rank Math build it from the raw post title).
 add_filter( 'document_title_parts', function ( $parts ) {
 	if ( is_page() && ! empty( $parts['title'] ) ) {
-		$parts['title'] = hifiexpert_page_title_override( get_queried_object_id(), $parts['title'] );
+		$parts['title'] = yamaha_audio_page_title_override( get_queried_object_id(), $parts['title'] );
 	}
 	return $parts;
 } );
 add_filter( 'rank_math/frontend/title', function ( $title ) {
-	if ( is_page() && preg_match( '/^(cart|checkout|my account|shop|wishlist|brands|promotii)(\s*[-–|].*)?$/i', (string) $title, $m ) ) {
-		$new = hifiexpert_page_title_override( get_queried_object_id(), $m[1] );
+	if ( is_page() && preg_match( '/^(cart|checkout|my account|shop|wishlist|promotii)(\s*[-–|].*)?$/i', (string) $title, $m ) ) {
+		$new = yamaha_audio_page_title_override( get_queried_object_id(), $m[1] );
 		return $new . ( $m[2] ?? '' );
 	}
 	return $title;
@@ -193,7 +189,7 @@ add_filter( 'the_content', function ( $content ) {
 	}
 	return str_replace(
 		array( 'Your cart is currently empty!', 'New in store', 'You may be interested in…', 'You may be interested in&hellip;', 'Browse store', 'Start shopping', 'Return to shop' ),
-		array( __( 'Coșul tău este gol', 'hifiexpert' ), __( 'Noutăți în magazin', 'hifiexpert' ), __( 'S‑ar putea să te intereseze', 'hifiexpert' ), __( 'S‑ar putea să te intereseze', 'hifiexpert' ), __( 'Vezi magazinul', 'hifiexpert' ), __( 'Vezi magazinul', 'hifiexpert' ), __( 'Înapoi la magazin', 'hifiexpert' ) ),
+		array( __( 'Coșul tău este gol', 'yamaha-audio' ), __( 'Noutăți în magazin', 'yamaha-audio' ), __( 'S‑ar putea să te intereseze', 'yamaha-audio' ), __( 'S‑ar putea să te intereseze', 'yamaha-audio' ), __( 'Vezi magazinul', 'yamaha-audio' ), __( 'Vezi magazinul', 'yamaha-audio' ), __( 'Înapoi la magazin', 'yamaha-audio' ) ),
 		$content
 	);
 }, 9 );
@@ -207,8 +203,8 @@ add_filter( 'pre_option_woocommerce_currency_pos', function () { return 'right_s
 
 add_filter( 'body_class', function ( $classes ) {
 	$classes[] = 'hx';
-	if ( function_exists( 'hifiexpert_campaign' ) && hifiexpert_campaign() ) {
-		$classes[] = 'hx-camp hx-camp--' . hifiexpert_campaign()['style'];
+	if ( function_exists( 'yamaha_audio_campaign' ) && yamaha_audio_campaign() ) {
+		$classes[] = 'hx-camp hx-camp--' . yamaha_audio_campaign()['style'];
 	}
 	if ( class_exists( 'WooCommerce' ) && ( is_cart() || is_checkout() || is_account_page() ) ) {
 		$classes[] = 'hx-checkout-flow';

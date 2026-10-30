@@ -2,7 +2,7 @@
 /**
  * Small helpers used across templates.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -10,8 +10,8 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Theme option with default (wraps get_theme_mod so defaults live in one place).
  */
-function hifiexpert_opt( $key, $default = '' ) {
-	$defaults = hifiexpert_option_defaults();
+function yamaha_audio_opt( $key, $default = '' ) {
+	$defaults = yamaha_audio_option_defaults();
 	$fallback = array_key_exists( $key, $defaults ) ? $defaults[ $key ] : $default;
 	return get_theme_mod( $key, $fallback );
 }
@@ -19,7 +19,7 @@ function hifiexpert_opt( $key, $default = '' ) {
 /**
  * Inline SVG icon (stroke icons, inherit currentColor).
  */
-function hifiexpert_icon( $name, $size = 20, $label = '' ) {
+function yamaha_audio_icon( $name, $size = 20, $label = '' ) {
 	$paths = array(
 		'search'   => '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
 		'user'     => '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
@@ -59,58 +59,45 @@ function hifiexpert_icon( $name, $size = 20, $label = '' ) {
 }
 
 /**
- * Brand taxonomy in use on this site.
+ * Main product category of a product (or null): Yoast's primary category when set, otherwise the
+ * deepest assigned category. Used where a multi-brand shop would show the brand.
  */
-function hifiexpert_brand_taxonomy() {
-	static $tax = null;
-	if ( null !== $tax ) {
-		return $tax;
+function yamaha_audio_product_category( $product ) {
+	static $cache = array();
+	if ( ! $product ) {
+		return null;
 	}
-	$candidates = array( 'product_brand', 'producator', 'pwb-brand', 'pa_brand', 'pa_producator' );
-	// WooCommerce registers an (empty) product_brand taxonomy on its own; the real brands live in pa_producator.
-	// Pick the first candidate that actually has terms assigned to products (cached 1h).
-	$cached = get_transient( 'hx_brand_tax' );
-	if ( is_string( $cached ) && taxonomy_exists( $cached ) ) {
-		$tax = $cached;
-		return $tax;
+	$id = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
+	if ( array_key_exists( $id, $cache ) ) {
+		return $cache[ $id ];
 	}
-	$first = '';
-	foreach ( $candidates as $candidate ) {
-		if ( ! taxonomy_exists( $candidate ) ) {
+	$primary = (int) get_post_meta( $id, '_yoast_wpseo_primary_product_cat', true );
+	if ( $primary ) {
+		$t = get_term( $primary, 'product_cat' );
+		if ( $t && ! is_wp_error( $t ) ) {
+			return $cache[ $id ] = $t;
+		}
+	}
+	$terms = get_the_terms( $id, 'product_cat' );
+	$best  = null;
+	$depth = -1;
+	foreach ( is_array( $terms ) ? $terms : array() as $t ) {
+		if ( 'uncategorized' === $t->slug ) {
 			continue;
 		}
-		$first = $first ?: $candidate;
-		$n     = wp_count_terms( array( 'taxonomy' => $candidate, 'hide_empty' => true ) );
-		if ( ! is_wp_error( $n ) && (int) $n > 0 ) {
-			$tax = $candidate;
-			set_transient( 'hx_brand_tax', $tax, HOUR_IN_SECONDS );
-			return $tax;
+		$d = count( get_ancestors( $t->term_id, 'product_cat' ) );
+		if ( $d > $depth ) {
+			$depth = $d;
+			$best  = $t;
 		}
 	}
-	$tax = $first;
-	return $tax;
-}
-
-/**
- * First brand term of a product (or null).
- */
-function hifiexpert_product_brand( $product ) {
-	$tax = hifiexpert_brand_taxonomy();
-	if ( ! $tax || ! $product ) {
-		return null;
-	}
-	$id    = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
-	$terms = get_the_terms( $id, $tax );
-	if ( is_wp_error( $terms ) || empty( $terms ) ) {
-		return null;
-	}
-	return $terms[0];
+	return $cache[ $id ] = $best;
 }
 
 /**
  * Format a lei amount the Romanian way: 17.999 lei.
  */
-function hifiexpert_lei( $amount ) {
+function yamaha_audio_lei( $amount ) {
 	$amount = (float) $amount;
 	$has_cents = abs( $amount - round( $amount ) ) > 0.004;
 	return number_format( $amount, $has_cents ? 2 : 0, ',', '.' ) . ' lei';
@@ -119,12 +106,12 @@ function hifiexpert_lei( $amount ) {
 /**
  * Monthly installment (price / count), or 0 when below the threshold.
  */
-function hifiexpert_installment( $price ) {
-	if ( ! hifiexpert_opt( 'rates_enabled' ) ) {
+function yamaha_audio_installment( $price ) {
+	if ( ! yamaha_audio_opt( 'rates_enabled' ) ) {
 		return 0;
 	}
-	$count = max( 2, (int) hifiexpert_opt( 'rates_count' ) );
-	$min   = (float) hifiexpert_opt( 'rates_min_price' );
+	$count = max( 2, (int) yamaha_audio_opt( 'rates_count' ) );
+	$min   = (float) yamaha_audio_opt( 'rates_min_price' );
 	$price = (float) $price;
 	if ( $price < $min || $price <= 0 ) {
 		return 0;
@@ -135,7 +122,7 @@ function hifiexpert_installment( $price ) {
 /**
  * Discount percentage for a product on sale (variable: based on min prices).
  */
-function hifiexpert_discount_percent( $product ) {
+function yamaha_audio_discount_percent( $product ) {
 	if ( ! $product || ! $product->is_on_sale() ) {
 		return 0;
 	}
@@ -155,7 +142,7 @@ function hifiexpert_discount_percent( $product ) {
 /**
  * Current "active" price used for the installment line.
  */
-function hifiexpert_active_price( $product ) {
+function yamaha_audio_active_price( $product ) {
 	if ( ! $product ) {
 		return 0;
 	}
@@ -166,73 +153,11 @@ function hifiexpert_active_price( $product ) {
 }
 
 /**
- * Products in the "music" categories (vinyl, CD…): sourced per order, so the stock story differs.
- */
-function hifiexpert_is_music( $product ) {
-	static $cache = array();
-	if ( ! $product ) {
-		return false;
-	}
-	$id = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
-	if ( isset( $cache[ $id ] ) ) {
-		return $cache[ $id ];
-	}
-	$slugs = array_values( array_filter( array_map( 'sanitize_title', preg_split( '/[,\n]+/', (string) hifiexpert_opt( 'music_cats' ) ) ) ) );
-	if ( ! $slugs ) {
-		return $cache[ $id ] = false;
-	}
-	$terms = get_the_terms( $id, 'product_cat' );
-	$is    = false;
-	foreach ( is_array( $terms ) ? $terms : array() as $t ) {
-		if ( in_array( $t->slug, $slugs, true ) ) {
-			$is = true;
-			break;
-		}
-		foreach ( get_ancestors( $t->term_id, 'product_cat' ) as $aid ) {
-			$a = get_term( $aid, 'product_cat' );
-			if ( $a && ! is_wp_error( $a ) && in_array( $a->slug, $slugs, true ) ) {
-				$is = true;
-				break 2;
-			}
-		}
-	}
-	return $cache[ $id ] = $is;
-}
-
-/**
- * Music that is not in stock is asked about, not ordered blindly.
- */
-function hifiexpert_is_inquiry_only( $product ) {
-	return $product && hifiexpert_is_music( $product ) && 'ask' === hifiexpert_stock_state( $product )[0];
-}
-
-/**
- * WhatsApp link asking about a product's availability.
- */
-function hifiexpert_inquiry_url( $product ) {
-	return hifiexpert_whatsapp_url( sprintf( __( 'Bună! Puteți verifica disponibilitatea pentru „%s”?', 'hifiexpert' ), $product->get_name() ) . ' ' . $product->get_permalink() );
-}
-
-/**
  * Stock state → array( class, label ).
  */
-function hifiexpert_stock_state( $product ) {
+function yamaha_audio_stock_state( $product ) {
 	if ( ! $product ) {
 		return array( 'muted', '' );
-	}
-	if ( hifiexpert_is_music( $product ) ) {
-		$in = $product->is_in_stock() && ! $product->is_on_backorder();
-		if ( $product->is_type( 'variable' ) ) {
-			$in = false;
-			foreach ( $product->get_children() as $child_id ) {
-				$child = wc_get_product( $child_id );
-				if ( $child && $child->is_in_stock() && ! $child->is_on_backorder() ) {
-					$in = true;
-					break;
-				}
-			}
-		}
-		return $in ? array( 'ok', hifiexpert_opt( 'music_instock_text' ) ) : array( 'ask', hifiexpert_opt( 'music_inquire_text' ) );
 	}
 	if ( $product->is_type( 'variable' ) ) {
 		$in = false;
@@ -243,42 +168,42 @@ function hifiexpert_stock_state( $product ) {
 				break;
 			}
 		}
-		return $in ? array( 'ok', __( 'În stoc', 'hifiexpert' ) ) : array( 'warn', __( 'La comandă', 'hifiexpert' ) );
+		return $in ? array( 'ok', __( 'În stoc', 'yamaha-audio' ) ) : array( 'warn', __( 'La comandă', 'yamaha-audio' ) );
 	}
 	if ( $product->is_on_backorder() ) {
-		return array( 'warn', __( 'La comandă', 'hifiexpert' ) );
+		return array( 'warn', __( 'La comandă', 'yamaha-audio' ) );
 	}
 	if ( ! $product->is_in_stock() ) {
-		return array( 'muted', __( 'Stoc epuizat', 'hifiexpert' ) );
+		return array( 'muted', __( 'Stoc epuizat', 'yamaha-audio' ) );
 	}
 	$qty = $product->get_stock_quantity();
 	if ( $product->managing_stock() && null !== $qty && $qty <= 2 ) {
-		return array( 'warn', __( 'Ultimele bucăți', 'hifiexpert' ) );
+		return array( 'warn', __( 'Ultimele bucăți', 'yamaha-audio' ) );
 	}
-	return array( 'ok', __( 'În stoc', 'hifiexpert' ) );
+	return array( 'ok', __( 'În stoc', 'yamaha-audio' ) );
 }
 
 /**
  * Opening hours as [ dow(1=Mon..7=Sun) => [open, close] ] in minutes since midnight.
  */
-function hifiexpert_hours_table() {
+function yamaha_audio_hours_table() {
 	$parse = function ( $s ) {
 		if ( ! preg_match( '/(\d{1,2})[:.](\d{2})\s*-\s*(\d{1,2})[:.](\d{2})/', (string) $s, $m ) ) {
 			return null;
 		}
 		return array( (int) $m[1] * 60 + (int) $m[2], (int) $m[3] * 60 + (int) $m[4] );
 	};
-	$wd = $parse( hifiexpert_opt( 'hours_weekday' ) );
-	$sa = $parse( hifiexpert_opt( 'hours_saturday' ) );
-	$su = $parse( hifiexpert_opt( 'hours_sunday' ) );
+	$wd = $parse( yamaha_audio_opt( 'hours_weekday' ) );
+	$sa = $parse( yamaha_audio_opt( 'hours_saturday' ) );
+	$su = $parse( yamaha_audio_opt( 'hours_sunday' ) );
 	return array( 1 => $wd, 2 => $wd, 3 => $wd, 4 => $wd, 5 => $wd, 6 => $sa, 7 => $su );
 }
 
 /**
  * Open/closed state right now (site timezone): [ is_open, label ].
  */
-function hifiexpert_open_state() {
-	$table = hifiexpert_hours_table();
+function yamaha_audio_open_state() {
+	$table = yamaha_audio_hours_table();
 	$now   = current_datetime(); // site timezone
 	$dow   = (int) $now->format( 'N' );
 	$mins  = (int) $now->format( 'G' ) * 60 + (int) $now->format( 'i' );
@@ -287,26 +212,26 @@ function hifiexpert_open_state() {
 
 	$today = $table[ $dow ];
 	if ( $today && $mins >= $today[0] && $mins < $today[1] ) {
-		return array( true, sprintf( __( 'Deschis acum · până la %s', 'hifiexpert' ), $fmt( $today[1] ) ) );
+		return array( true, sprintf( __( 'Deschis acum · până la %s', 'yamaha-audio' ), $fmt( $today[1] ) ) );
 	}
 	if ( $today && $mins < $today[0] ) {
-		return array( false, sprintf( __( 'Deschidem azi la %s', 'hifiexpert' ), $fmt( $today[0] ) ) );
+		return array( false, sprintf( __( 'Deschidem azi la %s', 'yamaha-audio' ), $fmt( $today[0] ) ) );
 	}
 	for ( $i = 1; $i <= 7; $i++ ) {
 		$d = ( $dow + $i - 1 ) % 7 + 1;
 		if ( $table[ $d ] ) {
-			$when = 1 === $i ? __( 'mâine', 'hifiexpert' ) : $days[ $d ];
-			return array( false, sprintf( __( 'Ne vedem %1$s de la %2$s', 'hifiexpert' ), $when, $fmt( $table[ $d ][0] ) ) );
+			$when = 1 === $i ? __( 'mâine', 'yamaha-audio' ) : $days[ $d ];
+			return array( false, sprintf( __( 'Ne vedem %1$s de la %2$s', 'yamaha-audio' ), $when, $fmt( $table[ $d ][0] ) ) );
 		}
 	}
-	return array( false, __( 'Închis', 'hifiexpert' ) );
+	return array( false, __( 'Închis', 'yamaha-audio' ) );
 }
 
 /**
  * WhatsApp link from the configured number.
  */
-function hifiexpert_whatsapp_url( $text = '' ) {
-	$number = preg_replace( '/[^0-9]/', '', (string) hifiexpert_opt( 'whatsapp' ) );
+function yamaha_audio_whatsapp_url( $text = '' ) {
+	$number = preg_replace( '/[^0-9]/', '', (string) yamaha_audio_opt( 'whatsapp' ) );
 	if ( ! $number ) {
 		return '';
 	}
@@ -321,7 +246,7 @@ function hifiexpert_whatsapp_url( $text = '' ) {
  * Base query args shared by all homepage product pickers:
  * published, visible in catalog, in stock, not in excluded categories.
  */
-function hifiexpert_home_base_args( $limit ) {
+function yamaha_audio_home_base_args( $limit ) {
 	$vis = wc_get_product_visibility_term_ids();
 	$tax = array(
 		array(
@@ -331,7 +256,7 @@ function hifiexpert_home_base_args( $limit ) {
 			'operator' => 'NOT IN',
 		),
 	);
-	$exclude = array_filter( array_map( 'trim', explode( ',', (string) hifiexpert_opt( 'home_exclude_cats' ) ) ) );
+	$exclude = array_filter( array_map( 'trim', explode( ',', (string) yamaha_audio_opt( 'home_exclude_cats' ) ) ) );
 	if ( $exclude ) {
 		$tax[] = array(
 			'taxonomy' => 'product_cat',
@@ -355,14 +280,14 @@ function hifiexpert_home_base_args( $limit ) {
  * Products for the homepage grid, by source: sale | bestsellers | featured | newest.
  * "sale" and "bestsellers" both order by popularity, so the first card is the one people buy.
  */
-function hifiexpert_home_products( $limit = 8, $source = null ) {
+function yamaha_audio_home_products( $limit = 8, $source = null ) {
 	static $cache = array();
-	$source = $source ?: hifiexpert_opt( 'home_products_source' );
+	$source = $source ?: yamaha_audio_opt( 'home_products_source' );
 	$key    = $source . ':' . $limit;
 	if ( isset( $cache[ $key ] ) ) {
 		return $cache[ $key ];
 	}
-	$args = hifiexpert_home_base_args( $limit );
+	$args = yamaha_audio_home_base_args( $limit );
 
 	switch ( $source ) {
 		case 'sale':
@@ -397,15 +322,10 @@ function hifiexpert_home_products( $limit = 8, $source = null ) {
 }
 
 /**
- * Products of one brand (by brand-taxonomy slug) or of one product category, most popular first.
- * $tax defaults to the brand taxonomy; home rows pass the taxonomy their term was found in.
+ * Products of one product category (by slug), most popular first.
  */
-function hifiexpert_brand_products( $slug, $limit = 4, $tax = '' ) {
-	$tax = $tax ?: hifiexpert_brand_taxonomy();
-	if ( ! $tax ) {
-		return array();
-	}
-	$args = hifiexpert_home_base_args( $limit );
+function yamaha_audio_term_products( $slug, $limit = 4, $tax = 'product_cat' ) {
+	$args = yamaha_audio_home_base_args( $limit );
 	$args['tax_query'][] = array( 'taxonomy' => $tax, 'field' => 'slug', 'terms' => $slug );
 	$args['meta_key']    = 'total_sales'; // phpcs:ignore WordPress.DB.SlowDBQuery
 	$args['orderby']     = 'meta_value_num date';
@@ -415,30 +335,21 @@ function hifiexpert_brand_products( $slug, $limit = 4, $tax = '' ) {
 }
 
 /**
- * Home rows configured in the Customizer: [ [slug, title, term, tax], … ].
- * A slug is looked up in the brand taxonomy first, then among product categories
- * (a single-brand shop groups its home page by product type).
+ * Home rows configured in the Customizer (product-category slug per line): [ [slug, title, term], … ].
  */
-function hifiexpert_home_rows() {
-	$tax  = hifiexpert_brand_taxonomy();
+function yamaha_audio_home_rows() {
 	$rows = array();
-	foreach ( preg_split( '/\r\n|\r|\n/', (string) hifiexpert_opt( 'home_rows' ) ) as $line ) {
+	foreach ( preg_split( '/\r\n|\r|\n/', (string) yamaha_audio_opt( 'home_rows' ) ) as $line ) {
 		$line = trim( $line );
 		if ( ! $line ) {
 			continue;
 		}
 		list( $slug, $title ) = array_pad( array_map( 'trim', explode( '|', $line, 2 ) ), 2, '' );
-		$slug = sanitize_title( $slug );
-		$term = $tax ? get_term_by( 'slug', $slug, $tax ) : null;
-		$in   = $tax;
-		if ( ! $term ) {
-			$term = get_term_by( 'slug', $slug, 'product_cat' );
-			$in   = 'product_cat';
-		}
+		$term = get_term_by( 'slug', sanitize_title( $slug ), 'product_cat' );
 		if ( ! $term ) {
 			continue;
 		}
-		$rows[] = array( 'slug' => $term->slug, 'title' => $title ?: $term->name, 'term' => $term, 'tax' => $in );
+		$rows[] = array( 'slug' => $term->slug, 'title' => $title ?: $term->name, 'term' => $term );
 	}
 	return $rows;
 }
@@ -446,13 +357,13 @@ function hifiexpert_home_rows() {
 /**
  * Product for the homepage hero: configured ID, else the most popular on-sale product.
  */
-function hifiexpert_hero_product() {
+function yamaha_audio_hero_product() {
 	static $product = false;
 	if ( false !== $product ) {
 		return $product;
 	}
 	$product = null;
-	$id      = (int) hifiexpert_opt( 'hero_product' );
+	$id      = (int) yamaha_audio_opt( 'hero_product' );
 	if ( $id ) {
 		$p = wc_get_product( $id );
 		if ( $p && 'publish' === $p->get_status() ) {
@@ -460,7 +371,7 @@ function hifiexpert_hero_product() {
 		}
 	}
 	foreach ( array( 'sale', 'bestsellers' ) as $source ) {
-		$found = hifiexpert_home_products( 1, $source );
+		$found = yamaha_audio_home_products( 1, $source );
 		if ( $found ) {
 			return $product = $found[0];
 		}
@@ -476,7 +387,7 @@ function hifiexpert_hero_product() {
  * Shared pre-clean for imported product HTML (short + long descriptions):
  * hidden blocks, empty images, brand-logo/award templates, dead shortcodes, broken heading fragments.
  */
-function hifiexpert_preclean_html( $html ) {
+function yamaha_audio_preclean_html( $html ) {
 	$html = (string) $html;
 	if ( '' === $html ) {
 		return '';
@@ -488,7 +399,7 @@ function hifiexpert_preclean_html( $html ) {
 	$html = preg_replace( '/\/h[1-6]&gt;|\/h[1-6]>/i', '', $html );
 	$html = preg_replace( '/(&lt;|<)(?=\s*(<\/|\r|\n|$))/', '', $html ); // "Title<" fragments
 	$html = preg_replace( '/<(p|div)>\s*(&nbsp;|\s)*<\/\1>/i', '', $html ); // empty paragraphs
-	return hifiexpert_fix_heading_blocks( $html );
+	return yamaha_audio_fix_heading_blocks( $html );
 }
 
 /**
@@ -496,7 +407,7 @@ function hifiexpert_preclean_html( $html ) {
  * ("<h2>Title<ul>…</ul></h2>"), which renders everything in heading size and weight.
  * Move block children out of headings, after the heading, in order.
  */
-function hifiexpert_fix_heading_blocks( $html ) {
+function yamaha_audio_fix_heading_blocks( $html ) {
 	if ( ! class_exists( 'DOMDocument' ) || ! preg_match( '/<h[1-6][\s>]/i', $html ) ) {
 		return $html;
 	}
@@ -545,7 +456,7 @@ function hifiexpert_fix_heading_blocks( $html ) {
 /**
  * Is this text just the product name (or a trivial variant of it)?
  */
-function hifiexpert_is_name_like( $text, $product ) {
+function yamaha_audio_is_name_like( $text, $product ) {
 	$t = trim( preg_replace( '/\s+/', ' ', html_entity_decode( $text, ENT_QUOTES, 'UTF-8' ) ) );
 	$n = trim( preg_replace( '/\s+/', ' ', html_entity_decode( $product->get_name(), ENT_QUOTES, 'UTF-8' ) ) );
 	if ( '' === $t ) {
@@ -576,8 +487,8 @@ function hifiexpert_is_name_like( $text, $product ) {
 	return false;
 }
 
-function hifiexpert_clean_description( $product ) {
-	$html = hifiexpert_preclean_html( $product->get_description() );
+function yamaha_audio_clean_description( $product ) {
+	$html = yamaha_audio_preclean_html( $product->get_description() );
 	if ( ! $html ) {
 		return '';
 	}
@@ -585,7 +496,7 @@ function hifiexpert_clean_description( $product ) {
 	$html = preg_replace_callback(
 		'/<(h[1-6]|p|div|strong)[^>]*>(.*?)<\/\1>/is',
 		function ( $m ) use ( $product ) {
-			return hifiexpert_is_name_like( wp_strip_all_tags( $m[2] ), $product ) && ! preg_match( '/<img/i', $m[2] ) ? '' : $m[0];
+			return yamaha_audio_is_name_like( wp_strip_all_tags( $m[2] ), $product ) && ! preg_match( '/<img/i', $m[2] ) ? '' : $m[0];
 		},
 		$html
 	);
@@ -596,10 +507,10 @@ function hifiexpert_clean_description( $product ) {
 }
 
 /**
- * Spec rows from product attributes: visible, non-brand, short values. [ [label, value], … ]
+ * Spec rows from product attributes: visible, short values (the brand attribute is skipped). [ [label, value], … ]
  */
-function hifiexpert_spec_rows( $product ) {
-	$skip = array( 'pa_producator', 'pa_disponibil-in-showroom', 'pa_artist', 'pa_gen-muzical', 'pa_casa-discuri' );
+function yamaha_audio_spec_rows( $product ) {
+	$skip = array( 'pa_producator', 'pa_brand', 'pa_disponibil-in-showroom' ); // the brand is always Yamaha here
 	$rows = array();
 	foreach ( $product->get_attributes() as $attribute ) {
 		if ( ! $attribute instanceof WC_Product_Attribute || ! $attribute->get_visible() ) {
@@ -632,14 +543,14 @@ function hifiexpert_spec_rows( $product ) {
 /**
  * One-sentence lead for a product: first real sentence of the (short) description.
  */
-function hifiexpert_product_lead( $product, $max_words = 32 ) {
+function yamaha_audio_product_lead( $product, $max_words = 32 ) {
 	$name   = trim( $product->get_name() );
 	$pieces = array();
 	foreach ( array( $product->get_short_description(), $product->get_description() ) as $html ) {
 		if ( ! $html ) {
 			continue;
 		}
-		$html = hifiexpert_preclean_html( strip_shortcodes( $html ) );
+		$html = yamaha_audio_preclean_html( strip_shortcodes( $html ) );
 		$html = preg_replace( '/\/?h[1-6]&gt;|\/h[1-6]>/i', '</p><p>', $html ); // broken heading fragments act as block breaks
 		// Split on block boundaries so headings that just repeat the product name can be dropped.
 		$blocks = preg_split( '/<\/?(p|h[1-6]|li|div|br)[^>]*>/i', $html );
@@ -649,7 +560,7 @@ function hifiexpert_product_lead( $product, $max_words = 32 ) {
 			if ( mb_strlen( $t ) < 30 ) {
 				continue; // too short to be a sentence (names, labels, "h4>" junk)
 			}
-			if ( hifiexpert_is_name_like( $t, $product ) ) {
+			if ( yamaha_audio_is_name_like( $t, $product ) ) {
 				continue; // the product name again
 			}
 			// Model number + a few words (e.g. "Amplificator integrat A-S701 Hi-Fi Expert Yamaha Audio"): a label, not a sentence.
@@ -678,8 +589,8 @@ function hifiexpert_product_lead( $product, $max_words = 32 ) {
 /**
  * Top-level product categories for the homepage tiles.
  */
-function hifiexpert_home_categories( $limit = 6 ) {
-	$exclude = array_filter( array_map( 'trim', explode( ',', (string) hifiexpert_opt( 'home_categories_exclude' ) ) ) );
+function yamaha_audio_home_categories( $limit = 6 ) {
+	$exclude = array_filter( array_map( 'trim', explode( ',', (string) yamaha_audio_opt( 'home_categories_exclude' ) ) ) );
 	$terms   = get_terms(
 		array(
 			'taxonomy'   => 'product_cat',
@@ -703,7 +614,7 @@ function hifiexpert_home_categories( $limit = 6 ) {
  * Image for a category tile: the category's own thumbnail, else the best-selling in-stock
  * product's image in that category.
  */
-function hifiexpert_category_image_id( $term ) {
+function yamaha_audio_category_image_id( $term ) {
 	$thumb = (int) get_term_meta( $term->term_id, 'thumbnail_id', true );
 	if ( $thumb ) {
 		return $thumb;
@@ -739,7 +650,7 @@ function hifiexpert_category_image_id( $term ) {
 /**
  * Child category names, comma separated, for a tile's subtitle.
  */
-function hifiexpert_category_children_label( $term, $max = 3 ) {
+function yamaha_audio_category_children_label( $term, $max = 3 ) {
 	$children = get_terms( array( 'taxonomy' => 'product_cat', 'parent' => $term->term_id, 'hide_empty' => true, 'number' => $max, 'orderby' => 'count', 'order' => 'DESC' ) );
 	if ( is_wp_error( $children ) || empty( $children ) ) {
 		return $term->description ? wp_strip_all_tags( $term->description ) : '';
@@ -748,278 +659,22 @@ function hifiexpert_category_children_label( $term, $max = 3 ) {
 }
 
 /**
- * Brand slugs hidden from the Branduri page / strips (Customizer).
- */
-function hifiexpert_hidden_brand_slugs() {
-	return array_values( array_filter( array_map( 'sanitize_title', preg_split( '/[,\n]+/', (string) hifiexpert_opt( 'brands_hidden' ) ) ) ) );
-}
-
-/**
- * Banner images the old (Flatsome) brands page used, by brand slug. Cached a day.
- * An image used for two brands is kept only for the first one (the old page had a copy/paste slip).
- */
-function hifiexpert_legacy_brand_banners() {
-	$legacy = get_transient( 'hx_brand_banners_v4' );
-	if ( false !== $legacy && is_array( $legacy ) ) {
-		return $legacy;
-	}
-	$legacy = array();
-	$page   = get_page_by_path( 'brands' ) ?: get_page_by_path( 'branduri' );
-	if ( $page ) {
-		$c = str_replace( array( '&#8221;', '&#8243;', '&#8220;', '”', '″', '“' ), '"', (string) $page->post_content );
-		if ( preg_match_all( '/\[ux_banner[^\]]*?bg="(\d+)"[^\]]*\]([\s\S]*?)\[\/ux_banner\]/', $c, $m, PREG_SET_ORDER ) ) {
-			$used = array();
-			foreach ( $m as $row ) {
-				$id = (int) $row[1];
-				if ( isset( $used[ $id ] ) || ! preg_match( '#/producator/([a-z0-9\-]+)#i', $row[2], $lm ) ) {
-					continue;
-				}
-				$slug = strtolower( $lm[1] );
-				if ( ! isset( $legacy[ $slug ] ) ) {
-					$legacy[ $slug ] = $id;
-					$used[ $id ]     = true;
-				}
-			}
-		}
-		// A banner whose file name carries ANOTHER brand's name (the old page had a WiiM tile with a ZenSati photo) is dropped.
-		$tax   = hifiexpert_brand_taxonomy();
-		$slugs = $tax ? get_terms( array( 'taxonomy' => $tax, 'hide_empty' => false, 'fields' => 'slugs' ) ) : array();
-		$slugs = is_wp_error( $slugs ) ? array_keys( $legacy ) : array_unique( array_merge( (array) $slugs, array_keys( $legacy ) ) );
-		foreach ( $legacy as $slug => $id ) {
-			$file = strtolower( wp_basename( (string) get_attached_file( $id ) ) );
-			$file = str_replace( array( '-', '_', ' ' ), '', $file );
-			$own  = str_replace( '-', '', $slug );
-			if ( ! $file || false !== strpos( $file, $own ) ) {
-				continue;
-			}
-			foreach ( $slugs as $other ) {
-				$o = str_replace( '-', '', $other );
-				if ( $other !== $slug && strlen( $o ) >= 4 && false !== strpos( $file, $o ) ) {
-					unset( $legacy[ $slug ] );
-					break;
-				}
-			}
-		}
-	}
-	set_transient( 'hx_brand_banners_v4', $legacy, DAY_IN_SECONDS );
-	return $legacy;
-}
-
-/**
- * Image for a brand tile: term meta `hx_brand_image` (set on the brand edit screen),
- * else the old page's banner, else the best-selling product of that brand.
- * $kind receives 'photo' (lifestyle banner) or 'product' (cut-out product shot on paper).
- */
-function hifiexpert_brand_image_id( $term, &$kind = null ) {
-	$kind = 'photo';
-	$own  = (int) get_term_meta( $term->term_id, 'hx_brand_image', true );
-	if ( $own ) {
-		return $own;
-	}
-	$legacy = hifiexpert_legacy_brand_banners();
-	if ( ! empty( $legacy[ $term->slug ] ) && wp_attachment_is_image( $legacy[ $term->slug ] ) ) {
-		return (int) $legacy[ $term->slug ];
-	}
-	$kind      = 'product';
-	$cache_key = 'hx_brand_img_' . $term->term_id;
-	$cached    = get_transient( $cache_key );
-	if ( false !== $cached ) {
-		return (int) $cached;
-	}
-	$img = 0;
-	foreach ( hifiexpert_brand_products( $term->slug, 6 ) as $p ) {
-		$t = (int) $p->get_image_id();
-		if ( $t ) {
-			$img = $t;
-			break;
-		}
-	}
-	set_transient( $cache_key, $img, 6 * HOUR_IN_SECONDS );
-	return $img;
-}
-
-/**
- * Brand terms for the audiophile band / brand strip.
- */
-function hifiexpert_brand_terms( $slugs = '' ) {
-	$tax = hifiexpert_brand_taxonomy();
-	if ( ! $tax ) {
-		return array();
-	}
-	$args = array( 'taxonomy' => $tax, 'hide_empty' => true, 'orderby' => 'count', 'order' => 'DESC', 'number' => 12 );
-	$slugs = array_filter( array_map( 'trim', explode( ',', (string) $slugs ) ) );
-	if ( $slugs ) {
-		$args['slug']    = $slugs;
-		$args['orderby'] = 'include';
-		unset( $args['number'] );
-	}
-	$terms = get_terms( $args );
-	if ( is_wp_error( $terms ) ) {
-		return array();
-	}
-	$hidden = hifiexpert_hidden_brand_slugs();
-	if ( $hidden && ! $slugs ) {
-		$terms = array_values( array_filter( $terms, function ( $t ) use ( $hidden ) {
-			return ! in_array( $t->slug, $hidden, true );
-		} ) );
-	}
-	if ( $slugs ) {
-		// keep the configured order
-		usort( $terms, function ( $a, $b ) use ( $slugs ) {
-			return array_search( $a->slug, $slugs, true ) <=> array_search( $b->slug, $slugs, true );
-		} );
-	}
-	return $terms;
-}
-
-/**
- * Logo of a brand (attachment ID): term meta `hx_brand_logo` (brand edit screen), else the best
- * "logo" file in the media library whose name carries the brand (cached a day). 0 when none.
- */
-function hifiexpert_brand_logo_id( $term ) {
-	$own = (int) get_term_meta( $term->term_id, 'hx_brand_logo', true );
-	if ( $own ) {
-		return $own;
-	}
-	$key    = 'hx_brand_logo2_' . $term->term_id;
-	$cached = get_transient( $key );
-	if ( false !== $cached ) {
-		return (int) $cached;
-	}
-	global $wpdb;
-	$hints = array( 'vitus' => 'VA_Master-Logo', 'luxman' => 'Luxman.png', 'sonus-faber' => 'Sonus-faber-Logo', 'mcintosh' => 'mcIntosh-logo-White' );
-	$name  = preg_replace( '/\s+(audio|acoustics?|design|hifi)$/i', '', $term->name );
-	$needle = isset( $hints[ $term->slug ] ) ? $hints[ $term->slug ] : $name;
-	$like  = '%' . $wpdb->esc_like( $needle ) . '%';
-	$rows  = $wpdb->get_results( $wpdb->prepare(
-		"SELECT p.ID, p.post_title, p.post_mime_type, m.meta_value AS file
-		 FROM {$wpdb->posts} p INNER JOIN {$wpdb->postmeta} m ON m.post_id = p.ID AND m.meta_key = '_wp_attached_file'
-		 WHERE p.post_type = 'attachment' AND p.post_mime_type LIKE 'image/%%' AND ( p.post_title LIKE %s OR m.meta_value LIKE %s )
-		 LIMIT 60",
-		$like,
-		$like
-	) );
-	$best  = 0;
-	$score = -99;
-	foreach ( (array) $rows as $r ) {
-		$f = strtolower( wp_basename( (string) $r->file ) . ' ' . $r->post_title );
-		$s = 0;
-		if ( false !== strpos( $f, 'logo' ) ) {
-			$s += 4;
-		} elseif ( ! isset( $hints[ $term->slug ] ) && 'image/svg+xml' !== $r->post_mime_type ) {
-			continue; // without a hint, only files called "…logo…" (or SVGs) qualify
-		}
-		if ( 'image/svg+xml' === $r->post_mime_type ) {
-			$s += 3;
-		} elseif ( 'image/png' === $r->post_mime_type || 'image/webp' === $r->post_mime_type ) {
-			$s += 2;
-		}
-		if ( false !== strpos( $f, 'white' ) || false !== strpos( $f, 'weiss' ) ) {
-			$s += 1;
-		}
-		if ( preg_match( '/-\d+x\d+\./', $f ) ) {
-			$s -= 2; // a generated size, not the original
-		}
-		if ( $s > $score ) {
-			$score = $s;
-			$best  = (int) $r->ID;
-		}
-	}
-	set_transient( $key, $best, DAY_IN_SECONDS );
-	return $best;
-}
-
-/**
- * True when an image has no transparency (JPEG, or PNG/WebP without any transparent pixel), so it
- * must be blended rather than recoloured. Cached in attachment meta.
- */
-function hifiexpert_image_is_flat( $id ) {
-	$cached = get_post_meta( $id, '_hx_flat', true );
-	if ( '' !== $cached ) {
-		return '1' === $cached;
-	}
-	$mime = get_post_mime_type( $id );
-	$flat = false;
-	if ( 'image/jpeg' === $mime ) {
-		$flat = true;
-	} elseif ( in_array( $mime, array( 'image/png', 'image/webp', 'image/gif' ), true ) && function_exists( 'imagecreatefromstring' ) ) {
-		$src  = image_get_intermediate_size( $id, 'thumbnail' );
-		$path = $src && ! empty( $src['path'] ) ? path_join( wp_upload_dir()['basedir'], $src['path'] ) : get_attached_file( $id );
-		$data = $path && file_exists( $path ) ? file_get_contents( $path ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions
-		$im   = $data ? @imagecreatefromstring( $data ) : false; // phpcs:ignore WordPress.PHP.NoSilencedErrors
-		if ( $im ) {
-			$w = imagesx( $im );
-			$h = imagesy( $im );
-			$transparent = false;
-			for ( $y = 0; $y < 24 && ! $transparent; $y++ ) {
-				for ( $x = 0; $x < 24; $x++ ) {
-					$px = imagecolorat( $im, (int) ( $x * ( $w - 1 ) / 23 ), (int) ( $y * ( $h - 1 ) / 23 ) );
-					if ( ( ( $px >> 24 ) & 0x7F ) > 8 ) {
-						$transparent = true;
-						break;
-					}
-				}
-			}
-			imagedestroy( $im );
-			$flat = ! $transparent;
-		}
-	}
-	update_post_meta( $id, '_hx_flat', $flat ? '1' : '0' );
-	return $flat;
-}
-
-/**
- * <img> for a brand logo rendered in white on dark (any source colour), or '' when there is none.
- */
-function hifiexpert_brand_logo_img( $term, $height = 36 ) {
-	$id = hifiexpert_brand_logo_id( $term );
-	if ( ! $id ) {
-		return '';
-	}
-	$flat = hifiexpert_image_is_flat( $id );
-	if ( 'image/svg+xml' === get_post_mime_type( $id ) ) {
-		$src = array( wp_get_attachment_url( $id ), 0, 0 );
-	} else {
-		$src = wp_get_attachment_image_src( $id, 'large' );
-	}
-	if ( ! $src || empty( $src[0] ) ) {
-		return '';
-	}
-	// Square-ish marks (Marten, Vitus) would be tiny at wordmark height: give them more.
-	$tall = ! empty( $src[1] ) && ! empty( $src[2] ) && ( $src[1] / $src[2] ) < 1.7;
-	if ( $tall ) {
-		$height = (int) round( $height * 1.7 );
-	}
-	$w = ! empty( $src[1] ) && ! empty( $src[2] ) ? round( $height * $src[1] / $src[2] ) : '';
-	return sprintf(
-		'<img class="hx-logomono%s%s" src="%s" alt="%s" loading="lazy" decoding="async" height="%d"%s style="--h:%dpx">',
-		$flat ? ' is-flat' : '',
-		$tall ? ' is-tall' : '',
-		esc_url( $src[0] ),
-		esc_attr( $term->name ),
-		(int) $height,
-		$w ? ' width="' . (int) $w . '"' : '',
-		(int) $height
-	);
-}
-
-/**
  * The active sale campaign (Black Edition, Winter Sales…) or null.
  * Enabled in the Customizer, optionally fenced by start/end dates (site timezone).
  */
-function hifiexpert_campaign() {
+function yamaha_audio_campaign() {
 	static $camp = false;
 	if ( false !== $camp ) {
 		return $camp;
 	}
 	$camp = null;
-	if ( ! hifiexpert_opt( 'camp_enabled' ) ) {
+	if ( ! yamaha_audio_opt( 'camp_enabled' ) ) {
 		return $camp;
 	}
 	$tz    = wp_timezone();
 	$now   = current_datetime()->getTimestamp();
-	$start = trim( (string) hifiexpert_opt( 'camp_start' ) );
-	$end   = trim( (string) hifiexpert_opt( 'camp_end' ) );
+	$start = trim( (string) yamaha_audio_opt( 'camp_start' ) );
+	$end   = trim( (string) yamaha_audio_opt( 'camp_end' ) );
 	$start_ts = $start ? ( date_create( $start, $tz ) ? date_create( $start, $tz )->getTimestamp() : 0 ) : 0;
 	$end_ts   = $end ? ( date_create( $end, $tz ) ? date_create( $end, $tz )->getTimestamp() : 0 ) : 0;
 	if ( $end_ts && ! preg_match( '/\d{1,2}:\d{2}/', $end ) ) {
@@ -1028,15 +683,15 @@ function hifiexpert_campaign() {
 	if ( ( $start_ts && $now < $start_ts ) || ( $end_ts && $now > $end_ts ) ) {
 		return $camp;
 	}
-	$style = (string) hifiexpert_opt( 'camp_style' );
+	$style = (string) yamaha_audio_opt( 'camp_style' );
 	$camp  = array(
-		'name'    => (string) hifiexpert_opt( 'camp_name' ) ?: 'Sale',
-		'tagline' => (string) hifiexpert_opt( 'camp_tagline' ),
+		'name'    => (string) yamaha_audio_opt( 'camp_name' ) ?: 'Sale',
+		'tagline' => (string) yamaha_audio_opt( 'camp_tagline' ),
 		'style'   => in_array( $style, array( 'black', 'winter', 'red' ), true ) ? $style : 'black',
-		'badge'   => (string) hifiexpert_opt( 'camp_badge' ) ?: (string) hifiexpert_opt( 'camp_name' ),
+		'badge'   => (string) yamaha_audio_opt( 'camp_badge' ) ?: (string) yamaha_audio_opt( 'camp_name' ),
 		'end_ts'  => $end_ts,
 		'end_txt' => $end_ts ? wp_date( 'j F', $end_ts ) : '',
-		'url'     => (string) hifiexpert_opt( 'camp_url' ) ?: ( get_page_by_path( 'promotii' ) ? get_permalink( get_page_by_path( 'promotii' ) ) : ( class_exists( 'WooCommerce' ) ? add_query_arg( 'orderby', 'popularity', wc_get_page_permalink( 'shop' ) ) : home_url( '/' ) ) ),
+		'url'     => (string) yamaha_audio_opt( 'camp_url' ) ?: ( get_page_by_path( 'promotii' ) ? get_permalink( get_page_by_path( 'promotii' ) ) : ( class_exists( 'WooCommerce' ) ? add_query_arg( 'orderby', 'popularity', wc_get_page_permalink( 'shop' ) ) : home_url( '/' ) ) ),
 	);
 	return $camp;
 }
@@ -1044,6 +699,6 @@ function hifiexpert_campaign() {
 /**
  * Is this product part of the campaign? (any product on sale while a campaign is active)
  */
-function hifiexpert_in_campaign( $product ) {
-	return $product && hifiexpert_campaign() && $product->is_on_sale();
+function yamaha_audio_in_campaign( $product ) {
+	return $product && yamaha_audio_campaign() && $product->is_on_sale();
 }

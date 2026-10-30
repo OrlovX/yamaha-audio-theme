@@ -1,4 +1,4 @@
-/* HiFi Expert theme — no dependencies, ~2 KB gzipped. */
+/* Yamaha Audio theme — no dependencies, ~2 KB gzipped. */
 (function () {
 	'use strict';
 
@@ -230,7 +230,7 @@
 
 	/* ---------- Scroll reveal (fade only) ---------- */
 	if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-		var revealTargets = $$('.hx-section__head, .hx-cat, .hx-card, .hx-bundle, .hx-trust__item, .hx-band__grid, .hx-brands, .hx-postcard, .hx-ribbon, .hx-why__item');
+		var revealTargets = $$('.hx-section__head, .hx-cat, .hx-card, .hx-bundle, .hx-trust__item, .hx-band__grid, .hx-postcard, .hx-ribbon, .hx-why__item');
 		revealTargets.forEach(function (el, i) {
 			// only elements below the first viewport animate; above-the-fold content paints at once
 			if (el.getBoundingClientRect().top > window.innerHeight * 0.9) { el.classList.add('hx-reveal'); }

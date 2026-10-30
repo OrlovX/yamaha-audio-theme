@@ -39,13 +39,12 @@ sudo -u www-data wp litespeed-purge all
 ```
 
 ## 5. DB-side setup (wp-admin)
-1. **Pagini legale → Instalează** — only after `legal/*.php` carry the Yamaha shop's company data; sets the
-   WooCommerce terms + privacy pages.
+1. **Yamaha Audio → Pagini legale → Instalează** — only after the company data in the Customizer is the Yamaha shop's;
+   sets the WooCommerce terms + privacy pages.
 2. **Aspect → Personalizare**: topbar/contact texts, hero, company data, campaign window.
-3. **Aspect → Meniuri**: primary menu = categories (by product type) + the extra items; no Branduri page for a
-   single-brand shop (`nav_extra` in the Customizer).
-4. **Yoast SEO**: the theme's `inc/seo.php` filters target Rank Math — either adapt them to Yoast or keep Yoast's own
-   titles; check the home title/description and a product page after activation.
+3. **Aspect → Meniuri**: primary menu = categories (by product type) + Blog / Promoții / Contact (`nav_extra`).
+4. **Yoast SEO**: the theme hooks Yoast's title/description/og:image filters; check the home title/description and a
+   product page after activation.
 5. **all-404-redirect-to-homepage**: decide — the theme has a proper `404.php`; a real 404 is better for SEO than a
    redirect to home. Deactivate the plugin or keep it consciously.
 6. **Code Snippets**: review snippets that touch the catalog (ordering, labels) — the theme orders the catalog itself.

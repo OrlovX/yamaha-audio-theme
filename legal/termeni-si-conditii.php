@@ -1,8 +1,8 @@
 <?php
 /**
- * Termeni și condiții – text generat de temă. $v = hifiexpert_legal_vars() (valori deja escapate).
+ * Termeni și condiții – text generat de temă. $v = yamaha_audio_legal_vars() (valori deja escapate).
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 <p class="hx-note hx-note--accent"><strong>Pe scurt:</strong> comanzi online sau în showroom, plătești cum îți este comod, primești produsele prin curier sau le ridici personal, ai 14 zile să te răzgândești pentru comenzile online și 2 ani garanție legală pentru produsele noi. Detaliile sunt mai jos. Folosirea site‑ului <?php echo $v['site']; ?> înseamnă că ai citit și accepți acești termeni.</p>
 
 <h2>1. Cine suntem</h2>
-<p>Site‑ul <a href="<?php echo $v['site_url']; ?>"><?php echo $v['site']; ?></a> („Site‑ul”) este administrat de <strong><?php echo $v['company']; ?></strong>, persoană juridică română cu sediul în <?php echo $v['address']; ?>, înregistrată la Oficiul Registrului Comerțului sub nr. <?php echo $v['reg']; ?>, CUI <?php echo $v['cui']; ?> („HiFi Expert”, „noi”).</p>
+<p>Site‑ul <a href="<?php echo $v['site_url']; ?>"><?php echo $v['site']; ?></a> („Site‑ul”) este administrat de <strong><?php echo $v['company']; ?></strong>, persoană juridică română cu sediul în <?php echo $v['address']; ?>, înregistrată la Oficiul Registrului Comerțului sub nr. <?php echo $v['reg']; ?>, CUI <?php echo $v['cui']; ?> („Yamaha Audio”, „noi”).</p>
 <ul>
 	<li><strong>Showroom:</strong> <?php echo $v['showroom']; ?> · <?php echo $v['hours']; ?></li>
 	<li><strong>E‑mail:</strong> <a href="mailto:<?php echo $v['email']; ?>"><?php echo $v['email']; ?></a> · <strong>Telefon / WhatsApp:</strong> <?php echo $v['phone']; ?></li>
@@ -24,7 +24,6 @@ defined( 'ABSPATH' ) || exit;
 	<li><strong>Comandă</strong> – documentul electronic prin care Clientul își exprimă intenția de a cumpăra produsele din coș, la prețul și în condițiile afișate.</li>
 	<li><strong>Contract la distanță</strong> – contractul încheiat între <?php echo $v['site']; ?> și Client prin intermediul Site‑ului, fără prezența fizică simultană a părților, în sensul OUG nr. 34/2014.</li>
 	<li><strong>Produse noi</strong> – produse sigilate, din stocul nostru sau al distribuitorilor autorizați.</li>
-	<li><strong>Produse în consignație</strong> – produse folosite (second‑hand) sau demo, vândute de <?php echo $v['site']; ?> în nume propriu pe baza unui contract de consignație, marcate ca atare pe Site și descrise cu starea lor reală.</li>
 </ul>
 
 <h2>3. Acceptarea termenilor</h2>
@@ -61,11 +60,8 @@ defined( 'ABSPATH' ) || exit;
 <p>Dreptul de retragere <strong>nu se aplică</strong>, printre altele, pentru: produsele confecționate după specificațiile Clientului sau personalizate (de exemplu cablurile tăiate la lungimea cerută sau terminate la comandă), înregistrările audio/video ori software‑ul sigilate care au fost desigilate după livrare, și achizițiile făcute direct din showroom (contract încheiat în prezența părților).</p>
 
 <h2>9. Garanții</h2>
-<p>Produsele noi beneficiază de <strong>garanția legală de conformitate de 2 ani</strong> pentru consumatori (OUG nr. 140/2021) și, acolo unde producătorul o oferă, de garanție comercială suplimentară, conform certificatului de garanție. Produsele în consignație (second‑hand) beneficiază de garanție legală de conformitate de <strong>12 luni</strong>, în condițiile legii. Condițiile complete, procedura și excluderile sunt în <a href="<?php echo $v['url_garantie']; ?>">Garanție și service</a>.</p>
 
-<h2>10. Produse în consignație</h2>
 <ul>
-	<li>Produsele din categoria <em>Consignație</em> sunt folosite sau demo. Le vindem în nume propriu, pe baza unui contract de consignație cu proprietarul; factura este emisă de <?php echo $v['site']; ?>, iar obligațiile de garanție și de retur ne revin nouă.</li>
 	<li>Starea produsului (cosmetică și funcțională), accesoriile și ambalajul livrate sunt descrise pe pagina produsului. Semnele normale de folosire descrise acolo nu reprezintă o neconformitate.</li>
 	<li>Prețul poate fi negociabil în limitele convenite cu proprietarul; dreptul de retragere pentru comenzile online se aplică și acestor produse.</li>
 </ul>

@@ -2,7 +2,7 @@
 /**
  * Politica de confidențialitate (GDPR) – text generat de temă.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;

@@ -2,15 +2,15 @@
 /**
  * Customizer: every piece of homepage/header/footer copy lives here (Yamaha Audio defaults).
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Defaults (also used by hifiexpert_opt()).
+ * Defaults (also used by yamaha_audio_opt()).
  */
-function hifiexpert_option_defaults() {
+function yamaha_audio_option_defaults() {
 	return array(
 		// Logo / top bar (kept from the current site).
 		'theme_mode'          => 'dark',
@@ -30,7 +30,7 @@ function hifiexpert_option_defaults() {
 		'waze_url'            => '',
 
 		// Header menu: these items leave the category bar and form a separate group on the right.
-		'nav_extra'           => 'blog, promotii, contact',   // single-brand shop: no Branduri / Consignație
+		'nav_extra'           => 'blog, promotii, contact',
 
 		// Company (footer + legal pages).
 		'company_name'        => 'HIGH-END EXPERT S.R.L.',
@@ -52,9 +52,6 @@ function hifiexpert_option_defaults() {
 		'rates_label'         => 'fără dobândă cu Card Avantaj',
 		'delivery_promise'    => 'Comandă până la ora 15:00 (L–V) și îl primești a doua zi lucrătoare.',
 		'pickup_promise'      => 'Sau ridicare din showroom Cotroceni, în aceeași zi.',
-		'music_cats'          => '',   // no music (inquiry-only) category on this shop
-		'music_instock_text'  => 'Livrare în 5–7 zile lucrătoare',
-		'music_inquire_text'  => 'Întreabă de stoc',
 		'warranty_text'       => 'Garanție 2 ani, service autorizat',
 		'returns_text'        => 'Retur în 14 zile',
 		'invoice_text'        => 'Factură fiscală, plată securizată',
@@ -89,15 +86,12 @@ function hifiexpert_option_defaults() {
 		'bundle_price_note'   => '',
 		'bundle_image'        => 0,
 
-		// Audiophile band.
+		// Feature band (MusicCast / complete system).
 		'audio_eyebrow'       => 'MusicCast',
 		'audio_title'         => 'Toată casa, un singur sistem.',
 		'audio_text'          => 'MusicCast leagă receiverul, soundbar‑ul, boxele wireless și streamerul Yamaha într‑un singur sistem multiroom, controlat din telefon. Ne spui camerele, muzica și bugetul; îți compunem sistemul, ți‑l livrăm în 24 de ore și îl punem la punct împreună.',
 		'audio_cta_label'     => 'Vreau un sistem MusicCast',
 		'audio_cta2_label'    => 'Programează o audiție',
-		'audio_brands'        => '',
-		'brands_featured'     => '',
-		'brands_hidden'       => '',
 
 		// Campaign / big sale mode (Black Edition, Winter Sales…).
 		// Black Edition 30 Oct → 2 Dec 2026 is baked in as the default, so deploying the theme files is enough
@@ -124,9 +118,9 @@ function hifiexpert_option_defaults() {
 add_action(
 	'customize_register',
 	function ( WP_Customize_Manager $wp ) {
-		$d = hifiexpert_option_defaults();
+		$d = yamaha_audio_option_defaults();
 
-		$panel = 'hifiexpert';
+		$panel = 'yamaha-audio';
 		$wp->add_panel( $panel, array( 'title' => 'Yamaha Audio', 'priority' => 10 ) );
 
 		$sections = array(
@@ -135,7 +129,7 @@ add_action(
 			'hx_hero'     => 'Acasă: Hero',
 			'hx_products' => 'Acasă: Categorii & produse',
 			'hx_bundle'   => 'Acasă: Pachet recomandat',
-			'hx_audio'    => 'Acasă: Pentru audiofili',
+			'hx_audio'    => 'Acasă: Bandă MusicCast / sistem complet',
 			'hx_campaign' => 'Campanie / Sale (Black Edition, Winter Sales…)',
 			'hx_footer'   => 'Footer',
 			'hx_company'  => 'Date firmă (footer & pagini legale)',
@@ -170,9 +164,6 @@ add_action(
 			array( 'hx_promises', 'rates_label', 'Text după rată (ex. „fără dobândă cu Card Avantaj”)', 'text' ),
 			array( 'hx_promises', 'delivery_promise', 'Promisiune livrare (produse în stoc)', 'text' ),
 			array( 'hx_promises', 'pickup_promise', 'Promisiune ridicare showroom', 'text' ),
-			array( 'hx_promises', 'music_cats', 'Categorii „muzică” (slug-uri, separate prin virgulă): în stoc = termen de livrare, altfel = întreabă de stoc', 'text' ),
-			array( 'hx_promises', 'music_instock_text', 'Muzică în stoc: text afișat', 'text' ),
-			array( 'hx_promises', 'music_inquire_text', 'Muzică fără stoc / la comandă: text buton', 'text' ),
 			array( 'hx_promises', 'warranty_text', 'Garanție', 'text' ),
 			array( 'hx_promises', 'returns_text', 'Retur', 'text' ),
 			array( 'hx_promises', 'invoice_text', 'Plată / factură', 'text' ),
@@ -186,13 +177,13 @@ add_action(
 			array( 'hx_hero', 'hero_cta2_label', 'Buton secundar: text', 'text' ),
 			array( 'hx_hero', 'hero_cta2_url', 'Buton secundar: link', 'text' ),
 
-			array( 'hx_products', 'home_categories_exclude', 'Categorii ascunse din grila de categorii (slug-uri, separate prin virgulă)', 'text' ),
 			array( 'hx_products', 'home_products_title', 'Titlu grilă produse', 'text' ),
 			array( 'hx_products', 'home_products_text', 'Subtitlu grilă produse', 'text' ),
 			array( 'hx_products', 'home_products_source', 'Sursă produse', 'select', array( 'bestsellers' => 'Cele mai vândute', 'sale' => 'La ofertă', 'featured' => 'Recomandate (featured)', 'newest' => 'Cele mai noi' ) ),
 			array( 'hx_products', 'home_products_count', 'Număr produse (4, 8 sau 12)', 'number' ),
+			array( 'hx_products', 'home_categories_exclude', 'Categorii ascunse din grila de categorii (slug-uri, separate prin virgulă)', 'text' ),
 			array( 'hx_products', 'home_exclude_cats', 'Categorii excluse din hero și din grile (slug-uri, separate prin virgulă)', 'text' ),
-			array( 'hx_products', 'home_rows', 'Rânduri sub oferte: câte un rând pe linie, format slug|Titlu afișat (slug de brand sau de categorie de produse)', 'textarea' ),
+			array( 'hx_products', 'home_rows', 'Rânduri sub oferte: câte un rând pe linie, format slug-categorie|Titlu afișat', 'textarea' ),
 
 			array( 'hx_bundle', 'bundle_enabled', 'Afișează blocul', 'checkbox' ),
 			array( 'hx_bundle', 'bundle_eyebrow', 'Text mic', 'text' ),
@@ -209,9 +200,6 @@ add_action(
 			array( 'hx_audio', 'audio_text', 'Paragraf', 'textarea' ),
 			array( 'hx_audio', 'audio_cta_label', 'Buton principal: text (deschide WhatsApp)', 'text' ),
 			array( 'hx_audio', 'audio_cta2_label', 'Link secundar: text (deschide WhatsApp; gol = ascuns)', 'text' ),
-			array( 'hx_audio', 'audio_brands', 'Branduri cu logo în bandă (slug-uri separate prin virgulă, în ordinea afișării; gol = cele mai populate)', 'text' ),
-			array( 'hx_audio', 'brands_featured', 'Pagina Branduri: branduri evidențiate sus (slug-uri separate prin virgulă)', 'text' ),
-			array( 'hx_audio', 'brands_hidden', 'Pagina Branduri: branduri ascunse (slug-uri separate prin virgulă)', 'text' ),
 
 			array( 'hx_campaign', 'camp_enabled', 'Campanie activă', 'checkbox' ),
 			array( 'hx_campaign', 'camp_name', 'Nume (ex. Black Edition, Winter Sales)', 'text' ),

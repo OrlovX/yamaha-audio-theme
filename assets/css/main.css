@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Yamaha Audio theme — single stylesheet (derived from the HiFi Expert theme).
+   Yamaha Audio theme — single stylesheet (derived from the Yamaha Audio theme).
    Dark, restrained, product-led; Yamaha violet instead of gold. Tokens first, then components.
    The accent is used two ways: as TEXT (--hx-accent, lighter on dark) and as a SURFACE
    (--hx-gold, kept under its old name: the brand violet, with --hx-on-accent text on it).
@@ -306,7 +306,7 @@ html.dgwt-wcas-overlay-mobile-on { overflow: hidden; }
 .dgwt-wcas-overlay-mobile .dgwt-wcas-preloader { right: 60px !important; }
 .dgwt-wcas-overlay-mobile .dgwt-wcas-voice-search { display: none !important; }
 /* a hint under the field while there are no results */
-.dgwt-wcas-overlay-mobile .dgwt-wcas-om-bar::after { content: "Caută după model, brand sau categorie — de ex. „A‑S701”, „Triangle Borea”, „cablu boxe”"; position: absolute; left: 44px; right: 44px; top: calc(100% + 18px); text-align: center; font-size: 14px; color: var(--hx-faint); pointer-events: none; }
+.dgwt-wcas-overlay-mobile .dgwt-wcas-om-bar::after { content: "Caută după model sau categorie — de ex. „A‑S701”, „RX‑V6A”, „MusicCast 20”"; position: absolute; left: 44px; right: 44px; top: calc(100% + 18px); text-align: center; font-size: 14px; color: var(--hx-faint); pointer-events: none; }
 .dgwt-wcas-overlay-mobile .dgwt-wcas-om-bar:has(.dgwt-wcas-suggestions-wrapp:not(:empty))::after { display: none; }
 /* suggestions: a glass card under the field */
 .dgwt-wcas-overlay-mobile .dgwt-wcas-suggestions-wrapp {
@@ -382,7 +382,7 @@ html.dgwt-wcas-overlay-mobile-on { overflow: hidden; }
 	transition: color .15s;
 }
 .hx-nav__link::after { content: ""; position: absolute; left: 9px; right: 9px; bottom: 18px; height: 2px; border-radius: 2px; background: var(--hx-accent); transform: scaleX(0); transform-origin: left; transition: transform .2s var(--hx-ease); }
-/* Blog / Branduri / Consignație / Promoții: a smaller group on the right, divided from the categories */
+/* Blog / Promoții / Contact: a smaller group on the right, divided from the categories */
 .hx-nav__extra { margin-left: auto; padding-left: 14px; position: relative; }
 .hx-nav__extra::before { content: ""; position: absolute; left: 0; top: 50%; height: 22px; width: 1px; background: rgba(var(--hx-fg-rgb), .16); transform: translateY(-50%); }
 .hx-nav__extra .hx-nav__link { font-size: 11.5px; letter-spacing: .1em; color: var(--hx-text-2); padding: 0 8px; }
@@ -438,7 +438,7 @@ html.dgwt-wcas-overlay-mobile-on { overflow: hidden; }
 .hx-mnav__search .hx-search, .hx-mnav__search .dgwt-wcas-search-wrapp { width: 100%; }
 .hx-mnav__list, .hx-mnav__list ul { list-style: none; }
 .hx-mnav__list > li { border-bottom: 1px solid var(--hx-line); }
-/* extra links (Blog, Branduri, Consignație, Promoții) as a compact group after the categories */
+/* extra links (Blog, Promoții, Contact) as a compact group after the categories */
 .hx-mnav__list > li.hx-extra { border-bottom: 0; }
 .hx-mnav__list > li.hx-extra > a { padding-top: 10px; padding-bottom: 10px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--hx-muted); }
 .hx-mnav__list > li.hx-extra.hx-sale > a { color: var(--hx-accent); }
@@ -501,13 +501,6 @@ html[data-theme="light"] .hx-mnav__theme .hx-theme__to-dark { display: inline; }
 .hx-stock--muted { color: var(--hx-faint); }
 .hx-stock--ask { color: var(--hx-accent); }
 .hx-stock--ask .hx-stock__dot { background: var(--hx-accent); color: var(--hx-accent); box-shadow: 0 0 0 1px rgba(0, 0, 0, .35) inset, 0 0 6px 1px currentColor; animation: none; }
-/* music without stock: ask-first block on the product page, ask button on cards */
-.hx-inquiry { display: flex; flex-direction: column; gap: 14px; padding: 18px 20px; border-radius: var(--hx-radius-sm); background: rgba(var(--hx-accent-rgb), .06); border: 1px solid var(--hx-accent-soft); margin: 4px 0 8px; }
-.hx-inquiry__text { font-size: 14px; color: var(--hx-text-2); line-height: 1.5; }
-.hx-inquiry__ctas { display: flex; flex-wrap: wrap; gap: 10px; }
-.hx-inquiry__ctas .hx-btn { flex: 1 1 auto; }
-.hx-card__cta .hx-btn--ask { opacity: 1; transform: none; border-color: var(--hx-accent-soft); color: var(--hx-accent); }
-.hx-card__cta .hx-btn--ask:hover { border-color: var(--hx-accent); background: rgba(var(--hx-accent-rgb), .08); color: var(--hx-accent); }
 .hx-stock--muted .hx-stock__dot { background: #2a2a2a; box-shadow: 0 0 0 1px rgba(var(--hx-fg-rgb), .12) inset; animation: none; }
 .hx-stock--muted .hx-stock__dot::after { opacity: .25; }
 @keyframes hx-led {
@@ -551,7 +544,7 @@ html[data-theme="light"] .hx-mnav__theme .hx-theme__to-dark { display: inline; }
 .hx-card:hover .hx-stage img { transform: scale(1.04); }
 .hx-card__media .hx-pill { position: absolute; top: 10px; left: 10px; }
 .hx-card__body { display: flex; flex-direction: column; gap: 8px; flex: 1; }
-.hx-card__brand { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--hx-faint); min-height: 15px; }
+.hx-card__kicker { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--hx-faint); min-height: 15px; }
 /* titles clamp to two lines and reserve them, so price/meta/button line up across a row */
 .hx-card__title { font-size: 16px; font-weight: 600; line-height: 1.3; letter-spacing: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
 .hx-card__title a::after { content: ""; position: absolute; inset: 0; z-index: 1; }
@@ -736,7 +729,7 @@ html[data-theme="light"] .hx-mnav__theme .hx-theme__to-dark { display: inline; }
 @media (max-width: 900px) { .hx-trust { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .hx-trust__item { padding: 16px; } }
 
 /* --------------------------------------------------------------------------
-   Audiophile band + brands
+   Feature band (MusicCast / complete system)
    -------------------------------------------------------------------------- */
 
 .hx-band { position: relative; overflow: hidden; background: var(--hx-bg-deep); border-top: 1px solid var(--hx-line); border-bottom: 1px solid var(--hx-line); margin-top: 16px; }
@@ -753,79 +746,17 @@ html[data-theme="light"] .hx-mnav__theme .hx-theme__to-dark { display: inline; }
 .hx-band__ctas { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
 .hx-band__note { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--hx-faint); }
 .hx-band__note .hx-icon { color: var(--hx-accent); }
-.hx-band__all { align-self: flex-end; font-size: 14px; }
 /* gold primary button */
 .hx-btn--gold { background: linear-gradient(135deg, var(--hx-accent-light) 0%, var(--hx-gold) 55%, var(--hx-accent-dark) 100%); color: var(--hx-on-accent); border-color: transparent; gap: 10px; box-shadow: 0 10px 30px rgba(var(--hx-accent-rgb), .18); }
 .hx-btn--gold:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(var(--hx-accent-rgb), .3); color: var(--hx-on-accent); }
 .hx-btn--gold .hx-icon { color: var(--hx-on-accent); }
 
-/* Logo marquee: every logo recoloured white, slow scroll, pauses on hover */
-.hx-logos { position: relative; display: flex; gap: 72px; overflow: hidden; padding: 28px 0 8px; border-top: 1px solid var(--hx-line); -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
-.hx-logos__track { display: flex; align-items: center; gap: 72px; flex: none; min-width: 100%; justify-content: space-around; animation: hx-marquee 48s linear infinite; }
-.hx-logos:hover .hx-logos__track { animation-play-state: paused; }
-.hx-logos__item { display: inline-flex; align-items: center; justify-content: center; height: 60px; flex: none; opacity: .62; transition: opacity .25s, transform .25s var(--hx-ease), filter .25s; }
-.hx-logos__item:hover { opacity: 1; transform: translateY(-2px); }
-.hx-logos__item img { height: var(--h, 34px); width: auto; max-width: 200px; object-fit: contain; display: block; }
-.hx-logos__item--text span { font-size: 17px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--hx-text); white-space: nowrap; }
-.hx-logomono { filter: brightness(0) invert(1); }
-.hx-logomono.is-flat { filter: invert(1) grayscale(1) contrast(1.15); mix-blend-mode: screen; }
-.hx-logos__item:hover .hx-logomono { filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(var(--hx-accent-rgb), .55)); }
-.hx-logos__item:hover .hx-logomono.is-flat { filter: invert(1) grayscale(1) contrast(1.15) drop-shadow(0 0 10px rgba(var(--hx-accent-rgb), .55)); }
-html[data-theme="light"] .hx-logomono { filter: brightness(0); }
-html[data-theme="light"] .hx-logomono.is-flat { filter: grayscale(1) contrast(1.15); mix-blend-mode: multiply; }
-html[data-theme="light"] .hx-logos__item:hover .hx-logomono { filter: brightness(0) drop-shadow(0 0 10px rgba(var(--hx-accent-rgb), .55)); }
-html[data-theme="light"] .hx-logos__item:hover .hx-logomono.is-flat { filter: grayscale(1) contrast(1.15) drop-shadow(0 0 10px rgba(var(--hx-accent-rgb), .55)); }
 html[data-theme="light"] .hx-logo--invert .hx-logo__img { filter: none; }
-@keyframes hx-marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - 72px)); } }
-@media (prefers-reduced-motion: reduce) {
-	.hx-logos { -webkit-mask-image: none; mask-image: none; }
-	.hx-logos__track { animation: none; flex-wrap: wrap; justify-content: center; gap: 28px 48px; min-width: 0; }
-	.hx-logos__track[aria-hidden="true"] { display: none; }
-}
 @media (max-width: 900px) {
 	.hx-band__inner { padding-top: 48px; padding-bottom: 40px; gap: 30px; }
 	.hx-band__grid { grid-template-columns: 1fr; gap: 24px; }
 	.hx-band__steps li { font-size: 14px; }
-	.hx-logos { gap: 48px; padding-top: 22px; }
-	.hx-logos__track { gap: 48px; animation-duration: 32s; }
-	.hx-logos__item { height: 36px; }
-	.hx-logos__item img { height: calc(var(--h, 34px) * .76); max-width: 150px; }
-	.hx-logos__item--text span { font-size: 14px; }
 }
-
-/* --------------------------------------------------------------------------
-   Brands page
-   -------------------------------------------------------------------------- */
-
-.hx-brands-page { padding-top: 32px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 40px; }
-.hx-letters { display: flex; flex-wrap: wrap; gap: 4px; }
-.hx-letters a { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--hx-line); font-size: 13px; font-weight: 600; color: var(--hx-muted); }
-.hx-letters a:hover { border-color: var(--hx-accent); color: var(--hx-text); }
-.hx-brandgroup { gap: 16px; scroll-margin-top: calc(var(--hx-header-h) + var(--hx-topbar-h) + 16px); }
-.hx-brandgroup__letter { font-size: 14px; letter-spacing: .14em; color: var(--hx-accent); padding-bottom: 10px; border-bottom: 1px solid var(--hx-line); }
-.hx-brandgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-.hx-brandgrid--featured { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.hx-brandtile {
-	position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: 200px; padding: 18px; overflow: hidden;
-	border-radius: var(--hx-radius); background: var(--hx-surface); border: 1px solid var(--hx-line); transition: border-color .2s, transform .2s var(--hx-ease);
-}
-.hx-brandtile:hover { border-color: var(--hx-accent-soft); transform: translateY(-3px); }
-.hx-brandtile--big { min-height: 300px; }
-.hx-brandtile__bg { position: absolute; inset: 0; }
-.hx-brandtile__bg img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.85) brightness(.9); transition: transform .6s var(--hx-ease); }
-.hx-brandtile:hover .hx-brandtile__bg img { transform: scale(1.04); }
-.hx-brandtile__bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(var(--hx-deep-rgb), .05) 0%, rgba(var(--hx-deep-rgb), .25) 45%, rgba(var(--hx-deep-rgb), .92) 100%); }
-/* Product cut-out instead of a lifestyle photo: on paper, fading into the tile's black (like the category tiles) */
-.hx-brandtile--product .hx-brandtile__bg { background: linear-gradient(180deg, #f4f2ee 0%, #e9e6df 100%); }
-.hx-brandtile--product .hx-brandtile__bg img { height: 74%; object-fit: contain; object-position: center top; padding: 8% 14% 0; mix-blend-mode: multiply; filter: saturate(.92); }
-.hx-brandtile--product .hx-brandtile__bg::after { background: linear-gradient(180deg, rgba(var(--hx-deep-rgb), 0) 0%, rgba(var(--hx-deep-rgb), .08) 30%, rgba(var(--hx-deep-rgb), .72) 58%, rgba(var(--hx-deep-rgb), .97) 76%, var(--hx-bg-deep) 100%); }
-.hx-brandtile__word { position: absolute; left: 18px; right: 18px; top: 50%; transform: translateY(-70%); font-size: clamp(22px, 2.6vw, 34px); font-weight: 600; letter-spacing: -.02em; line-height: 1; color: rgba(var(--hx-fg-rgb), .14); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.hx-brandtile__body { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 4px; }
-.hx-brandtile__name { font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
-.hx-brandtile--big .hx-brandtile__name { font-size: 26px; }
-.hx-brandtile__count { font-size: 13px; color: var(--hx-muted); }
-@media (max-width: 1100px) { .hx-brandgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .hx-brandgrid--featured { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 640px) { .hx-brandgrid, .hx-brandgrid--featured { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .hx-brandtile { min-height: 150px; padding: 14px; } .hx-brandtile--big { min-height: 200px; } .hx-brandtile__name { font-size: 16px; } }
 
 /* --------------------------------------------------------------------------
    Blog cards, article, pages
@@ -989,7 +920,7 @@ html[data-theme="light"] .hx-price--single.hx-price--camp { background: linear-g
 html[data-theme="light"] .hx-price--single .hx-price__camp { color: var(--hx-camp); }
 html[data-theme="light"] .hx-pill--camp { box-shadow: 0 8px 22px color-mix(in srgb, var(--hx-camp-text) 25%, transparent); }
 
-/* Cards: an empty lead still reserves its lines so consignație cards line up */
+/* Cards: an empty lead still reserves its lines so cards line up */
 .hx-card__lead--empty { visibility: hidden; }
 
 @media print {
@@ -1247,7 +1178,7 @@ html[data-theme="light"] .hx-pill--camp { box-shadow: 0 8px 22px color-mix(in sr
 .hx-single__top { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 56px; align-items: start; }
 .hx-single__gallery { position: relative; }
 .hx-single__summary { display: flex; flex-direction: column; gap: 20px; position: sticky; top: calc(var(--hx-header-h) + var(--hx-topbar-h) + 20px); }
-.hx-single__brand { font-size: 13px; }
+.hx-single__kicker { font-size: 13px; }
 .product_title { font-size: clamp(28px, 3vw, 40px); line-height: 1.05; letter-spacing: -.03em; }
 .woocommerce-product-details__short-description { font-size: 16px; line-height: 1.55; color: var(--hx-muted); }
 .woocommerce-product-details__short-description ul { padding-left: 1.2em; margin-top: .6em; }
@@ -1523,7 +1454,7 @@ form.cart .wpa_hidden_field, form.cart .wpa-admin-notice, form.cart .wpa-test-ms
 }
 .hx-buybar.is-visible { transform: none; }
 .hx-buybar__name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.hx-buybar__brand { font-size: 12px; color: var(--hx-faint); }
+.hx-buybar__kicker { font-size: 12px; color: var(--hx-faint); }
 .hx-buybar__title { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hx-buybar__right { display: flex; align-items: center; gap: 16px; flex: none; }
 .hx-buybar__price { display: flex; flex-direction: column; align-items: flex-end; }

@@ -7,7 +7,7 @@
  * - chevron separators, pill links, current item truncated; one scrollable row on phones.
  *
  * @see     https://woocommerce.com/document/template-structure/
- * @package hifiexpert
+ * @package yamaha-audio
  * @version 2.3.0
  */
 
@@ -41,10 +41,10 @@ for ( $i = $last - 1; $i >= 0; $i-- ) {
 	}
 }
 ?>
-<nav class="hx-crumbs" aria-label="<?php esc_attr_e( 'Navigare', 'hifiexpert' ); ?>">
+<nav class="hx-crumbs" aria-label="<?php esc_attr_e( 'Navigare', 'yamaha-audio' ); ?>">
 	<?php if ( $back ) : ?>
-		<a class="hx-crumbs__back" href="<?php echo esc_url( $back[1] ); ?>" title="<?php echo esc_attr( sprintf( __( 'Înapoi la %s', 'hifiexpert' ), $back[0] ) ); ?>">
-			<?php echo hifiexpert_icon( 'arrow-left', 16 ); ?><span><?php echo esc_html( sprintf( __( 'Înapoi la %s', 'hifiexpert' ), $back[0] ) ); ?></span>
+		<a class="hx-crumbs__back" href="<?php echo esc_url( $back[1] ); ?>" title="<?php echo esc_attr( sprintf( __( 'Înapoi la %s', 'yamaha-audio' ), $back[0] ) ); ?>">
+			<?php echo yamaha_audio_icon( 'arrow-left', 16 ); ?><span><?php echo esc_html( sprintf( __( 'Înapoi la %s', 'yamaha-audio' ), $back[0] ) ); ?></span>
 		</a>
 	<?php endif; ?>
 	<ol class="hx-crumbs__list">

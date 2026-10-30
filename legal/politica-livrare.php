@@ -2,7 +2,7 @@
 /**
  * Livrare și plată – text generat de temă.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;

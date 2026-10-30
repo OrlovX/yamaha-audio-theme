@@ -2,7 +2,7 @@
 /**
  * Blog index / generic fallback.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -19,9 +19,9 @@ get_header();
 				} elseif ( is_archive() ) {
 					echo wp_kses_post( get_the_archive_title() );
 				} elseif ( is_search() ) {
-					printf( esc_html__( 'Rezultate pentru „%s”', 'hifiexpert' ), esc_html( get_search_query() ) );
+					printf( esc_html__( 'Rezultate pentru „%s”', 'yamaha-audio' ), esc_html( get_search_query() ) );
 				} else {
-					esc_html_e( 'Blog', 'hifiexpert' );
+					esc_html_e( 'Blog', 'yamaha-audio' );
 				}
 				?>
 			</h1>
@@ -36,13 +36,13 @@ get_header();
 			<?php
 			while ( have_posts() ) {
 				the_post();
-				hifiexpert_post_card();
+				yamaha_audio_post_card();
 			}
 			?>
 		</div>
-		<?php hifiexpert_pagination(); ?>
+		<?php yamaha_audio_pagination(); ?>
 	<?php else : ?>
-		<p class="hx-shop__empty"><?php esc_html_e( 'Nimic de afișat încă.', 'hifiexpert' ); ?></p>
+		<p class="hx-shop__empty"><?php esc_html_e( 'Nimic de afișat încă.', 'yamaha-audio' ); ?></p>
 	<?php endif; ?>
 </div>
 <?php

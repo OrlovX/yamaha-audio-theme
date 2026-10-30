@@ -1,9 +1,10 @@
 <?php
 /**
  * Product awards: stored as `_hx_awards` (JSON list of {award, year, stars, source}),
- * written by tools/awards/awards.py or by hand in the product editor; rendered as badges.
+ * written by hand in the product editor (or by an importer); rendered as badges. Yamaha products carry
+ * EISA / What Hi-Fi? awards regularly, so the badges are worth filling in.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -11,7 +12,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Awards for a product (parent for variations). Returns [] when none.
  */
-function hifiexpert_product_awards( $product ) {
+function yamaha_audio_product_awards( $product ) {
 	if ( ! $product ) {
 		return array();
 	}
@@ -42,12 +43,12 @@ function hifiexpert_product_awards( $product ) {
 /**
  * Badge markup.
  */
-function hifiexpert_awards_html( $product, $compact = false ) {
-	$awards = hifiexpert_product_awards( $product );
+function yamaha_audio_awards_html( $product, $compact = false ) {
+	$awards = yamaha_audio_product_awards( $product );
 	if ( ! $awards ) {
 		return '';
 	}
-	$html = '<ul class="hx-awards' . ( $compact ? ' hx-awards--compact' : '' ) . '" aria-label="' . esc_attr__( 'Premii și recenzii', 'hifiexpert' ) . '">';
+	$html = '<ul class="hx-awards' . ( $compact ? ' hx-awards--compact' : '' ) . '" aria-label="' . esc_attr__( 'Premii și recenzii', 'yamaha-audio' ) . '">';
 	foreach ( $compact ? array_slice( $awards, 0, 2 ) : $awards as $a ) {
 		$label = $a['award'];
 		if ( $a['stars'] ) {
@@ -56,9 +57,9 @@ function hifiexpert_awards_html( $product, $compact = false ) {
 		if ( $a['year'] ) {
 			$label .= ' ' . $a['year'];
 		}
-		$inner = '<span class="hx-award__laurel" aria-hidden="true">' . hifiexpert_icon( 'laurel', 14 ) . '</span><span class="hx-award__text">' . esc_html( $label ) . '</span>';
+		$inner = '<span class="hx-award__laurel" aria-hidden="true">' . yamaha_audio_icon( 'laurel', 14 ) . '</span><span class="hx-award__text">' . esc_html( $label ) . '</span>';
 		if ( $a['source'] && ! $compact ) {
-			$html .= '<li><a class="hx-award" href="' . esc_url( $a['source'] ) . '" target="_blank" rel="noopener nofollow" title="' . esc_attr__( 'Vezi sursa', 'hifiexpert' ) . '">' . $inner . '</a></li>';
+			$html .= '<li><a class="hx-award" href="' . esc_url( $a['source'] ) . '" target="_blank" rel="noopener nofollow" title="' . esc_attr__( 'Vezi sursa', 'yamaha-audio' ) . '">' . $inner . '</a></li>';
 		} else {
 			$html .= '<li><span class="hx-award">' . $inner . '</span></li>';
 		}
@@ -72,7 +73,7 @@ function hifiexpert_awards_html( $product, $compact = false ) {
 // Product page: under the lead sentence.
 add_action( 'woocommerce_single_product_summary', function () {
 	global $product;
-	echo hifiexpert_awards_html( $product ); // phpcs:ignore
+	echo yamaha_audio_awards_html( $product ); // phpcs:ignore
 }, 21 );
 
 /* -------------------------------------------------------------------------
@@ -80,14 +81,14 @@ add_action( 'woocommerce_single_product_summary', function () {
  * ---------------------------------------------------------------------- */
 
 add_action( 'add_meta_boxes', function () {
-	add_meta_box( 'hx_awards', __( 'Premii și recenzii (temă)', 'hifiexpert' ), function ( $post ) {
-		$list = hifiexpert_product_awards( wc_get_product( $post->ID ) );
+	add_meta_box( 'hx_awards', __( 'Premii și recenzii (temă)', 'yamaha-audio' ), function ( $post ) {
+		$list = yamaha_audio_product_awards( wc_get_product( $post->ID ) );
 		$lines = array();
 		foreach ( $list as $a ) {
 			$lines[] = implode( ' | ', array( $a['award'], $a['year'], $a['stars'] ? $a['stars'] : '', $a['source'] ) );
 		}
 		wp_nonce_field( 'hx_awards_save', 'hx_awards_nonce' );
-		echo '<p class="description">' . esc_html__( 'Un premiu pe linie: Nume | An | Stele (0–5) | Link sursă. Ex.: What Hi-Fi? | 2024 | 5 | https://…', 'hifiexpert' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Un premiu pe linie: Nume | An | Stele (0–5) | Link sursă. Ex.: What Hi-Fi? | 2024 | 5 | https://…', 'yamaha-audio' ) . '</p>';
 		echo '<textarea name="hx_awards" rows="5" style="width:100%;font-family:monospace">' . esc_textarea( implode( "\n", $lines ) ) . '</textarea>';
 	}, 'product', 'side', 'default' );
 } );

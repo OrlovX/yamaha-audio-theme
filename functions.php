@@ -1,31 +1,28 @@
 <?php
 /**
- * Yamaha Audio theme bootstrap (derived from the HiFi Expert theme).
+ * Yamaha Audio theme bootstrap (derived from the Yamaha Audio theme).
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'HIFIEXPERT_VERSION', '0.2.0' ); // keep in step with style.css; bumping re-runs the one-time logo pick
-define( 'HIFIEXPERT_DIR', get_template_directory() );
-define( 'HIFIEXPERT_URI', get_template_directory_uri() );
+define( 'YAMAHA_AUDIO_VERSION', '0.2.0' ); // keep in step with style.css; bumping re-runs the one-time logo pick
+define( 'YAMAHA_AUDIO_DIR', get_template_directory() );
+define( 'YAMAHA_AUDIO_URI', get_template_directory_uri() );
 
-require HIFIEXPERT_DIR . '/inc/setup.php';
-require HIFIEXPERT_DIR . '/inc/assets.php';
-require HIFIEXPERT_DIR . '/inc/helpers.php';
-require HIFIEXPERT_DIR . '/inc/customizer.php';
-require HIFIEXPERT_DIR . '/inc/menu-walker.php';
-require HIFIEXPERT_DIR . '/inc/template-tags.php';
-require HIFIEXPERT_DIR . '/inc/newsletter.php';
-require HIFIEXPERT_DIR . '/inc/legal.php';
-require HIFIEXPERT_DIR . '/inc/seo.php';
+require YAMAHA_AUDIO_DIR . '/inc/setup.php';
+require YAMAHA_AUDIO_DIR . '/inc/assets.php';
+require YAMAHA_AUDIO_DIR . '/inc/helpers.php';
+require YAMAHA_AUDIO_DIR . '/inc/customizer.php';
+require YAMAHA_AUDIO_DIR . '/inc/menu-walker.php';
+require YAMAHA_AUDIO_DIR . '/inc/template-tags.php';
+require YAMAHA_AUDIO_DIR . '/inc/newsletter.php';
+require YAMAHA_AUDIO_DIR . '/inc/legal.php';
+require YAMAHA_AUDIO_DIR . '/inc/seo.php';
 
 if ( class_exists( 'WooCommerce' ) ) {
-	require HIFIEXPERT_DIR . '/inc/woocommerce.php';
-	require HIFIEXPERT_DIR . '/inc/filters.php';
-	require HIFIEXPERT_DIR . '/inc/awards.php';
-	if ( is_admin() ) {
-		require HIFIEXPERT_DIR . '/inc/brand-admin.php';
-	}
+	require YAMAHA_AUDIO_DIR . '/inc/woocommerce.php';
+	require YAMAHA_AUDIO_DIR . '/inc/filters.php';
+	require YAMAHA_AUDIO_DIR . '/inc/awards.php';
 }

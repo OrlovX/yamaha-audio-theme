@@ -5,14 +5,14 @@
  * - Otherwise the theme's own form: e-mail + consent, stored as entries in Newsletter (admin menu),
  *   exportable as CSV, with a notification e-mail to the shop. No third-party service required.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
 
 add_action( 'init', function () {
 	register_post_type( 'hx_subscriber', array(
-		'labels'       => array( 'name' => __( 'Newsletter', 'hifiexpert' ), 'singular_name' => __( 'Abonat', 'hifiexpert' ), 'menu_name' => __( 'Newsletter', 'hifiexpert' ) ),
+		'labels'       => array( 'name' => __( 'Newsletter', 'yamaha-audio' ), 'singular_name' => __( 'Abonat', 'yamaha-audio' ), 'menu_name' => __( 'Newsletter', 'yamaha-audio' ) ),
 		'public'       => false,
 		'show_ui'      => true,
 		'show_in_menu' => true,
@@ -24,8 +24,8 @@ add_action( 'init', function () {
 	) );
 } );
 
-function hifiexpert_newsletter_form() {
-	$shortcode = hifiexpert_opt( 'newsletter_shortcode' );
+function yamaha_audio_newsletter_form() {
+	$shortcode = yamaha_audio_opt( 'newsletter_shortcode' );
 	if ( $shortcode ) {
 		return do_shortcode( $shortcode );
 	}
@@ -37,20 +37,20 @@ function hifiexpert_newsletter_form() {
 		<?php wp_nonce_field( 'hx_subscribe', 'hx_nl_nonce' ); ?>
 		<input type="text" name="hx_website" value="" tabindex="-1" autocomplete="off" class="hx-nl__hp" aria-hidden="true">
 		<div class="hx-nl__row">
-			<label for="hx-nl-email" class="screen-reader-text"><?php esc_html_e( 'Adresa de e‑mail', 'hifiexpert' ); ?></label>
-			<input id="hx-nl-email" type="email" name="email" required placeholder="<?php esc_attr_e( 'adresa@email.ro', 'hifiexpert' ); ?>" autocomplete="email">
-			<button class="hx-btn hx-btn--primary" type="submit"><?php esc_html_e( 'Mă abonez', 'hifiexpert' ); ?></button>
+			<label for="hx-nl-email" class="screen-reader-text"><?php esc_html_e( 'Adresa de e‑mail', 'yamaha-audio' ); ?></label>
+			<input id="hx-nl-email" type="email" name="email" required placeholder="<?php esc_attr_e( 'adresa@email.ro', 'yamaha-audio' ); ?>" autocomplete="email">
+			<button class="hx-btn hx-btn--primary" type="submit"><?php esc_html_e( 'Mă abonez', 'yamaha-audio' ); ?></button>
 		</div>
-		<label class="hx-nl__consent"><input type="checkbox" name="consent" value="1" required> <span><?php printf( wp_kses_post( __( 'Sunt de acord cu <a href="%s">politica de confidențialitate</a>. Te poți dezabona oricând.', 'hifiexpert' ) ), esc_url( get_privacy_policy_url() ?: home_url( '/politica-de-confidentialitate/' ) ) ); ?></span></label>
-		<?php if ( 'ok' === $status ) : ?><p class="hx-nl__msg hx-nl__msg--ok"><?php esc_html_e( 'Mulțumim! Te-am adăugat pe listă.', 'hifiexpert' ); ?></p><?php endif; ?>
-		<?php if ( 'dup' === $status ) : ?><p class="hx-nl__msg"><?php esc_html_e( 'Adresa este deja abonată.', 'hifiexpert' ); ?></p><?php endif; ?>
-		<?php if ( 'err' === $status ) : ?><p class="hx-nl__msg hx-nl__msg--err"><?php esc_html_e( 'Nu am putut salva adresa. Încearcă din nou.', 'hifiexpert' ); ?></p><?php endif; ?>
+		<label class="hx-nl__consent"><input type="checkbox" name="consent" value="1" required> <span><?php printf( wp_kses_post( __( 'Sunt de acord cu <a href="%s">politica de confidențialitate</a>. Te poți dezabona oricând.', 'yamaha-audio' ) ), esc_url( get_privacy_policy_url() ?: home_url( '/politica-de-confidentialitate/' ) ) ); ?></span></label>
+		<?php if ( 'ok' === $status ) : ?><p class="hx-nl__msg hx-nl__msg--ok"><?php esc_html_e( 'Mulțumim! Te-am adăugat pe listă.', 'yamaha-audio' ); ?></p><?php endif; ?>
+		<?php if ( 'dup' === $status ) : ?><p class="hx-nl__msg"><?php esc_html_e( 'Adresa este deja abonată.', 'yamaha-audio' ); ?></p><?php endif; ?>
+		<?php if ( 'err' === $status ) : ?><p class="hx-nl__msg hx-nl__msg--err"><?php esc_html_e( 'Nu am putut salva adresa. Încearcă din nou.', 'yamaha-audio' ); ?></p><?php endif; ?>
 	</form>
 	<?php
 	return ob_get_clean();
 }
 
-function hifiexpert_handle_subscribe() {
+function yamaha_audio_handle_subscribe() {
 	$back = wp_get_referer() ?: home_url( '/' );
 	$back = remove_query_arg( 'nl', $back );
 	if ( ! isset( $_POST['hx_nl_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['hx_nl_nonce'] ) ), 'hx_subscribe' ) || ! empty( $_POST['hx_website'] ) ) {
@@ -78,16 +78,16 @@ function hifiexpert_handle_subscribe() {
 	wp_safe_redirect( add_query_arg( 'nl', 'ok', $back ) . '#newsletter' );
 	exit;
 }
-add_action( 'admin_post_nopriv_hx_subscribe', 'hifiexpert_handle_subscribe' );
-add_action( 'admin_post_hx_subscribe', 'hifiexpert_handle_subscribe' );
+add_action( 'admin_post_nopriv_hx_subscribe', 'yamaha_audio_handle_subscribe' );
+add_action( 'admin_post_hx_subscribe', 'yamaha_audio_handle_subscribe' );
 
 /* Admin: CSV export button + columns */
 add_filter( 'manage_hx_subscriber_posts_columns', function ( $cols ) {
-	return array( 'cb' => $cols['cb'], 'title' => __( 'E‑mail', 'hifiexpert' ), 'date' => __( 'Data', 'hifiexpert' ) );
+	return array( 'cb' => $cols['cb'], 'title' => __( 'E‑mail', 'yamaha-audio' ), 'date' => __( 'Data', 'yamaha-audio' ) );
 } );
 add_action( 'restrict_manage_posts', function ( $post_type ) {
 	if ( 'hx_subscriber' === $post_type ) {
-		echo '<a class="button" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=hx_subscribers_csv' ), 'hx_subscribers_csv' ) ) . '">' . esc_html__( 'Exportă CSV', 'hifiexpert' ) . '</a>';
+		echo '<a class="button" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=hx_subscribers_csv' ), 'hx_subscribers_csv' ) ) . '">' . esc_html__( 'Exportă CSV', 'yamaha-audio' ) . '</a>';
 	}
 } );
 add_action( 'admin_post_hx_subscribers_csv', function () {

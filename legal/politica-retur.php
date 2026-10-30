@@ -2,7 +2,7 @@
 /**
  * Retur și drept de retragere – text generat de temă (include formularul de retragere, Anexa B la OUG 34/2014).
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;

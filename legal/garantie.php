@@ -2,17 +2,16 @@
 /**
  * Garanție și service – text generat de temă.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
 ?>
-<p class="hx-note hx-note--accent"><strong>Pe scurt:</strong> produsele noi au 2 ani garanție legală (consumatori), produsele în consignație 12 luni. Dacă ceva nu funcționează, ne scrii, aducem produsul la service‑ul autorizat al distribuitorului și îl reparăm sau îl înlocuim gratuit. Pe durata reparației, garanția se prelungește.</p>
+<p class="hx-note hx-note--accent"><strong>Pe scurt:</strong> produsele au 2 ani garanție legală de conformitate (consumatori). Dacă ceva nu funcționează, ne scrii, aducem produsul la service‑ul autorizat al distribuitorului și îl reparăm sau îl înlocuim gratuit. Pe durata reparației, garanția se prelungește.</p>
 
 <h2>1. Garanția legală de conformitate (consumatori)</h2>
 <ul>
 	<li>Toate produsele <strong>noi</strong> vândute de <?php echo $v['company']; ?> beneficiază de garanția legală de conformitate de <strong>2 ani de la livrare</strong>, conform OUG nr. 140/2021 privind anumite aspecte referitoare la contractele de vânzare de bunuri.</li>
-	<li>Produsele <strong>în consignație (second‑hand sau demo)</strong> beneficiază de garanție legală de conformitate de <strong>12 luni de la livrare</strong>, termen redus convenit în condițiile art. 11 din OUG nr. 140/2021 și menționat pe pagina produsului și pe factură.</li>
 	<li>Pentru neconformitățile apărute în primul an de la livrare, legea prezumă că ele existau la momentul livrării, cu excepția cazului în care prezumția este incompatibilă cu natura produsului sau a neconformității.</li>
 	<li>Garanția legală este oferită de vânzător (noi) și nu este condiționată de un certificat; factura ține loc de document de garanție. Producătorii pot oferi suplimentar o <strong>garanție comercială</strong> (de exemplu 3–5 ani la unele boxe sau amplificatoare), în condițiile din certificatul lor, care nu limitează drepturile legale.</li>
 </ul>

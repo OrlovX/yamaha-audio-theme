@@ -2,7 +2,7 @@
 /**
  * WooCommerce integration: hooks, query tweaks, single-product layout.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -19,9 +19,9 @@ remove_action( 'woocommerce_before_shop_loop', 'woocommerce_output_all_notices',
 
 add_filter( 'woocommerce_breadcrumb_defaults', function ( $d ) {
 	$d['delimiter']   = '<span class="hx-crumbs__sep" aria-hidden="true">/</span>';
-	$d['wrap_before'] = '<nav class="hx-crumbs" aria-label="' . esc_attr__( 'Navigare', 'hifiexpert' ) . '">';
+	$d['wrap_before'] = '<nav class="hx-crumbs" aria-label="' . esc_attr__( 'Navigare', 'yamaha-audio' ) . '">';
 	$d['wrap_after']  = '</nav>';
-	$d['home']        = __( 'Acasă', 'hifiexpert' );
+	$d['home']        = __( 'Acasă', 'yamaha-audio' );
 	return $d;
 } );
 
@@ -95,10 +95,10 @@ add_filter( 'posts_clauses', function ( $clauses, $query ) {
 
 add_filter( 'woocommerce_catalog_orderby', function ( $options ) {
 	return array(
-		'popularity' => __( 'Recomandate', 'hifiexpert' ),
-		'date'       => __( 'Noutăți', 'hifiexpert' ),
-		'price'      => __( 'Preț crescător', 'hifiexpert' ),
-		'price-desc' => __( 'Preț descrescător', 'hifiexpert' ),
+		'popularity' => __( 'Recomandate', 'yamaha-audio' ),
+		'date'       => __( 'Noutăți', 'yamaha-audio' ),
+		'price'      => __( 'Preț crescător', 'yamaha-audio' ),
+		'price-desc' => __( 'Preț descrescător', 'yamaha-audio' ),
 	);
 } );
 
@@ -117,16 +117,16 @@ add_filter( 'woocommerce_add_to_cart_fragments', function ( $fragments ) {
  * ---------------------------------------------------------------------- */
 
 add_filter( 'woocommerce_product_single_add_to_cart_text', function () {
-	return __( 'Adaugă în coș', 'hifiexpert' );
+	return __( 'Adaugă în coș', 'yamaha-audio' );
 } );
 add_filter( 'woocommerce_product_add_to_cart_text', function ( $text, $product ) {
 	if ( $product && $product->is_type( 'variable' ) ) {
-		return __( 'Alege opțiunile', 'hifiexpert' );
+		return __( 'Alege opțiunile', 'yamaha-audio' );
 	}
 	return $text;
 }, 10, 2 );
 
-// Summary order: brand, title, lead, price, rate, variations/add-to-cart, promises, secondary CTAs, trust.
+// Summary order: category, title, lead, price, rate, variations/add-to-cart, promises, secondary CTAs, trust.
 remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10 );
 remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_price', 10 );
 remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40 );
@@ -136,10 +136,10 @@ remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_p
 // Short descriptions on this site are "name + [product_info_table]" from the old theme:
 // show a real lead sentence from the description instead.
 remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20 );
-add_action( 'woocommerce_single_product_summary', 'hifiexpert_single_lead', 20 );
-function hifiexpert_single_lead() {
+add_action( 'woocommerce_single_product_summary', 'yamaha_audio_single_lead', 20 );
+function yamaha_audio_single_lead() {
 	global $product;
-	$lead = hifiexpert_product_lead( $product, 40 );
+	$lead = yamaha_audio_product_lead( $product, 40 );
 	if ( $lead ) {
 		echo '<p class="woocommerce-product-details__short-description">' . esc_html( $lead ) . '</p>';
 	}
@@ -151,47 +151,50 @@ add_action( 'init', function () {
 	}
 }, 20 );
 
-add_action( 'woocommerce_single_product_summary', 'hifiexpert_single_brand', 4 );
-add_action( 'woocommerce_single_product_summary', 'hifiexpert_single_price', 10 );
-add_action( 'woocommerce_single_product_summary', 'hifiexpert_single_promises', 25 );
-add_action( 'woocommerce_single_product_summary', 'hifiexpert_single_secondary', 32 );
-add_action( 'woocommerce_single_product_summary', 'hifiexpert_single_trust', 35 );
-add_action( 'woocommerce_after_single_product_summary', 'hifiexpert_single_sections', 10 );
-add_action( 'woocommerce_after_single_product', 'hifiexpert_single_buybar', 5 );
+add_action( 'woocommerce_single_product_summary', 'yamaha_audio_single_kicker', 4 );
+add_action( 'woocommerce_single_product_summary', 'yamaha_audio_single_price', 10 );
+add_action( 'woocommerce_single_product_summary', 'yamaha_audio_single_promises', 25 );
+add_action( 'woocommerce_single_product_summary', 'yamaha_audio_single_secondary', 32 );
+add_action( 'woocommerce_single_product_summary', 'yamaha_audio_single_trust', 35 );
+add_action( 'woocommerce_after_single_product_summary', 'yamaha_audio_single_sections', 10 );
+add_action( 'woocommerce_after_single_product', 'yamaha_audio_single_buybar', 5 );
 
 // Keep sale badge off the gallery (we render our own pill).
 remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10 );
 remove_action( 'woocommerce_before_shop_loop_item_title', 'woocommerce_show_product_loop_sale_flash', 10 );
 
-function hifiexpert_single_brand() {
+/**
+ * Eyebrow above the product title: the product's main category (the brand is always Yamaha here).
+ */
+function yamaha_audio_single_kicker() {
 	global $product;
-	$brand = hifiexpert_product_brand( $product );
-	if ( $brand ) {
-		printf( '<a class="hx-eyebrow hx-single__brand" href="%s">%s</a>', esc_url( get_term_link( $brand ) ), esc_html( $brand->name ) );
+	$cat = yamaha_audio_product_category( $product );
+	if ( $cat ) {
+		printf( '<a class="hx-eyebrow hx-single__kicker" href="%s">%s</a>', esc_url( get_term_link( $cat ) ), esc_html( $cat->name ) );
 	}
 }
 
-function hifiexpert_single_price() {
+function yamaha_audio_single_price() {
 	global $product;
-	$percent = hifiexpert_discount_percent( $product );
+	$percent = yamaha_audio_discount_percent( $product );
 	echo '<div class="hx-single__pricing">';
-	hifiexpert_price_block( $product, 'single' );
-	$rate = hifiexpert_installment( hifiexpert_active_price( $product ) );
+	yamaha_audio_price_block( $product, 'single' );
+	$rate = yamaha_audio_installment( yamaha_audio_active_price( $product ) );
 	if ( $rate ) {
 		printf(
 			'<p class="hx-single__rate">%s <strong>%d × %s</strong> %s</p>',
-			esc_html__( 'sau', 'hifiexpert' ),
-			(int) hifiexpert_opt( 'rates_count' ),
-			esc_html( hifiexpert_lei( $rate ) ),
-			esc_html( hifiexpert_opt( 'rates_label' ) )
+			esc_html__( 'sau', 'yamaha-audio' ),
+			(int) yamaha_audio_opt( 'rates_count' ),
+			esc_html( yamaha_audio_lei( $rate ) ),
+			esc_html( yamaha_audio_opt( 'rates_label' ) )
 		);
 	}
 	echo '</div>';
 }
 
-function hifiexpert_single_promises() {
+function yamaha_audio_single_promises() {
 	global $product;
-	list( $state, $label ) = hifiexpert_stock_state( $product );
+	list( $state, $label ) = yamaha_audio_stock_state( $product );
 	if ( ! $label ) {
 		return;
 	}
@@ -199,62 +202,29 @@ function hifiexpert_single_promises() {
 	echo '<div class="hx-promise">';
 	echo '<span class="hx-stock hx-stock--' . esc_attr( $state ) . ' hx-promise__stock"><span class="hx-stock__dot"></span>' . esc_html( $label );
 	if ( 'ok' === $state && null !== $qty && $qty > 0 && $qty <= 5 ) {
-		echo ' · ' . sprintf( esc_html( _n( '%d bucată', '%d bucăți', $qty, 'hifiexpert' ) ), (int) $qty );
+		echo ' · ' . sprintf( esc_html( _n( '%d bucată', '%d bucăți', $qty, 'yamaha-audio' ) ), (int) $qty );
 	}
 	echo '</span>';
-	if ( hifiexpert_is_music( $product ) ) {
-		if ( 'ok' === $state ) {
-			echo '<span class="hx-promise__line">' . esc_html__( 'Discurile vin de la distribuitor la comandă; le trimitem prin curier sau le păstrăm în showroom pentru ridicare.', 'hifiexpert' ) . '</span>';
-		} else {
-			echo '<span class="hx-promise__line">' . esc_html__( 'Nu îl avem pe stoc chiar acum: scrie‑ne și verificăm la distribuitor în aceeași zi dacă îl putem aduce.', 'hifiexpert' ) . '</span>';
-		}
-	} elseif ( 'ok' === $state || 'warn' === $state && $product->is_in_stock() ) {
-		echo '<span class="hx-promise__line">' . esc_html( hifiexpert_opt( 'delivery_promise' ) ) . '</span>';
-		$pickup = hifiexpert_opt( 'pickup_promise' );
+	if ( 'ok' === $state || 'warn' === $state && $product->is_in_stock() ) {
+		echo '<span class="hx-promise__line">' . esc_html( yamaha_audio_opt( 'delivery_promise' ) ) . '</span>';
+		$pickup = yamaha_audio_opt( 'pickup_promise' );
 		if ( $pickup ) {
 			echo '<span class="hx-promise__line hx-promise__line--muted">' . esc_html( $pickup ) . '</span>';
 		}
 	} elseif ( 'warn' === $state ) {
-		echo '<span class="hx-promise__line">' . esc_html__( 'Produs la comandă: te contactăm cu termenul de livrare după confirmare.', 'hifiexpert' ) . '</span>';
+		echo '<span class="hx-promise__line">' . esc_html__( 'Produs la comandă: te contactăm cu termenul de livrare după confirmare.', 'yamaha-audio' ) . '</span>';
 	}
 	echo '</div>';
 }
 
-/**
- * Music without stock: no cart form, an "ask about availability" block instead.
- */
-add_action( 'wp', function () {
-	if ( ! is_product() ) {
-		return;
-	}
-	$product = wc_get_product( get_queried_object_id() );
-	if ( $product && hifiexpert_is_inquiry_only( $product ) ) {
-		remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
-		add_action( 'woocommerce_single_product_summary', 'hifiexpert_single_inquiry', 30 );
-	}
-} );
-
-function hifiexpert_single_inquiry() {
+function yamaha_audio_single_secondary() {
 	global $product;
-	$wa = hifiexpert_inquiry_url( $product );
-	echo '<div class="hx-inquiry">';
-	echo '<p class="hx-inquiry__text">' . esc_html__( 'Disponibilitatea se confirmă la cerere. Îți răspundem în programul showroom‑ului, de obicei în câteva minute.', 'hifiexpert' ) . '</p>';
-	echo '<div class="hx-inquiry__ctas">';
-	if ( $wa ) {
-		echo '<a class="hx-btn hx-btn--gold" href="' . esc_url( $wa ) . '" target="_blank" rel="noopener nofollow">' . hifiexpert_icon( 'chat', 18 ) . esc_html( hifiexpert_opt( 'music_inquire_text' ) ) . '</a>';
-	}
-	echo '<a class="hx-btn hx-btn--ghost" href="mailto:' . esc_attr( hifiexpert_opt( 'topbar_email' ) ) . '?subject=' . rawurlencode( sprintf( __( 'Disponibilitate: %s', 'hifiexpert' ), $product->get_name() ) ) . '">' . hifiexpert_icon( 'mail', 18 ) . esc_html__( 'Trimite e‑mail', 'hifiexpert' ) . '</a>';
-	echo '</div></div>';
-}
-
-function hifiexpert_single_secondary() {
-	global $product;
-	$wa = hifiexpert_whatsapp_url( sprintf( __( 'Bună! Am o întrebare despre %s (%s)', 'hifiexpert' ), $product->get_name(), $product->get_permalink() ) );
+	$wa = yamaha_audio_whatsapp_url( sprintf( __( 'Bună! Am o întrebare despre %s (%s)', 'yamaha-audio' ), $product->get_name(), $product->get_permalink() ) );
 	echo '<div class="hx-single__secondary">';
 	if ( $wa ) {
-		echo '<a class="hx-btn hx-btn--ghost" href="' . esc_url( $wa ) . '" target="_blank" rel="noopener">' . hifiexpert_icon( 'chat', 18 ) . esc_html__( 'Întreabă un expert', 'hifiexpert' ) . '</a>';
+		echo '<a class="hx-btn hx-btn--ghost" href="' . esc_url( $wa ) . '" target="_blank" rel="noopener">' . yamaha_audio_icon( 'chat', 18 ) . esc_html__( 'Întreabă un expert', 'yamaha-audio' ) . '</a>';
 	}
-	echo '<a class="hx-btn hx-btn--ghost" href="' . esc_url( hifiexpert_opt( 'topbar_address_url' ) ) . '" target="_blank" rel="noopener">' . hifiexpert_icon( 'pin', 18 ) . esc_html__( 'Ascultă‑l în showroom', 'hifiexpert' ) . '</a>';
+	echo '<a class="hx-btn hx-btn--ghost" href="' . esc_url( yamaha_audio_opt( 'topbar_address_url' ) ) . '" target="_blank" rel="noopener">' . yamaha_audio_icon( 'pin', 18 ) . esc_html__( 'Ascultă‑l în showroom', 'yamaha-audio' ) . '</a>';
 	echo '</div>';
 	if ( function_exists( 'YITH_WCWL' ) && shortcode_exists( 'yith_wcwl_add_to_wishlist' ) ) {
 		echo '<div class="hx-single__wishlist">' . do_shortcode( '[yith_wcwl_add_to_wishlist]' ) . '</div>';
@@ -262,13 +232,13 @@ function hifiexpert_single_secondary() {
 }
 
 // Wishlist button texts (the plugin's defaults are in English / shouty).
-add_filter( 'yith_wcwl_button_label', function () { return __( 'Salvează în lista de dorințe', 'hifiexpert' ); } );
-add_filter( 'yith_wcwl_browse_wishlist_label', function () { return __( 'Vezi lista de dorințe', 'hifiexpert' ); } );
-add_filter( 'yith_wcwl_product_added_to_wishlist_message_button', function () { return __( 'Salvat în lista de dorințe', 'hifiexpert' ); } );
-add_filter( 'yith_wcwl_product_already_in_wishlist_message_button', function () { return __( 'Este deja în lista ta', 'hifiexpert' ); } );
+add_filter( 'yith_wcwl_button_label', function () { return __( 'Salvează în lista de dorințe', 'yamaha-audio' ); } );
+add_filter( 'yith_wcwl_browse_wishlist_label', function () { return __( 'Vezi lista de dorințe', 'yamaha-audio' ); } );
+add_filter( 'yith_wcwl_product_added_to_wishlist_message_button', function () { return __( 'Salvat în lista de dorințe', 'yamaha-audio' ); } );
+add_filter( 'yith_wcwl_product_already_in_wishlist_message_button', function () { return __( 'Este deja în lista ta', 'yamaha-audio' ); } );
 
-function hifiexpert_single_trust() {
-	$items = array_filter( array( hifiexpert_opt( 'warranty_text' ), hifiexpert_opt( 'returns_text' ), hifiexpert_opt( 'invoice_text' ) ) );
+function yamaha_audio_single_trust() {
+	$items = array_filter( array( yamaha_audio_opt( 'warranty_text' ), yamaha_audio_opt( 'returns_text' ), yamaha_audio_opt( 'invoice_text' ) ) );
 	if ( ! $items ) {
 		return;
 	}
@@ -283,7 +253,7 @@ function hifiexpert_single_trust() {
  * Highlights from the short description: if it is a bullet list, tiles; else nothing extra
  * (the short description is already shown as the lead in the summary).
  */
-function hifiexpert_highlight_items( $product ) {
+function yamaha_audio_highlight_items( $product ) {
 	$html = $product->get_short_description();
 	if ( ! $html || false === stripos( $html, '<li' ) ) {
 		return array();
@@ -295,34 +265,34 @@ function hifiexpert_highlight_items( $product ) {
 	return array_slice( $items, 0, 6 );
 }
 
-function hifiexpert_single_sections() {
+function yamaha_audio_single_sections() {
 	global $product;
-	$highlights = hifiexpert_highlight_items( $product );
-	$desc       = apply_filters( 'the_content', hifiexpert_clean_description( $product ) );
+	$highlights = yamaha_audio_highlight_items( $product );
+	$desc       = apply_filters( 'the_content', yamaha_audio_clean_description( $product ) );
 
 	echo '<div class="hx-single__sections">';
 
 	if ( $highlights ) {
-		echo '<section class="hx-section hx-section--tight"><h2 class="hx-section__title">' . sprintf( esc_html__( 'De ce %s', 'hifiexpert' ), esc_html( $product->get_name() ) ) . '</h2><div class="hx-why">';
+		echo '<section class="hx-section hx-section--tight"><h2 class="hx-section__title">' . sprintf( esc_html__( 'De ce %s', 'yamaha-audio' ), esc_html( $product->get_name() ) ) . '</h2><div class="hx-why">';
 		foreach ( $highlights as $h ) {
 			echo '<div class="hx-why__item">' . esc_html( $h ) . '</div>';
 		}
 		echo '</div></section>';
 	}
 
-	$specs = hifiexpert_spec_rows( $product );
+	$specs = yamaha_audio_spec_rows( $product );
 
 	if ( $desc ) {
-		echo '<section class="hx-section hx-section--tight hx-single__desc"><h2 class="hx-section__title">' . esc_html__( 'Descriere', 'hifiexpert' ) . '</h2><div class="hx-prose">' . $desc . '</div></section>'; // phpcs:ignore
+		echo '<section class="hx-section hx-section--tight hx-single__desc"><h2 class="hx-section__title">' . esc_html__( 'Descriere', 'yamaha-audio' ) . '</h2><div class="hx-prose">' . $desc . '</div></section>'; // phpcs:ignore
 	}
 	if ( count( $specs ) >= 3 ) {
-		echo '<section class="hx-section hx-section--tight hx-single__specs"><h2 class="hx-section__title">' . esc_html__( 'Specificații', 'hifiexpert' ) . '</h2><dl class="hx-specs hx-specs--grid">';
+		echo '<section class="hx-section hx-section--tight hx-single__specs"><h2 class="hx-section__title">' . esc_html__( 'Specificații', 'yamaha-audio' ) . '</h2><dl class="hx-specs hx-specs--grid">';
 		foreach ( $specs as $row ) {
 			echo '<div class="hx-specs__row"><dt>' . esc_html( $row[0] ) . '</dt><dd>' . esc_html( $row[1] ) . '</dd></div>';
 		}
 		$sku = $product->get_sku();
 		if ( $sku ) {
-			echo '<div class="hx-specs__row"><dt>' . esc_html__( 'Cod produs', 'hifiexpert' ) . '</dt><dd>' . esc_html( $sku ) . '</dd></div>';
+			echo '<div class="hx-specs__row"><dt>' . esc_html__( 'Cod produs', 'yamaha-audio' ) . '</dt><dd>' . esc_html( $sku ) . '</dd></div>';
 		}
 		echo '</dl></section>';
 	}
@@ -340,29 +310,25 @@ function hifiexpert_single_sections() {
 /**
  * Sticky buy bar shown when the summary scrolls out of view.
  */
-function hifiexpert_single_buybar() {
+function yamaha_audio_single_buybar() {
 	global $product;
 	if ( ! $product || ! $product->is_purchasable() ) {
 		return;
 	}
-	$brand = hifiexpert_product_brand( $product );
-	$rate  = hifiexpert_rate_line( $product );
+	$cat  = yamaha_audio_product_category( $product );
+	$rate = yamaha_audio_rate_line( $product );
 	?>
 	<div class="hx-buybar" id="hx-buybar" hidden>
 		<div class="hx-buybar__name">
-			<?php if ( $brand ) : ?><span class="hx-buybar__brand"><?php echo esc_html( $brand->name ); ?></span><?php endif; ?>
+			<?php if ( $cat ) : ?><span class="hx-buybar__kicker"><?php echo esc_html( $cat->name ); ?></span><?php endif; ?>
 			<span class="hx-buybar__title"><?php echo esc_html( $product->get_name() ); ?></span>
 		</div>
 		<div class="hx-buybar__right">
 			<span class="hx-buybar__price">
-				<span><?php echo esc_html( hifiexpert_lei( hifiexpert_active_price( $product ) ) ); ?></span>
+				<span><?php echo esc_html( yamaha_audio_lei( yamaha_audio_active_price( $product ) ) ); ?></span>
 				<?php if ( $rate ) : ?><small><?php echo esc_html( $rate ); ?></small><?php endif; ?>
 			</span>
-			<?php if ( hifiexpert_is_inquiry_only( $product ) ) : ?>
-				<a class="hx-btn hx-btn--gold hx-btn--sm" href="<?php echo esc_url( hifiexpert_inquiry_url( $product ) ); ?>" target="_blank" rel="noopener nofollow"><?php echo esc_html( hifiexpert_opt( 'music_inquire_text' ) ); ?></a>
-			<?php else : ?>
-				<button type="button" class="hx-btn hx-btn--primary hx-btn--sm" data-hx-buy><?php echo $product->is_type( 'variable' ) ? esc_html__( 'Alege opțiunile', 'hifiexpert' ) : esc_html__( 'Adaugă în coș', 'hifiexpert' ); ?></button>
-			<?php endif; ?>
+			<button type="button" class="hx-btn hx-btn--primary hx-btn--sm" data-hx-buy><?php echo $product->is_type( 'variable' ) ? esc_html__( 'Alege opțiunile', 'yamaha-audio' ) : esc_html__( 'Adaugă în coș', 'yamaha-audio' ); ?></button>
 		</div>
 	</div>
 	<?php
@@ -381,10 +347,10 @@ add_filter( 'woocommerce_upsells_columns', function () {
 	return 3;
 } );
 add_filter( 'woocommerce_product_related_products_heading', function () {
-	return __( 'Produse similare', 'hifiexpert' );
+	return __( 'Produse similare', 'yamaha-audio' );
 } );
 add_filter( 'woocommerce_product_upsells_products_heading', function () {
-	return __( 'Se potrivește cu', 'hifiexpert' );
+	return __( 'Se potrivește cu', 'yamaha-audio' );
 } );
 
 /* -------------------------------------------------------------------------

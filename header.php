@@ -2,7 +2,7 @@
 /**
  * Header: top bar (showroom / hours / e-mail), main bar with mega menu, search, actions.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -16,26 +16,26 @@ defined( 'ABSPATH' ) || exit;
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
-<a class="screen-reader-text hx-skip" href="#hx-main"><?php esc_html_e( 'Sari la conținut', 'hifiexpert' ); ?></a>
+<a class="screen-reader-text hx-skip" href="#hx-main"><?php esc_html_e( 'Sari la conținut', 'yamaha-audio' ); ?></a>
 
 <?php
-$hx_address = hifiexpert_opt( 'topbar_address' );
-$hx_hours   = hifiexpert_opt( 'topbar_hours' );
-$hx_email   = hifiexpert_opt( 'topbar_email' );
-$hx_wa      = hifiexpert_whatsapp_url();
-$hx_phone   = hifiexpert_opt( 'phone' );
-list( $hx_open, $hx_open_label ) = hifiexpert_open_state();
-$hx_hours_json = wp_json_encode( array_map( function ( $r ) { return $r ?: null; }, hifiexpert_hours_table() ) );
+$hx_address = yamaha_audio_opt( 'topbar_address' );
+$hx_hours   = yamaha_audio_opt( 'topbar_hours' );
+$hx_email   = yamaha_audio_opt( 'topbar_email' );
+$hx_wa      = yamaha_audio_whatsapp_url();
+$hx_phone   = yamaha_audio_opt( 'phone' );
+list( $hx_open, $hx_open_label ) = yamaha_audio_open_state();
+$hx_hours_json = wp_json_encode( array_map( function ( $r ) { return $r ?: null; }, yamaha_audio_hours_table() ) );
 ?>
 <div class="hx-topbar">
 	<div class="hx-wrap hx-topbar__inner" data-hx-ticker>
-		<a class="hx-topbar__item" href="<?php echo esc_url( hifiexpert_opt( 'topbar_address_url' ) ); ?>" target="_blank" rel="noopener">
-			<?php echo hifiexpert_icon( 'pin', 15 ); ?><strong><?php esc_html_e( 'Showroom', 'hifiexpert' ); ?></strong> <span><?php echo esc_html( $hx_address ); ?></span>
+		<a class="hx-topbar__item" href="<?php echo esc_url( yamaha_audio_opt( 'topbar_address_url' ) ); ?>" target="_blank" rel="noopener">
+			<?php echo yamaha_audio_icon( 'pin', 15 ); ?><strong><?php esc_html_e( 'Showroom', 'yamaha-audio' ); ?></strong> <span><?php echo esc_html( $hx_address ); ?></span>
 		</a>
 		<span class="hx-topbar__item hx-topbar__hours hx-open<?php echo $hx_open ? ' is-open' : ' is-closed'; ?>" data-hx-hours='<?php echo esc_attr( $hx_hours_json ); ?>' title="<?php echo esc_attr( $hx_hours ); ?>"><span class="hx-open__led" aria-hidden="true"></span><span class="hx-open__label"><?php echo esc_html( $hx_open_label ); ?></span></span>
-		<a class="hx-topbar__item hx-topbar__mail" href="mailto:<?php echo esc_attr( $hx_email ); ?>"><?php echo hifiexpert_icon( 'mail', 15 ); ?><span><?php echo esc_html( $hx_email ); ?></span></a>
+		<a class="hx-topbar__item hx-topbar__mail" href="mailto:<?php echo esc_attr( $hx_email ); ?>"><?php echo yamaha_audio_icon( 'mail', 15 ); ?><span><?php echo esc_html( $hx_email ); ?></span></a>
 		<?php if ( $hx_wa ) : ?>
-			<a class="hx-topbar__item hx-topbar__wa" href="<?php echo esc_url( $hx_wa ); ?>" target="_blank" rel="noopener"><?php echo hifiexpert_icon( 'chat', 15 ); ?><span><?php echo esc_html( $hx_phone ); ?> · WhatsApp</span></a>
+			<a class="hx-topbar__item hx-topbar__wa" href="<?php echo esc_url( $hx_wa ); ?>" target="_blank" rel="noopener"><?php echo yamaha_audio_icon( 'chat', 15 ); ?><span><?php echo esc_html( $hx_phone ); ?> · WhatsApp</span></a>
 		<?php endif; ?>
 		<?php
 		if ( has_nav_menu( 'topbar' ) ) {
@@ -56,9 +56,9 @@ $hx_hours_json = wp_json_encode( array_map( function ( $r ) { return $r ?: null;
 
 <header class="hx-header" id="hx-header">
 	<div class="hx-wrap hx-header__inner">
-		<button class="hx-iconbtn hx-burger" type="button" aria-controls="hx-mnav" aria-expanded="false" aria-label="<?php esc_attr_e( 'Meniu', 'hifiexpert' ); ?>"><?php echo hifiexpert_icon( 'menu', 22 ); ?></button>
-		<?php hifiexpert_logo(); ?>
-		<nav class="hx-nav" aria-label="<?php esc_attr_e( 'Categorii', 'hifiexpert' ); ?>">
+		<button class="hx-iconbtn hx-burger" type="button" aria-controls="hx-mnav" aria-expanded="false" aria-label="<?php esc_attr_e( 'Meniu', 'yamaha-audio' ); ?>"><?php echo yamaha_audio_icon( 'menu', 22 ); ?></button>
+		<?php yamaha_audio_logo(); ?>
+		<nav class="hx-nav" aria-label="<?php esc_attr_e( 'Categorii', 'yamaha-audio' ); ?>">
 			<?php
 			if ( has_nav_menu( 'primary' ) ) {
 				// Categories (mega menu) on the left…
@@ -68,12 +68,12 @@ $hx_hours_json = wp_json_encode( array_map( function ( $r ) { return $r ?: null;
 						'container'      => false,
 						'menu_class'     => 'hx-nav__list',
 						'depth'          => 3,
-						'walker'         => new HiFiExpert_Mega_Walker(),
+						'walker'         => new Yamaha_Audio_Mega_Walker(),
 						'fallback_cb'    => false,
 						'hx_group'       => 'cats',
 					)
 				);
-				// …and Blog / Branduri / Consignație / Promoții as a separate group on the right.
+				// …and Blog / Promoții / Contact as a separate group on the right.
 				wp_nav_menu(
 					array(
 						'theme_location' => 'primary',
@@ -81,14 +81,14 @@ $hx_hours_json = wp_json_encode( array_map( function ( $r ) { return $r ?: null;
 						'menu_class'     => 'hx-nav__list hx-nav__extra',
 						'menu_id'        => 'hx-nav-extra',
 						'depth'          => 1,
-						'walker'         => new HiFiExpert_Mega_Walker(),
+						'walker'         => new Yamaha_Audio_Mega_Walker(),
 						'fallback_cb'    => false,
 						'hx_group'       => 'extra',
 					)
 				);
 			} elseif ( class_exists( 'WooCommerce' ) ) {
 				echo '<ul class="hx-nav__list">';
-				foreach ( hifiexpert_home_categories( 7 ) as $term ) {
+				foreach ( yamaha_audio_home_categories( 7 ) as $term ) {
 					printf( '<li class="hx-nav__item"><a class="hx-nav__link" href="%s">%s</a></li>', esc_url( get_term_link( $term ) ), esc_html( $term->name ) );
 				}
 				echo '</ul>';
@@ -96,30 +96,30 @@ $hx_hours_json = wp_json_encode( array_map( function ( $r ) { return $r ?: null;
 			?>
 		</nav>
 		<div class="hx-header__right">
-			<?php hifiexpert_search_form( true ); ?>
-			<?php hifiexpert_header_actions(); ?>
+			<?php yamaha_audio_search_form( true ); ?>
+			<?php yamaha_audio_header_actions(); ?>
 		</div>
 	</div>
 </header>
 
-<?php $hx_camp = hifiexpert_campaign(); ?>
-<?php if ( $hx_camp && hifiexpert_opt( 'camp_bar' ) && ! ( class_exists( 'WooCommerce' ) && ( is_checkout() || is_cart() ) ) ) : ?>
+<?php $hx_camp = yamaha_audio_campaign(); ?>
+<?php if ( $hx_camp && yamaha_audio_opt( 'camp_bar' ) && ! ( class_exists( 'WooCommerce' ) && ( is_checkout() || is_cart() ) ) ) : ?>
 	<div class="hx-campbar" role="region" aria-label="<?php echo esc_attr( $hx_camp['name'] ); ?>">
 		<div class="hx-wrap hx-campbar__inner">
 			<a class="hx-campbar__name" href="<?php echo esc_url( $hx_camp['url'] ); ?>"><?php echo esc_html( $hx_camp['name'] ); ?></a>
 			<?php if ( $hx_camp['tagline'] ) : ?><span class="hx-campbar__tag"><?php echo esc_html( $hx_camp['tagline'] ); ?></span><?php endif; ?>
-			<?php if ( $hx_camp['end_ts'] ) : ?><span class="hx-campbar__timer" data-hx-countdown="<?php echo (int) $hx_camp['end_ts']; ?>"><?php printf( esc_html__( 'până pe %s', 'hifiexpert' ), esc_html( $hx_camp['end_txt'] ) ); ?></span><?php endif; ?>
-			<?php if ( ! is_page( 'promotii' ) ) : ?><a class="hx-btn hx-btn--sm hx-campbar__cta" href="<?php echo esc_url( $hx_camp['url'] ); ?>"><?php esc_html_e( 'Vezi ofertele', 'hifiexpert' ); ?> →</a><?php endif; ?>
+			<?php if ( $hx_camp['end_ts'] ) : ?><span class="hx-campbar__timer" data-hx-countdown="<?php echo (int) $hx_camp['end_ts']; ?>"><?php printf( esc_html__( 'până pe %s', 'yamaha-audio' ), esc_html( $hx_camp['end_txt'] ) ); ?></span><?php endif; ?>
+			<?php if ( ! is_page( 'promotii' ) ) : ?><a class="hx-btn hx-btn--sm hx-campbar__cta" href="<?php echo esc_url( $hx_camp['url'] ); ?>"><?php esc_html_e( 'Vezi ofertele', 'yamaha-audio' ); ?> →</a><?php endif; ?>
 		</div>
 	</div>
 <?php endif; ?>
 
 <div class="hx-mnav" id="hx-mnav" hidden>
 	<div class="hx-mnav__head">
-		<span class="hx-mnav__title"><?php esc_html_e( 'Meniu', 'hifiexpert' ); ?></span>
-		<button class="hx-iconbtn" type="button" data-hx-close aria-label="<?php esc_attr_e( 'Închide meniul', 'hifiexpert' ); ?>"><?php echo hifiexpert_icon( 'close', 22 ); ?></button>
+		<span class="hx-mnav__title"><?php esc_html_e( 'Meniu', 'yamaha-audio' ); ?></span>
+		<button class="hx-iconbtn" type="button" data-hx-close aria-label="<?php esc_attr_e( 'Închide meniul', 'yamaha-audio' ); ?>"><?php echo yamaha_audio_icon( 'close', 22 ); ?></button>
 	</div>
-	<div class="hx-mnav__search"><?php hifiexpert_search_form(); ?></div>
+	<div class="hx-mnav__search"><?php yamaha_audio_search_form(); ?></div>
 	<?php
 	if ( has_nav_menu( 'primary' ) ) {
 		wp_nav_menu(
@@ -134,10 +134,10 @@ $hx_hours_json = wp_json_encode( array_map( function ( $r ) { return $r ?: null;
 	}
 	?>
 	<div class="hx-mnav__foot">
-		<a href="<?php echo esc_url( hifiexpert_opt( 'topbar_address_url' ) ); ?>"><?php echo hifiexpert_icon( 'pin', 16 ); ?><?php echo esc_html( $hx_address ); ?></a>
-		<?php if ( $hx_wa ) : ?><a href="<?php echo esc_url( $hx_wa ); ?>"><?php echo hifiexpert_icon( 'chat', 16 ); ?><?php echo esc_html( $hx_phone ); ?> · WhatsApp</a><?php endif; ?>
-		<a href="mailto:<?php echo esc_attr( $hx_email ); ?>"><?php echo hifiexpert_icon( 'mail', 16 ); ?><?php echo esc_html( $hx_email ); ?></a>
-		<?php hifiexpert_theme_switch( true ); ?>
+		<a href="<?php echo esc_url( yamaha_audio_opt( 'topbar_address_url' ) ); ?>"><?php echo yamaha_audio_icon( 'pin', 16 ); ?><?php echo esc_html( $hx_address ); ?></a>
+		<?php if ( $hx_wa ) : ?><a href="<?php echo esc_url( $hx_wa ); ?>"><?php echo yamaha_audio_icon( 'chat', 16 ); ?><?php echo esc_html( $hx_phone ); ?> · WhatsApp</a><?php endif; ?>
+		<a href="mailto:<?php echo esc_attr( $hx_email ); ?>"><?php echo yamaha_audio_icon( 'mail', 16 ); ?><?php echo esc_html( $hx_email ); ?></a>
+		<?php yamaha_audio_theme_switch( true ); ?>
 	</div>
 </div>
 <div class="hx-scrim" data-hx-close hidden></div>

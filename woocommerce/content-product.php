@@ -2,7 +2,7 @@
 /**
  * Product card in loops (shop, category, related, upsells).
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -15,4 +15,4 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 
 // the first row loads eagerly (LCP); the rest lazily
 $hx_loop_index = (int) wc_get_loop_prop( 'loop' );
-hifiexpert_product_card( $product, array( 'lazy' => $hx_loop_index > 3 ) );
+yamaha_audio_product_card( $product, array( 'lazy' => $hx_loop_index > 3 ) );

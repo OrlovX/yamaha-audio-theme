@@ -2,7 +2,7 @@
 /**
  * Scripts & styles: one stylesheet, one small script, nothing we don't use.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -10,25 +10,25 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Cache-busting by file mtime so git pulls on staging always refresh.
  */
-function hifiexpert_asset_ver( $rel ) {
-	$file = HIFIEXPERT_DIR . $rel;
-	return file_exists( $file ) ? (string) filemtime( $file ) : HIFIEXPERT_VERSION;
+function yamaha_audio_asset_ver( $rel ) {
+	$file = YAMAHA_AUDIO_DIR . $rel;
+	return file_exists( $file ) ? (string) filemtime( $file ) : YAMAHA_AUDIO_VERSION;
 }
 
 add_action(
 	'wp_enqueue_scripts',
 	function () {
 		wp_enqueue_style(
-			'hifiexpert-fonts',
+			'yamaha-audio-fonts',
 			'https://fonts.googleapis.com/css2?family=Manrope:wght@400..800&display=swap',
 			array(),
 			null
 		);
-		wp_enqueue_style( 'hifiexpert-main', HIFIEXPERT_URI . '/assets/css/main.css', array(), hifiexpert_asset_ver( '/assets/css/main.css' ) );
+		wp_enqueue_style( 'yamaha-audio-main', YAMAHA_AUDIO_URI . '/assets/css/main.css', array(), yamaha_audio_asset_ver( '/assets/css/main.css' ) );
 
-		wp_enqueue_script( 'hifiexpert-main', HIFIEXPERT_URI . '/assets/js/main.js', array(), hifiexpert_asset_ver( '/assets/js/main.js' ), array( 'strategy' => 'defer' ) );
+		wp_enqueue_script( 'yamaha-audio-main', YAMAHA_AUDIO_URI . '/assets/js/main.js', array(), yamaha_audio_asset_ver( '/assets/js/main.js' ), array( 'strategy' => 'defer' ) );
 		wp_localize_script(
-			'hifiexpert-main',
+			'yamaha-audio-main',
 			'hxData',
 			array(
 				'cartUrl' => class_exists( 'WooCommerce' ) ? wc_get_cart_url() : home_url( '/' ),
@@ -61,15 +61,15 @@ add_filter( 'woocommerce_enqueue_styles', '__return_empty_array' );
 // Print the theme stylesheet last, after every plugin stylesheet, so theme rules win on equal specificity.
 add_action( 'wp_print_styles', function () {
 	global $wp_styles;
-	if ( ! $wp_styles || ! in_array( 'hifiexpert-main', $wp_styles->queue, true ) ) {
+	if ( ! $wp_styles || ! in_array( 'yamaha-audio-main', $wp_styles->queue, true ) ) {
 		return;
 	}
-	$wp_styles->queue = array_values( array_diff( $wp_styles->queue, array( 'hifiexpert-main' ) ) );
-	$wp_styles->queue[] = 'hifiexpert-main';
+	$wp_styles->queue = array_values( array_diff( $wp_styles->queue, array( 'yamaha-audio-main' ) ) );
+	$wp_styles->queue[] = 'yamaha-audio-main';
 	// Anything enqueued late (footer) still prints after; declare the known offenders as our deps instead.
 	foreach ( array( 'themecomplete-styles', 'tm-epo', 'nouislider', 'themecomplete-styles-smallscreen' ) as $h ) {
 		if ( isset( $wp_styles->registered[ $h ] ) ) {
-			$wp_styles->registered['hifiexpert-main']->deps[] = $h;
+			$wp_styles->registered['yamaha-audio-main']->deps[] = $h;
 		}
 	}
 }, 999 );
@@ -95,11 +95,11 @@ add_action(
 		if ( ! is_front_page() || ! class_exists( 'WooCommerce' ) ) {
 			return;
 		}
-		$product = hifiexpert_hero_product();
+		$product = yamaha_audio_hero_product();
 		if ( ! $product ) {
 			return;
 		}
-		$src = wp_get_attachment_image_url( $product->get_image_id(), 'hifiexpert-hero' );
+		$src = wp_get_attachment_image_url( $product->get_image_id(), 'yamaha-audio-hero' );
 		if ( $src ) {
 			printf( '<link rel="preload" as="image" href="%s" fetchpriority="high">' . "\n", esc_url( $src ) );
 		}
@@ -110,7 +110,7 @@ add_action(
 // Theme colour for mobile browser chrome + the light/dark choice, applied before the first paint
 // (localStorage "hx-theme" wins, then the Customizer default; "auto" follows the device setting).
 add_action( 'wp_head', function () {
-	$mode = (string) hifiexpert_opt( 'theme_mode' );
+	$mode = (string) yamaha_audio_opt( 'theme_mode' );
 	$mode = in_array( $mode, array( 'dark', 'light', 'auto' ), true ) ? $mode : 'dark';
 	echo '<meta name="theme-color" content="#121212" data-hx-dark="#121212" data-hx-light="#f5f3ee">' . "\n";
 	echo '<script>(function(){var m="' . esc_js( $mode ) . '",t=null;try{t=localStorage.getItem("hx-theme")}catch(e){}'

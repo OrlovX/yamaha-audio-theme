@@ -20,36 +20,44 @@ The staging DB came from live with Yamaha Sync, the product importer, feed, Shor
 **deactivated**, the two "Stoc" webhooks **disabled**, noindex on, no cron. Leave it that way. Test orders on staging are
 fine (COD) — nothing leaves the box. Never migrate the staging DB to live. Never paste passwords into the chat.
 
-## Code map (unchanged from HiFi Expert — full notes in `hifiexpert-theme/docs/HANDOVER.md`)
-- `functions.php` requires `inc/*`. `inc/setup.php` (supports, menus, template routing by slug), `inc/customizer.php`
-  (**all settings**: `hifiexpert_option_defaults()` code defaults + Customizer sections), `inc/helpers.php`,
-  `inc/menu-walker.php` (mega menu; `nav_extra` slug list), `inc/template-tags.php` (product card, price block, search),
-  `inc/woocommerce.php` (catalog ordering, single product, music inquiry flow), `inc/filters.php`, `inc/awards.php`,
-  `inc/legal.php` + `legal/*.php` (six legal pages, HiFi Expert company data), `inc/seo.php` (Rank Math filters, og:image,
-  JSON-LD Store), `inc/brand-admin.php`.
-- Templates: `header.php`, `footer.php`, `front-page.php`, `page-brands.php`, `page-promotii.php`, `page-contact.php`,
-  `page-legal.php`, `woocommerce/*`. One CSS (`assets/css/main.css`, tokens `--hx-*`, light theme under
-  `html[data-theme="light"]`), one JS (`assets/js/main.js`). Campaign mode (Black Edition 30 Oct → 2 Dec 2026 is the code default).
+## Code map
+- `functions.php` requires `inc/*` (WooCommerce files only when WooCommerce is active). Prefix `yamaha_audio_`,
+  text domain `yamaha-audio`, constants `YAMAHA_AUDIO_*`; CSS classes and internal keys keep the short `hx-`/`hx_`
+  namespace. No brand taxonomy anywhere: where a multi-brand shop shows the brand, this theme shows the product's
+  main category (`yamaha_audio_product_category()`, Yoast primary category when set).
+- `inc/setup.php` (supports, menus, template routing by slug: `promotii|promotii-2|oferte → page-promotii.php`,
+  `contact → page-contact.php`; Romanian WooCommerce page titles), `inc/customizer.php` (**all settings**:
+  `yamaha_audio_option_defaults()` + Customizer panel "Yamaha Audio"), `inc/helpers.php`, `inc/menu-walker.php`
+  (`nav_extra` slug list), `inc/template-tags.php` (product card with category kicker, price block, search),
+  `inc/woocommerce.php` (catalog ordering, single product, sticky buy bar), `inc/filters.php` (facets = all product
+  attributes, rendered only when they split the result set; price, stock, showroom), `inc/awards.php`,
+  `inc/legal.php` + `legal/*.php` (six legal pages from the Customizer company data; no consignment clauses),
+  `inc/seo.php` (Yoast + Rank Math hooks, og:image fallback, Store schema from the Customizer address).
+- Templates: `header.php`, `footer.php`, `front-page.php` (hero, categories, offers, category rows, bundle, MusicCast
+  band, blog), `page-promotii.php`, `page-contact.php`, `page-legal.php`, `woocommerce/*`. One CSS
+  (`assets/css/main.css`; tokens `--hx-*`; accent as text `--hx-accent`, accent as surface `--hx-gold` + `--hx-on-accent`;
+  light theme under `html[data-theme="light"]`), one JS (`assets/js/main.js`). Campaign mode keeps its own palette
+  (Black Edition 30 Oct → 2 Dec 2026 is the code default).
 
-## Redesign scope — decide with the owner, then do on staging
-1. **Branding**: keep dark + gold (`--hx-accent: #c9a96a`) or a Yamaha palette; logo; Instrument Sans or other.
-   Rename the Customizer panel ("HiFi Expert" → "Yamaha Audio"); keep function prefix `hifiexpert_` and text domain
-   `hifiexpert` (renaming them is churn with no user-visible benefit).
-2. **Single-brand shop**: no Branduri page / brand rail; `nav_extra` without `branduri`; hero + "High-End" band copy
-   for Yamaha; menu by product type (amplificatoare, receivere AV, boxe, streaming / MusicCast, pick-up, căști…).
-3. **Company data**: footer, contact page, legal pages. Confirm the legal entity for the Yamaha shop (hifiexpert uses
-   HIGH-END EXPERT S.R.L., CUI RO31095680) **before** running "Pagini legale → Instalează".
-4. **SEO**: yamaha-audio.ro uses **Yoast**, not Rank Math — `inc/seo.php` filters are no-ops here. Either port the title/
-   description logic to Yoast filters (`wpseo_title`, `wpseo_metadesc`, `wpseo_opengraph_image`) or let Yoast handle it.
-   The theme's JSON-LD Store schema needs the Yamaha shop data.
-5. **404**: the `all-404-redirect-to-homepage` plugin redirects every 404 to home; the theme has `404.php`. Recommend
+## Done in the first redesign pass (2026-10-30)
+- Palette: Yamaha violet as accent surface, lavender as accent text on dark; Manrope; cool greys. Logo white on dark.
+- All `hifiexpert` identifiers renamed; brand pages/rails/filters/labels, the music inquiry flow and the consignment
+  clauses removed; home rows by product category; facets from WooCommerce attributes; SEO on Yoast hooks.
+- Customizer defaults written for a Yamaha dealer (hero, offers, MusicCast band, menu, campaign tagline).
+
+## Still to decide / do with the owner
+1. **Company data** (`topbar_email` is a placeholder `office@yamaha-audio.ro`; company line says High End Expert S.R.L.
+   — confirm the legal entity and phone/e-mail) **before** running "Pagini legale → Instalează".
+2. **Menu + home rows**: set `home_rows` to the real category slugs (`wp term list product_cat`), build the primary menu
+   by product type, pick the hero product and a Yamaha-only bundle (prices!) — then enable `bundle_enabled`.
+3. **Exact brand violet** from the logo file (current `#5a2d8c` is from memory).
+4. **404**: the `all-404-redirect-to-homepage` plugin redirects every 404 to home; the theme has `404.php`. Recommend
    deactivating the plugin on go-live (and the `ErrorDocument` line in `.htaccess` goes with it).
-6. **Catalog**: ordering (in stock → priced → bestselling → newest) carries over; the music category / inquiry flow
-   (`hifiexpert_is_music()`) is not relevant — leave dormant or remove.
+6. **Catalog**: ordering (in stock → priced → bestselling → newest) carries over.
 7. **Campaign mode**: same Black Edition window (code default) or Yamaha-specific name/dates in the Customizer.
 8. **Plugins to look at on live** (DB-side, at deploy): Code Snippets contents, FiboSearch (free version here) index,
    YITH wishlist label, Extra Product Options, LiteSpeed Cache (no page cache on Apache — consider WP Super Cache).
-9. **Awards** (`tools/awards/`): Yamaha products do carry awards (EISA etc.) — dry run on staging before enabling.
+9. **Awards**: badges render from product meta `_hx_awards`; Yamaha products carry EISA / What Hi-Fi? awards — fill in by hand or write a small importer (the old scraper was hifiexpert-specific and was removed).
 
 ## Open items outside the theme
 - Delete the old Bitnami instance after ~1 week (snapshot first); remove the push key `yamaha-migration` lines from

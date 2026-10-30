@@ -6,25 +6,25 @@
  * Level 1: columns inside the panel (heading link).
  * Level 2: links inside a column.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Slugs/titles of top-level items that are NOT categories (Blog, Branduri, Consignație, Promoții…).
+ * Slugs/titles of top-level items that are NOT categories (Blog, Promoții, Contact…).
  * They leave the category bar and form a separate group on the right.
  */
-function hifiexpert_nav_extra_slugs() {
+function yamaha_audio_nav_extra_slugs() {
 	static $slugs = null;
 	if ( null === $slugs ) {
-		$slugs = array_values( array_filter( array_map( 'sanitize_title', preg_split( '/[,\n]+/', (string) hifiexpert_opt( 'nav_extra' ) ) ) ) );
+		$slugs = array_values( array_filter( array_map( 'sanitize_title', preg_split( '/[,\n]+/', (string) yamaha_audio_opt( 'nav_extra' ) ) ) ) );
 	}
 	return $slugs;
 }
 
-function hifiexpert_nav_item_is_extra( $item ) {
-	$slugs = hifiexpert_nav_extra_slugs();
+function yamaha_audio_nav_item_is_extra( $item ) {
+	$slugs = yamaha_audio_nav_extra_slugs();
 	if ( ! $slugs ) {
 		return false;
 	}
@@ -40,25 +40,25 @@ function hifiexpert_nav_item_is_extra( $item ) {
 /**
  * Menu labels from the old theme carry HTML line breaks ("Cabluri <br> interconnect"): render them as plain text.
  */
-function hifiexpert_clean_menu_title( $title ) {
+function yamaha_audio_clean_menu_title( $title ) {
 	$title = preg_replace( '/<br\s*\/?>|&lt;br\s*\/?&gt;/i', ' ', (string) $title );
 	$title = wp_strip_all_tags( $title );
 	return trim( preg_replace( '/\s+/u', ' ', $title ) );
 }
 add_filter( 'nav_menu_item_title', function ( $title ) {
-	return hifiexpert_clean_menu_title( $title );
+	return yamaha_audio_clean_menu_title( $title );
 }, 5 );
 
 add_filter( 'wp_nav_menu_objects', function ( $items, $args ) {
 	foreach ( $items as $it ) {
-		$it->title = hifiexpert_clean_menu_title( $it->title );
+		$it->title = yamaha_audio_clean_menu_title( $it->title );
 	}
 	if ( empty( $args->hx_group ) ) {
 		return $items;
 	}
 	$extra = array();
 	foreach ( $items as $it ) {
-		if ( 0 === (int) $it->menu_item_parent && hifiexpert_nav_item_is_extra( $it ) ) {
+		if ( 0 === (int) $it->menu_item_parent && yamaha_audio_nav_item_is_extra( $it ) ) {
 			$extra[ $it->ID ] = true;
 		}
 	}
@@ -84,7 +84,7 @@ add_filter( 'wp_nav_menu_objects', function ( $items, $args ) {
 
 // Off-canvas menu (default walker): mark the extra items so CSS can separate them.
 add_filter( 'nav_menu_css_class', function ( $classes, $item, $args, $depth ) {
-	if ( 0 === (int) $depth && hifiexpert_nav_item_is_extra( $item ) ) {
+	if ( 0 === (int) $depth && yamaha_audio_nav_item_is_extra( $item ) ) {
 		$classes[] = 'hx-extra';
 		if ( preg_match( '/promo|ofert|reduc/i', $item->title . ' ' . $item->url ) ) {
 			$classes[] = 'hx-sale';
@@ -93,7 +93,7 @@ add_filter( 'nav_menu_css_class', function ( $classes, $item, $args, $depth ) {
 	return $classes;
 }, 10, 4 );
 
-class HiFiExpert_Mega_Walker extends Walker_Nav_Menu {
+class Yamaha_Audio_Mega_Walker extends Walker_Nav_Menu {
 
 	/**
 	 * Skip leftovers from the old menu plugin (custom-content rows, placeholders).

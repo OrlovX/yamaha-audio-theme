@@ -2,9 +2,9 @@
 /**
  * Faceted filters for product archives — no plugin, URL-driven, counts aware of the current result set.
  *
- * URL shape: ?f[pa_producator]=yamaha,triangle&f[pa_clasa]=a&min=1000&max=5000&stock=1&showroom=1
+ * URL shape: ?f[pa_culoare]=negru&f[pa_canale]=7-2&min=1000&max=5000&stock=1&showroom=1
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -12,65 +12,34 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Which facets to offer in which context. Keys are product_cat slugs (any ancestor matches);
  * '_default' is used when nothing matches. Each entry: taxonomy => label.
+ * Single-brand shop: there is no brand facet. The default set is every product attribute registered in
+ * WooCommerce (labelled as in WooCommerce); a facet is only rendered when it actually splits the result
+ * set, so this stays tidy on its own. Per-category sets can be added through the filter.
  * Non-taxonomy facets ('price', 'stock', 'showroom') are handled separately and always shown.
  */
-function hifiexpert_facet_map() {
-	$brand = array( 'pa_producator' => __( 'Brand', 'hifiexpert' ) );
-	return apply_filters(
-		'hifiexpert_facet_map',
-		array(
-			'boxe'          => $brand + array(
-				'pa_numar-cai'                     => __( 'Număr căi', 'hifiexpert' ),
-				'pa_culoare'                       => __( 'Finisaj', 'hifiexpert' ),
-				'pa_impedanta'                     => __( 'Impedanță', 'hifiexpert' ),
-				'pa_dimensiune-recomandata-camera' => __( 'Cameră recomandată', 'hifiexpert' ),
-				'pa_sensibilitate'                 => __( 'Sensibilitate', 'hifiexpert' ),
-			),
-			'amplificatoare' => $brand + array(
-				'pa_clasa'          => __( 'Clasă', 'hifiexpert' ),
-				'pa_numar-canale'   => __( 'Canale', 'hifiexpert' ),
-				'pa_dac-inclus'     => __( 'DAC inclus', 'hifiexpert' ),
-				'pa_pre-phono'      => __( 'Pre‑phono', 'hifiexpert' ),
-				'pa_streamer'       => __( 'Streaming', 'hifiexpert' ),
-				'pa_tip-preamplificator' => __( 'Tip', 'hifiexpert' ),
-				'pa_destinatie'     => __( 'Destinație', 'hifiexpert' ),
-				'pa_culoare'        => __( 'Finisaj', 'hifiexpert' ),
-			),
-			'surse'         => $brand + array(
-				'pa_streamer'   => __( 'Streaming', 'hifiexpert' ),
-				'pa_dsd'        => __( 'DSD', 'hifiexpert' ),
-				'pa_sacd'       => __( 'SACD', 'hifiexpert' ),
-				'pa_tip-curea'  => __( 'Antrenare', 'hifiexpert' ),
-				'pa_brat-inclus' => __( 'Braț inclus', 'hifiexpert' ),
-				'pa_tip-stylus' => __( 'Stylus', 'hifiexpert' ),
-				'pa_culoare'    => __( 'Finisaj', 'hifiexpert' ),
-			),
-			'cabluri'       => $brand + array(
-				'pa_tip-cablu'    => __( 'Tip cablu', 'hifiexpert' ),
-				'pa_lungime'      => __( 'Lungime', 'hifiexpert' ),
-				'pa_conector-1'   => __( 'Conector', 'hifiexpert' ),
-				'pa_standard-cablu' => __( 'Standard', 'hifiexpert' ),
-			),
-			'muzica'        => array(
-				'pa_gen-muzical'  => __( 'Gen muzical', 'hifiexpert' ),
-				'pa_format'       => __( 'Format', 'hifiexpert' ),
-				'pa_casa-discuri' => __( 'Casă de discuri', 'hifiexpert' ),
-			),
-			'accesorii-2'   => $brand + array(
-				'pa_culoare' => __( 'Culoare', 'hifiexpert' ),
-			),
-			'_default'      => $brand + array(
-				'pa_culoare' => __( 'Finisaj', 'hifiexpert' ),
-			),
-		)
-	);
+function yamaha_audio_facet_map() {
+	static $map = null;
+	if ( null !== $map ) {
+		return $map;
+	}
+	$default = array();
+	if ( function_exists( 'wc_get_attribute_taxonomies' ) ) {
+		foreach ( wc_get_attribute_taxonomies() as $a ) {
+			if ( in_array( $a->attribute_name, array( 'producator', 'brand', 'marca', 'disponibil-in-showroom' ), true ) ) {
+				continue;
+			}
+			$default[ wc_attribute_taxonomy_name( $a->attribute_name ) ] = $a->attribute_label;
+		}
+	}
+	$map = apply_filters( 'yamaha_audio_facet_map', array( '_default' => $default ) );
+	return $map;
 }
 
 /**
  * Facets for the current archive.
  */
-function hifiexpert_active_facet_set() {
-	$map = hifiexpert_facet_map();
+function yamaha_audio_active_facet_set() {
+	$map = yamaha_audio_facet_map();
 	if ( is_tax( 'product_cat' ) ) {
 		$term = get_queried_object();
 		// walk up: category, parent, grandparent
@@ -82,19 +51,13 @@ function hifiexpert_active_facet_set() {
 			$t = $t->parent ? get_term( $t->parent, 'product_cat' ) : null;
 		}
 	}
-	if ( is_tax() && 'pa_producator' === get_queried_object()->taxonomy ) {
-		// Brand page: offer category-neutral facets without the brand itself.
-		$set = $map['_default'];
-		unset( $set['pa_producator'] );
-		return array( 'product_cat' => __( 'Categorie', 'hifiexpert' ) ) + $set;
-	}
 	return $map['_default'];
 }
 
 /**
  * Parse the request into a normalized filter state.
  */
-function hifiexpert_filter_state() {
+function yamaha_audio_filter_state() {
 	static $state = null;
 	if ( null !== $state ) {
 		return $state;
@@ -118,8 +81,8 @@ function hifiexpert_filter_state() {
 	return $state;
 }
 
-function hifiexpert_filters_active() {
-	$s = hifiexpert_filter_state();
+function yamaha_audio_filters_active() {
+	$s = yamaha_audio_filter_state();
 	return $s['tax'] || $s['min'] || $s['max'] || $s['stock'] || $s['showroom'];
 }
 
@@ -130,7 +93,7 @@ add_action( 'woocommerce_product_query', function ( WP_Query $q ) {
 	if ( is_admin() || ! $q->is_main_query() ) {
 		return;
 	}
-	$s   = hifiexpert_filter_state();
+	$s   = yamaha_audio_filter_state();
 	$tax = (array) $q->get( 'tax_query' );
 	foreach ( $s['tax'] as $taxonomy => $slugs ) {
 		$tax[] = array( 'taxonomy' => $taxonomy, 'field' => 'slug', 'terms' => $slugs, 'operator' => 'IN' );
@@ -170,13 +133,13 @@ add_action( 'woocommerce_product_query', function ( WP_Query $q ) {
  * IDs matching the current archive + filters, optionally ignoring one taxonomy
  * (so a facet's own counts show what *adding* each term would give).
  */
-function hifiexpert_filtered_ids( $ignore_tax = '' ) {
+function yamaha_audio_filtered_ids( $ignore_tax = '' ) {
 	static $cache = array();
 	if ( isset( $cache[ $ignore_tax ] ) ) {
 		return $cache[ $ignore_tax ];
 	}
 	global $wp_query;
-	$s    = hifiexpert_filter_state();
+	$s    = yamaha_audio_filter_state();
 	$args = array(
 		'post_type'      => 'product',
 		'post_status'    => 'publish',
@@ -186,7 +149,7 @@ function hifiexpert_filtered_ids( $ignore_tax = '' ) {
 		'tax_query'      => array( 'relation' => 'AND' ),
 		'meta_query'     => array(),
 	);
-	// Context: category / brand / search.
+	// Context: category / search.
 	if ( is_tax() ) {
 		$t = get_queried_object();
 		$args['tax_query'][] = array( 'taxonomy' => $t->taxonomy, 'field' => 'term_id', 'terms' => $t->term_id );
@@ -218,7 +181,7 @@ function hifiexpert_filtered_ids( $ignore_tax = '' ) {
 /**
  * Term counts for one taxonomy within a set of product IDs.
  */
-function hifiexpert_facet_counts( $taxonomy, array $ids ) {
+function yamaha_audio_facet_counts( $taxonomy, array $ids ) {
 	global $wpdb;
 	if ( ! $ids ) {
 		return array();
@@ -239,7 +202,7 @@ function hifiexpert_facet_counts( $taxonomy, array $ids ) {
 /**
  * Min/max price in a set of IDs.
  */
-function hifiexpert_price_bounds( array $ids ) {
+function yamaha_audio_price_bounds( array $ids ) {
 	global $wpdb;
 	if ( ! $ids ) {
 		return array( 0, 0 );
@@ -252,8 +215,8 @@ function hifiexpert_price_bounds( array $ids ) {
 /**
  * Build a URL for the current archive with a modified filter state.
  */
-function hifiexpert_filter_url( array $changes = array() ) {
-	$s = hifiexpert_filter_state();
+function yamaha_audio_filter_url( array $changes = array() ) {
+	$s = yamaha_audio_filter_state();
 	foreach ( $changes as $k => $v ) {
 		if ( 'tax' === $k ) {
 			foreach ( $v as $tax => $slugs ) {
@@ -288,33 +251,33 @@ function hifiexpert_filter_url( array $changes = array() ) {
 /**
  * Toggle URL for a term in a facet.
  */
-function hifiexpert_facet_toggle_url( $tax, $slug ) {
-	$s       = hifiexpert_filter_state();
+function yamaha_audio_facet_toggle_url( $tax, $slug ) {
+	$s       = yamaha_audio_filter_state();
 	$current = $s['tax'][ $tax ] ?? array();
 	if ( in_array( $slug, $current, true ) ) {
 		$current = array_values( array_diff( $current, array( $slug ) ) );
 	} else {
 		$current[] = $slug;
 	}
-	return hifiexpert_filter_url( array( 'tax' => array( $tax => $current ) ) );
+	return yamaha_audio_filter_url( array( 'tax' => array( $tax => $current ) ) );
 }
 
 /**
  * Render the filter rail. Returns the number of facets printed.
  */
-function hifiexpert_render_filters() {
-	$facets  = hifiexpert_active_facet_set();
-	$state   = hifiexpert_filter_state();
-	$all_ids = hifiexpert_filtered_ids();
+function yamaha_audio_render_filters() {
+	$facets  = yamaha_audio_active_facet_set();
+	$state   = yamaha_audio_filter_state();
+	$all_ids = yamaha_audio_filtered_ids();
 	$printed = 0;
 
 	// Price (bounds from the context without the price filter applied).
-	list( $lo, $hi ) = hifiexpert_price_bounds( hifiexpert_filtered_ids( 'price' ) );
+	list( $lo, $hi ) = yamaha_audio_price_bounds( yamaha_audio_filtered_ids( 'price' ) );
 	if ( $hi > $lo ) {
 		$printed++;
 		?>
-		<form class="hx-filter hx-filter--price" method="get" action="<?php echo esc_url( hifiexpert_filter_url( array( 'min' => 0, 'max' => 0 ) ) ); ?>">
-			<h3 class="hx-filter__title"><?php esc_html_e( 'Preț', 'hifiexpert' ); ?></h3>
+		<form class="hx-filter hx-filter--price" method="get" action="<?php echo esc_url( yamaha_audio_filter_url( array( 'min' => 0, 'max' => 0 ) ) ); ?>">
+			<h3 class="hx-filter__title"><?php esc_html_e( 'Preț', 'yamaha-audio' ); ?></h3>
 			<?php
 			// carry everything else as hidden inputs
 			foreach ( $state['tax'] as $tax => $slugs ) {
@@ -325,12 +288,12 @@ function hifiexpert_render_filters() {
 			if ( is_search() ) { printf( '<input type="hidden" name="s" value="%s"><input type="hidden" name="post_type" value="product">', esc_attr( get_search_query() ) ); }
 			?>
 			<div class="hx-filter__range">
-				<label><span class="screen-reader-text"><?php esc_html_e( 'Preț minim', 'hifiexpert' ); ?></span><input type="number" name="min" inputmode="numeric" min="0" placeholder="<?php echo esc_attr( $lo ); ?>" value="<?php echo $state['min'] ? (int) $state['min'] : ''; ?>"></label>
+				<label><span class="screen-reader-text"><?php esc_html_e( 'Preț minim', 'yamaha-audio' ); ?></span><input type="number" name="min" inputmode="numeric" min="0" placeholder="<?php echo esc_attr( $lo ); ?>" value="<?php echo $state['min'] ? (int) $state['min'] : ''; ?>"></label>
 				<span aria-hidden="true">–</span>
-				<label><span class="screen-reader-text"><?php esc_html_e( 'Preț maxim', 'hifiexpert' ); ?></span><input type="number" name="max" inputmode="numeric" min="0" placeholder="<?php echo esc_attr( $hi ); ?>" value="<?php echo $state['max'] ? (int) $state['max'] : ''; ?>"></label>
-				<button class="hx-filter__go" type="submit" aria-label="<?php esc_attr_e( 'Aplică prețul', 'hifiexpert' ); ?>"><?php echo hifiexpert_icon( 'arrow', 16 ); ?></button>
+				<label><span class="screen-reader-text"><?php esc_html_e( 'Preț maxim', 'yamaha-audio' ); ?></span><input type="number" name="max" inputmode="numeric" min="0" placeholder="<?php echo esc_attr( $hi ); ?>" value="<?php echo $state['max'] ? (int) $state['max'] : ''; ?>"></label>
+				<button class="hx-filter__go" type="submit" aria-label="<?php esc_attr_e( 'Aplică prețul', 'yamaha-audio' ); ?>"><?php echo yamaha_audio_icon( 'arrow', 16 ); ?></button>
 			</div>
-			<span class="hx-filter__hint"><?php printf( esc_html__( '%1$s – %2$s', 'hifiexpert' ), esc_html( hifiexpert_lei( $lo ) ), esc_html( hifiexpert_lei( $hi ) ) ); ?></span>
+			<span class="hx-filter__hint"><?php printf( esc_html__( '%1$s – %2$s', 'yamaha-audio' ), esc_html( yamaha_audio_lei( $lo ) ), esc_html( yamaha_audio_lei( $hi ) ) ); ?></span>
 		</form>
 		<?php
 	}
@@ -339,28 +302,29 @@ function hifiexpert_render_filters() {
 	$printed++;
 	?>
 	<div class="hx-filter">
-		<h3 class="hx-filter__title"><?php esc_html_e( 'Disponibilitate', 'hifiexpert' ); ?></h3>
+		<h3 class="hx-filter__title"><?php esc_html_e( 'Disponibilitate', 'yamaha-audio' ); ?></h3>
 		<ul class="hx-filter__list">
-			<li><a class="hx-filter__opt<?php echo $state['stock'] ? ' is-on' : ''; ?>" href="<?php echo hifiexpert_filter_url( array( 'stock' => ! $state['stock'] ) ); ?>" rel="nofollow"><span class="hx-filter__box"></span><?php esc_html_e( 'În stoc, livrare 24h', 'hifiexpert' ); ?></a></li>
+			<li><a class="hx-filter__opt<?php echo $state['stock'] ? ' is-on' : ''; ?>" href="<?php echo yamaha_audio_filter_url( array( 'stock' => ! $state['stock'] ) ); ?>" rel="nofollow"><span class="hx-filter__box"></span><?php esc_html_e( 'În stoc, livrare 24h', 'yamaha-audio' ); ?></a></li>
 			<?php if ( taxonomy_exists( 'pa_disponibil-in-showroom' ) ) : ?>
-				<li><a class="hx-filter__opt<?php echo $state['showroom'] ? ' is-on' : ''; ?>" href="<?php echo hifiexpert_filter_url( array( 'showroom' => ! $state['showroom'] ) ); ?>" rel="nofollow"><span class="hx-filter__box"></span><?php esc_html_e( 'Poate fi ascultat în showroom', 'hifiexpert' ); ?></a></li>
+				<li><a class="hx-filter__opt<?php echo $state['showroom'] ? ' is-on' : ''; ?>" href="<?php echo yamaha_audio_filter_url( array( 'showroom' => ! $state['showroom'] ) ); ?>" rel="nofollow"><span class="hx-filter__box"></span><?php esc_html_e( 'Poate fi ascultat în showroom', 'yamaha-audio' ); ?></a></li>
 			<?php endif; ?>
 		</ul>
 	</div>
 	<?php
 
+	$shown = 0;
 	foreach ( $facets as $tax => $label ) {
-		if ( ! taxonomy_exists( $tax ) ) {
+		if ( ! taxonomy_exists( $tax ) || $shown >= 8 ) {
 			continue;
 		}
-		$ids   = hifiexpert_filtered_ids( $tax );
-		$terms = hifiexpert_facet_counts( $tax, $ids );
+		$ids   = yamaha_audio_filtered_ids( $tax );
+		$terms = yamaha_audio_facet_counts( $tax, $ids );
 		// Facet is only useful if it splits the set: at least 2 options, or 1 option that is already selected.
 		$selected = $state['tax'][ $tax ] ?? array();
 		if ( count( $terms ) < 2 && ! $selected ) {
 			continue;
 		}
-		// For brand pages, 'product_cat' facet shows only top-level categories.
+		// A 'product_cat' facet (search results) shows only top-level categories.
 		if ( 'product_cat' === $tax ) {
 			$terms = array_values( array_filter( $terms, function ( $t ) {
 				$term = get_term( $t->term_id, 'product_cat' );
@@ -371,33 +335,34 @@ function hifiexpert_render_filters() {
 			}
 		}
 		$printed++;
+		$shown++;
 		$limit = 8;
 		$many  = count( $terms ) > $limit;
 		?>
 		<div class="hx-filter<?php echo $many ? ' hx-filter--collapsible' : ''; ?>" data-facet="<?php echo esc_attr( $tax ); ?>">
 			<h3 class="hx-filter__title"><?php echo esc_html( $label ); ?></h3>
 			<?php if ( count( $terms ) > 12 ) : ?>
-				<input class="hx-filter__search" type="search" placeholder="<?php esc_attr_e( 'Caută…', 'hifiexpert' ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Caută în %s', 'hifiexpert' ), $label ) ); ?>" data-hx-facet-search>
+				<input class="hx-filter__search" type="search" placeholder="<?php esc_attr_e( 'Caută…', 'yamaha-audio' ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Caută în %s', 'yamaha-audio' ), $label ) ); ?>" data-hx-facet-search>
 			<?php endif; ?>
 			<ul class="hx-filter__list">
 				<?php foreach ( $terms as $i => $t ) : ?>
 					<?php $on = in_array( $t->slug, $selected, true ); ?>
 					<li<?php echo ( $many && $i >= $limit && ! $on ) ? ' class="hx-filter__extra" hidden' : ''; ?>>
-						<a class="hx-filter__opt<?php echo $on ? ' is-on' : ''; ?>" href="<?php echo hifiexpert_facet_toggle_url( $tax, $t->slug ); ?>" rel="nofollow">
+						<a class="hx-filter__opt<?php echo $on ? ' is-on' : ''; ?>" href="<?php echo yamaha_audio_facet_toggle_url( $tax, $t->slug ); ?>" rel="nofollow">
 							<span class="hx-filter__box"></span><span class="hx-filter__name"><?php echo esc_html( html_entity_decode( $t->name, ENT_QUOTES, 'UTF-8' ) ); ?></span> <small><?php echo (int) $t->n; ?></small>
 						</a>
 					</li>
 				<?php endforeach; ?>
 			</ul>
 			<?php if ( $many ) : ?>
-				<button class="hx-filter__more" type="button" data-hx-facet-more aria-expanded="false"><?php printf( esc_html__( 'Toate (%d) +', 'hifiexpert' ), count( $terms ) ); ?></button>
+				<button class="hx-filter__more" type="button" data-hx-facet-more aria-expanded="false"><?php printf( esc_html__( 'Toate (%d) +', 'yamaha-audio' ), count( $terms ) ); ?></button>
 			<?php endif; ?>
 		</div>
 		<?php
 	}
 
-	if ( hifiexpert_filters_active() ) {
-		echo '<a class="hx-btn hx-btn--ghost hx-btn--sm hx-filter__reset" href="' . hifiexpert_filter_url( array( 'tax' => array_fill_keys( array_keys( $state['tax'] ), array() ), 'min' => 0, 'max' => 0, 'stock' => false, 'showroom' => false ) ) . '">' . esc_html__( 'Resetează filtrele', 'hifiexpert' ) . '</a>';
+	if ( yamaha_audio_filters_active() ) {
+		echo '<a class="hx-btn hx-btn--ghost hx-btn--sm hx-filter__reset" href="' . yamaha_audio_filter_url( array( 'tax' => array_fill_keys( array_keys( $state['tax'] ), array() ), 'min' => 0, 'max' => 0, 'stock' => false, 'showroom' => false ) ) . '">' . esc_html__( 'Resetează filtrele', 'yamaha-audio' ) . '</a>';
 	}
 	return $printed;
 }
@@ -405,8 +370,8 @@ function hifiexpert_render_filters() {
 /**
  * Applied-filter chips for the toolbar.
  */
-function hifiexpert_render_applied_chips() {
-	$state = hifiexpert_filter_state();
+function yamaha_audio_render_applied_chips() {
+	$state = yamaha_audio_filter_state();
 	$out   = array();
 	foreach ( $state['tax'] as $tax => $slugs ) {
 		foreach ( $slugs as $slug ) {
@@ -414,18 +379,18 @@ function hifiexpert_render_applied_chips() {
 			if ( ! $term ) {
 				continue;
 			}
-			$out[] = '<a class="hx-tag" href="' . hifiexpert_facet_toggle_url( $tax, $slug ) . '" rel="nofollow">' . esc_html( html_entity_decode( $term->name, ENT_QUOTES, 'UTF-8' ) ) . ' <span aria-hidden="true">×</span></a>';
+			$out[] = '<a class="hx-tag" href="' . yamaha_audio_facet_toggle_url( $tax, $slug ) . '" rel="nofollow">' . esc_html( html_entity_decode( $term->name, ENT_QUOTES, 'UTF-8' ) ) . ' <span aria-hidden="true">×</span></a>';
 		}
 	}
 	if ( $state['min'] || $state['max'] ) {
-		$label = $state['min'] && $state['max'] ? hifiexpert_lei( $state['min'] ) . ' – ' . hifiexpert_lei( $state['max'] ) : ( $state['min'] ? 'peste ' . hifiexpert_lei( $state['min'] ) : 'sub ' . hifiexpert_lei( $state['max'] ) );
-		$out[] = '<a class="hx-tag" href="' . hifiexpert_filter_url( array( 'min' => 0, 'max' => 0 ) ) . '" rel="nofollow">' . esc_html( $label ) . ' <span aria-hidden="true">×</span></a>';
+		$label = $state['min'] && $state['max'] ? yamaha_audio_lei( $state['min'] ) . ' – ' . yamaha_audio_lei( $state['max'] ) : ( $state['min'] ? 'peste ' . yamaha_audio_lei( $state['min'] ) : 'sub ' . yamaha_audio_lei( $state['max'] ) );
+		$out[] = '<a class="hx-tag" href="' . yamaha_audio_filter_url( array( 'min' => 0, 'max' => 0 ) ) . '" rel="nofollow">' . esc_html( $label ) . ' <span aria-hidden="true">×</span></a>';
 	}
 	if ( $state['stock'] ) {
-		$out[] = '<a class="hx-tag" href="' . hifiexpert_filter_url( array( 'stock' => false ) ) . '" rel="nofollow">' . esc_html__( 'În stoc', 'hifiexpert' ) . ' <span aria-hidden="true">×</span></a>';
+		$out[] = '<a class="hx-tag" href="' . yamaha_audio_filter_url( array( 'stock' => false ) ) . '" rel="nofollow">' . esc_html__( 'În stoc', 'yamaha-audio' ) . ' <span aria-hidden="true">×</span></a>';
 	}
 	if ( $state['showroom'] ) {
-		$out[] = '<a class="hx-tag" href="' . hifiexpert_filter_url( array( 'showroom' => false ) ) . '" rel="nofollow">' . esc_html__( 'În showroom', 'hifiexpert' ) . ' <span aria-hidden="true">×</span></a>';
+		$out[] = '<a class="hx-tag" href="' . yamaha_audio_filter_url( array( 'showroom' => false ) ) . '" rel="nofollow">' . esc_html__( 'În showroom', 'yamaha-audio' ) . ' <span aria-hidden="true">×</span></a>';
 	}
 	echo implode( '', $out ); // phpcs:ignore
 	return count( $out );
@@ -435,7 +400,7 @@ function hifiexpert_render_applied_chips() {
  * Filtered pages shouldn't be indexed as separate URLs.
  */
 add_action( 'wp_head', function () {
-	if ( ( is_shop() || is_product_taxonomy() ) && hifiexpert_filters_active() ) {
+	if ( ( is_shop() || is_product_taxonomy() ) && yamaha_audio_filters_active() ) {
 		echo '<meta name="robots" content="noindex,follow">' . "\n";
 	}
 }, 1 );

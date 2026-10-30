@@ -2,7 +2,7 @@
 /**
  * Single blog post.
  *
- * @package hifiexpert
+ * @package yamaha-audio
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -17,10 +17,10 @@ while ( have_posts() ) :
 		<header class="hx-article__head">
 			<?php if ( $cats ) : ?><a class="hx-eyebrow" href="<?php echo esc_url( get_category_link( $cats[0] ) ); ?>"><?php echo esc_html( $cats[0]->name ); ?></a><?php endif; ?>
 			<h1 class="hx-article__title"><?php the_title(); ?></h1>
-			<p class="hx-article__meta"><?php echo esc_html( get_the_date() ); ?> · <?php printf( esc_html__( '%s min de citit', 'hifiexpert' ), (int) max( 1, round( str_word_count( wp_strip_all_tags( get_the_content() ) ) / 200 ) ) ); ?></p>
+			<p class="hx-article__meta"><?php echo esc_html( get_the_date() ); ?> · <?php printf( esc_html__( '%s min de citit', 'yamaha-audio' ), (int) max( 1, round( str_word_count( wp_strip_all_tags( get_the_content() ) ) / 200 ) ) ); ?></p>
 		</header>
 		<?php if ( has_post_thumbnail() ) : ?>
-			<figure class="hx-stage hx-stage--article"><?php the_post_thumbnail( 'hifiexpert-hero', array( 'loading' => 'eager', 'fetchpriority' => 'high' ) ); ?></figure>
+			<figure class="hx-stage hx-stage--article"><?php the_post_thumbnail( 'yamaha-audio-hero', array( 'loading' => 'eager', 'fetchpriority' => 'high' ) ); ?></figure>
 		<?php endif; ?>
 		<div class="hx-prose hx-article__body">
 			<?php the_content(); ?>
@@ -38,8 +38,8 @@ while ( have_posts() ) :
 	if ( $related ) :
 		?>
 		<section class="hx-section hx-wrap">
-			<?php hifiexpert_section_head( __( 'Citește și', 'hifiexpert' ) ); ?>
-			<div class="hx-grid hx-grid--3"><?php foreach ( $related as $r ) { hifiexpert_post_card( $r->ID ); } ?></div>
+			<?php yamaha_audio_section_head( __( 'Citește și', 'yamaha-audio' ) ); ?>
+			<div class="hx-grid hx-grid--3"><?php foreach ( $related as $r ) { yamaha_audio_post_card( $r->ID ); } ?></div>
 		</section>
 		<?php
 	endif;
