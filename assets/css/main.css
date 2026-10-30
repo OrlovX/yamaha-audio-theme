@@ -1914,10 +1914,12 @@ html[data-theme="light"] .dgwt-wcas-overlay-mobile .dgwt-wcas-sf-wrapp::before {
 .hx .wc_payment_method > input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; }
 .hx .wc_payment_method > label::before { content: ""; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--hx-line-strong); background: var(--hx-surface); flex: none; transition: border-color .15s, box-shadow .15s; }
 .hx .wc_payment_method:has(input:checked) > label::before { border-color: var(--hx-gold); box-shadow: inset 0 0 0 4px var(--hx-gold); }
-/* gateway logos (NETOPIA prints one or more): keep proportions, align right, wrap under the title when the column is narrow */
-.hx .wc_payment_method > label img { display: block; height: 26px; width: auto; max-width: 100%; object-fit: contain; object-position: right center; margin: 0; flex: none; }
-.hx .wc_payment_method > label img:first-of-type { margin-left: auto; }
-.hx .wc_payment_method > label a { display: inline-flex; align-items: center; margin-left: 6px; font-size: 12px; font-weight: 500; color: var(--hx-faint); }
+/* no gateway logos: a small icon per method instead (card / cash / bank), right-aligned */
+.hx .wc_payment_method > label img, .hx .wc_payment_method > label a.about_paypal { display: none !important; }
+.hx .wc_payment_method > label::after { content: ""; margin-left: auto; width: 34px; height: 34px; border-radius: 10px; flex: none; background: rgba(var(--hx-accent-rgb), .1) center / 20px no-repeat; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234b1e78' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='5' width='19' height='14' rx='3'/%3E%3Cpath d='M2.5 10h19M6.5 15h4'/%3E%3C/svg%3E"); }
+.hx .wc_payment_method.payment_method_cod > label::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234b1e78' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='6' width='19' height='12' rx='2.5'/%3E%3Ccircle cx='12' cy='12' r='2.6'/%3E%3Cpath d='M6 9.5h.01M18 14.5h.01'/%3E%3C/svg%3E"); }
+.hx .wc_payment_method.payment_method_bacs > label::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234b1e78' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 10l9-5 9 5M4 10v8M9 10v8M15 10v8M20 10v8M2.5 19.5h19'/%3E%3C/svg%3E"); }
+html[data-theme="dark"] .hx .wc_payment_method > label::after { background-color: rgba(var(--hx-accent-rgb), .16); filter: brightness(0) invert(1); opacity: .9; }
 .hx .wc_payment_method .payment_box { margin: 0 16px 14px; padding: 12px 14px; border-radius: 10px; background: var(--hx-surface); border: 1px solid var(--hx-line); font-size: 13.5px; line-height: 1.5; color: var(--hx-text-2); }
 .hx .wc_payment_method .payment_box p { margin: 0; }
 .hx .wc_payment_method .payment_box fieldset { border: 0; padding: 0; margin: 0; }
