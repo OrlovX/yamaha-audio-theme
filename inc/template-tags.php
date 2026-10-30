@@ -20,7 +20,7 @@ function hifiexpert_logo() {
 		printf( '<a class="%s" href="%s" rel="home" aria-label="%s">%s</a>', esc_attr( $cls ), $home, esc_attr( get_bloginfo( 'name' ) . ', prima pagină' ), $logo ); // phpcs:ignore
 		return;
 	}
-	printf( '<a class="hx-logo hx-logo--text" href="%s" rel="home" aria-label="%s">HiFi<span>Expert</span></a>', $home, esc_attr( get_bloginfo( 'name' ) . ', prima pagină' ) );
+	printf( '<a class="hx-logo hx-logo--text" href="%s" rel="home" aria-label="%s">Yamaha<span>Audio</span></a>', $home, esc_attr( get_bloginfo( 'name' ) . ', prima pagină' ) );
 }
 
 /**

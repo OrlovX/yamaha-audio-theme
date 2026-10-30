@@ -397,10 +397,11 @@ function hifiexpert_home_products( $limit = 8, $source = null ) {
 }
 
 /**
- * Products of one brand (by brand-taxonomy slug), most popular first.
+ * Products of one brand (by brand-taxonomy slug) or of one product category, most popular first.
+ * $tax defaults to the brand taxonomy; home rows pass the taxonomy their term was found in.
  */
-function hifiexpert_brand_products( $slug, $limit = 4 ) {
-	$tax = hifiexpert_brand_taxonomy();
+function hifiexpert_brand_products( $slug, $limit = 4, $tax = '' ) {
+	$tax = $tax ?: hifiexpert_brand_taxonomy();
 	if ( ! $tax ) {
 		return array();
 	}
@@ -414,7 +415,9 @@ function hifiexpert_brand_products( $slug, $limit = 4 ) {
 }
 
 /**
- * Brand rows configured in the Customizer: [ [slug, title, term], … ].
+ * Home rows configured in the Customizer: [ [slug, title, term, tax], … ].
+ * A slug is looked up in the brand taxonomy first, then among product categories
+ * (a single-brand shop groups its home page by product type).
  */
 function hifiexpert_home_rows() {
 	$tax  = hifiexpert_brand_taxonomy();
@@ -425,11 +428,17 @@ function hifiexpert_home_rows() {
 			continue;
 		}
 		list( $slug, $title ) = array_pad( array_map( 'trim', explode( '|', $line, 2 ) ), 2, '' );
-		$term = $tax ? get_term_by( 'slug', sanitize_title( $slug ), $tax ) : null;
+		$slug = sanitize_title( $slug );
+		$term = $tax ? get_term_by( 'slug', $slug, $tax ) : null;
+		$in   = $tax;
+		if ( ! $term ) {
+			$term = get_term_by( 'slug', $slug, 'product_cat' );
+			$in   = 'product_cat';
+		}
 		if ( ! $term ) {
 			continue;
 		}
-		$rows[] = array( 'slug' => $term->slug, 'title' => $title ?: $term->name, 'term' => $term );
+		$rows[] = array( 'slug' => $term->slug, 'title' => $title ?: $term->name, 'term' => $term, 'tax' => $in );
 	}
 	return $rows;
 }

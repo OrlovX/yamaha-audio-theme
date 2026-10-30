@@ -135,7 +135,7 @@ $rates    = (int) hifiexpert_opt( 'rates_count' );
 
 <?php foreach ( $rows as $row ) : ?>
 	<?php
-	$row_products = hifiexpert_brand_products( $row['slug'], 4 );
+	$row_products = hifiexpert_brand_products( $row['slug'], 4, $row['tax'] );
 	if ( ! $row_products ) {
 		continue;
 	}

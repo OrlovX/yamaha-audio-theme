@@ -27,18 +27,18 @@ function hifiexpert_seo_meta() {
 	$rates = (int) hifiexpert_opt( 'rates_count' );
 
 	if ( is_front_page() ) {
-		$meta['title'] = sprintf( '%s – Audio hi‑fi și high‑end · Showroom București', $site );
-		$meta['desc']  = sprintf( 'Boxe, amplificatoare, surse și cabluri de la Yamaha, Triangle, Accuphase, Luxman, McIntosh și alte branduri alese pe sunet. În stoc în București, livrare în 24h, transport gratuit peste %s lei, până la %d rate fără dobândă. Ascultă‑le în showroom‑ul din Cotroceni.', $free, $rates );
+		$meta['title'] = sprintf( '%s – Receivere, amplificatoare, boxe și MusicCast Yamaha · Showroom București', $site );
+		$meta['desc']  = sprintf( 'Dealer autorizat Yamaha: receivere AV, amplificatoare și receivere stereo, streamere MusicCast, boxe, pick‑up‑uri și căști. În stoc în București, livrare în 24h, transport gratuit peste %s lei, până la %d rate fără dobândă. Ascultă‑le în showroom‑ul din Cotroceni.', $free, $rates );
 	} elseif ( class_exists( 'WooCommerce' ) && is_product_taxonomy() ) {
 		$term = get_queried_object();
 		if ( $term && hifiexpert_brand_taxonomy() === $term->taxonomy ) {
 			$meta['title'] = sprintf( '%1$s – produse în stoc, prețuri și oferte | %2$s', $term->name, $site );
-			$meta['desc']  = $term->description ? wp_strip_all_tags( $term->description ) : sprintf( '%1$s la HiFi Expert: %2$d produse, în stoc în București, livrare în 24h, garanție 2 ani și service autorizat. Ascultă %1$s în showroom‑ul din Cotroceni sau cere o recomandare pe WhatsApp.', $term->name, (int) $term->count );
+			$meta['desc']  = $term->description ? wp_strip_all_tags( $term->description ) : sprintf( '%1$s la %3$s: %2$d produse, în stoc în București, livrare în 24h, garanție 2 ani și service autorizat. Ascultă %1$s în showroom‑ul din Cotroceni sau cere o recomandare pe WhatsApp.', $term->name, (int) $term->count, $site );
 		} elseif ( $term && 'product_cat' === $term->taxonomy && empty( $term->description ) ) {
 			$brands = hifiexpert_category_top_brands( $term, 4 );
 			$meta['desc'] = $brands
-				? sprintf( '%1$s de la %2$s și alte branduri alese pe sunet: %3$d produse, în stoc în București, livrare în 24h, până la %4$d rate fără dobândă. Vino să le asculți în showroom‑ul HiFi Expert.', $term->name, implode( ', ', $brands ), (int) $term->count, $rates )
-				: sprintf( '%1$s alese pe sunet: %2$d produse, în stoc în București, livrare în 24h, până la %3$d rate fără dobândă. Vino să le asculți în showroom‑ul HiFi Expert.', $term->name, (int) $term->count, $rates );
+				? sprintf( '%1$s de la %2$s: %3$d produse, în stoc în București, livrare în 24h, până la %4$d rate fără dobândă. Vino să le asculți în showroom‑ul %5$s.', $term->name, implode( ', ', $brands ), (int) $term->count, $rates, $site )
+				: sprintf( '%1$s Yamaha: %2$d produse, în stoc în București, livrare în 24h, până la %3$d rate fără dobândă. Vino să le asculți în showroom‑ul %4$s.', $term->name, (int) $term->count, $rates, $site );
 		}
 	} elseif ( class_exists( 'WooCommerce' ) && is_product() ) {
 		$product = wc_get_product( get_queried_object_id() );
@@ -46,15 +46,15 @@ function hifiexpert_seo_meta() {
 			$short = trim( wp_strip_all_tags( strip_shortcodes( (string) $product->get_short_description() ) ) );
 			if ( strlen( $short ) < 60 || hifiexpert_is_name_like( $short, $product ) ) {
 				$lead = function_exists( 'hifiexpert_product_lead' ) ? hifiexpert_product_lead( $product, 40 ) : '';
-				$meta['desc'] = $lead ? $lead . ' ' . sprintf( 'În stoc la HiFi Expert, livrare în 24h, garanție 2 ani.' ) : sprintf( '%s – preț, specificații și disponibilitate la HiFi Expert. Livrare în 24h, garanție 2 ani, ascultare în showroom.', $product->get_name() );
+				$meta['desc'] = $lead ? $lead . ' ' . sprintf( 'În stoc la %s, livrare în 24h, garanție 2 ani.', $site ) : sprintf( '%1$s – preț, specificații și disponibilitate la %2$s. Livrare în 24h, garanție 2 ani, ascultare în showroom.', $product->get_name(), $site );
 			}
 		}
 	} elseif ( is_page( 'promotii' ) ) {
-		$meta['desc'] = sprintf( 'Toate produsele hi‑fi la ofertă, în stoc: reduceri reale față de cel mai mic preț din ultimele 30 de zile, livrare în 24h, până la %d rate fără dobândă.', $rates );
+		$meta['desc'] = sprintf( 'Toate produsele Yamaha la ofertă, în stoc: reduceri reale față de cel mai mic preț din ultimele 30 de zile, livrare în 24h, până la %d rate fără dobândă.', $rates );
 	} elseif ( is_page( 'contact' ) ) {
-		$meta['desc'] = sprintf( 'Showroom HiFi Expert, %s. Program: %s. Telefon/WhatsApp %s, e‑mail %s. Programează o audiție sau scrie‑ne pentru o recomandare.', hifiexpert_opt( 'topbar_address' ), hifiexpert_opt( 'topbar_hours' ), hifiexpert_opt( 'phone' ), hifiexpert_opt( 'topbar_email' ) );
+		$meta['desc'] = sprintf( 'Showroom %5$s, %1$s. Program: %2$s. Telefon/WhatsApp %3$s, e‑mail %4$s. Programează o audiție sau scrie‑ne pentru o recomandare.', hifiexpert_opt( 'topbar_address' ), hifiexpert_opt( 'topbar_hours' ), hifiexpert_opt( 'phone' ), hifiexpert_opt( 'topbar_email' ), $site );
 	} elseif ( is_page( 'brands' ) || is_page( 'branduri' ) ) {
-		$meta['desc'] = 'Brandurile HiFi Expert: Yamaha, Triangle, Accuphase, Luxman, McIntosh, Sonus faber, Aurender, Marten, Vitus, Siltech și altele – alese pe criterii de sunet, multe disponibile pentru audiție în showroom‑ul din București.';
+		$meta['desc'] = sprintf( 'Brandurile %s – disponibile pentru audiție în showroom‑ul din București.', $site );
 	}
 	return $meta;
 }

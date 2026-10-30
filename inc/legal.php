@@ -4,7 +4,7 @@
  * Retur & drept de retragere (cu formular), Garanție & service.
  *
  * The texts live in /legal/*.php and are filled with the company data from the Customizer
- * (HiFi Expert → Date firmă). An admin screen (HiFi Expert → Pagini legale) writes them into
+ * (Yamaha Audio → Date firmă). An admin screen (Yamaha Audio → Pagini legale) writes them into
  * real WordPress pages, so they can still be edited by hand afterwards. Pages in this set are
  * rendered with page-legal.php (table of contents, legal typography, company card).
  *
@@ -131,11 +131,11 @@ add_filter( 'the_content', function ( $content ) {
 }, 1 );
 
 /* -------------------------------------------------------------------------
- * Admin: HiFi Expert → Pagini legale
+ * Admin: Yamaha Audio → Pagini legale
  * ---------------------------------------------------------------------- */
 
 add_action( 'admin_menu', function () {
-	add_menu_page( 'HiFi Expert', 'HiFi Expert', 'manage_options', 'hifiexpert', 'hifiexpert_legal_admin_page', 'dashicons-admin-customizer', 58 );
+	add_menu_page( 'Yamaha Audio', 'Yamaha Audio', 'manage_options', 'hifiexpert', 'hifiexpert_legal_admin_page', 'dashicons-admin-customizer', 58 );
 	add_submenu_page( 'hifiexpert', __( 'Pagini legale', 'hifiexpert' ), __( 'Pagini legale', 'hifiexpert' ), 'manage_options', 'hifiexpert', 'hifiexpert_legal_admin_page' );
 } );
 
@@ -149,7 +149,7 @@ function hifiexpert_legal_admin_page() {
 		<?php if ( $notice ) : ?>
 			<div class="notice notice-success is-dismissible"><p><?php echo esc_html( sprintf( __( 'Gata: %s.', 'hifiexpert' ), $notice ) ); ?></p></div>
 		<?php endif; ?>
-		<p><?php esc_html_e( 'Tema conține textele legale necesare unui magazin online din România (OUG 34/2014, OUG 140/2021, Legea 365/2002, GDPR, Legea 506/2004). Ele se completează automat cu datele firmei din Customizer → HiFi Expert → Date firmă și se scriu în paginile de mai jos; după aceea le poți edita ca pe orice pagină.', 'hifiexpert' ); ?></p>
+		<p><?php esc_html_e( 'Tema conține textele legale necesare unui magazin online din România (OUG 34/2014, OUG 140/2021, Legea 365/2002, GDPR, Legea 506/2004). Ele se completează automat cu datele firmei din Customizer → Yamaha Audio → Date firmă și se scriu în paginile de mai jos; după aceea le poți edita ca pe orice pagină.', 'hifiexpert' ); ?></p>
 		<p class="description"><?php esc_html_e( 'Textele sunt un model solid, nu consultanță juridică: cere unui avocat să le verifice înainte de publicare.', 'hifiexpert' ); ?></p>
 
 		<h2 class="title"><?php esc_html_e( 'Datele folosite', 'hifiexpert' ); ?></h2>

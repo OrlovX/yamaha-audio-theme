@@ -1,6 +1,6 @@
 <?php
 /**
- * Customizer: every piece of homepage/header/footer copy lives here.
+ * Customizer: every piece of homepage/header/footer copy lives here (Yamaha Audio defaults).
  *
  * @package hifiexpert
  */
@@ -15,22 +15,22 @@ function hifiexpert_option_defaults() {
 		// Logo / top bar (kept from the current site).
 		'theme_mode'          => 'dark',
 		'theme_switch'        => true,
-		'logo_invert'         => false,
-		'logo_viewbox'        => '8 -248 993 978',
+		'logo_invert'         => true,   // the violet PNG logo is shown white on the dark theme, as is on the light one
+		'logo_viewbox'        => '',
 		'topbar_address'      => 'Bd. Eroii Sanitari 89, Cotroceni, București',
 		'topbar_address_url'  => 'https://maps.app.goo.gl/1erfzMfo8ityregH7',
 		'topbar_hours'        => 'Luni–Vineri 10:00–17:00 · Sâmbătă 10:00–14:00',
 		'hours_weekday'       => '10:00-17:00',
 		'hours_saturday'      => '10:00-14:00',
 		'hours_sunday'        => '',
-		'topbar_email'        => 'info@hifiexpert.ro',
+		'topbar_email'        => 'office@yamaha-audio.ro',   // TODO confirm with the owner
 		'phone'               => '0758 818 181',
 		'whatsapp'            => '+40758818181',
 		'showroom_directions' => "Metrou: M1 Eroilor sau Petrache Poenaru, apoi 7 minute pe jos pe Bd. Eroii Sanitari\nTramvai 41 / autobuze pe Bd. Eroii Sanitari, stația Universitatea de Medicină\nParcare: pe Bd. Eroii Sanitari și străzile adiacente (zonă cu plată în timpul zilei)\nIntrarea este la stradă, lângă Universitatea de Medicină „Carol Davila”",
 		'waze_url'            => '',
 
 		// Header menu: these items leave the category bar and form a separate group on the right.
-		'nav_extra'           => 'blog, brands, branduri, consignatie, promotii, contact',
+		'nav_extra'           => 'blog, promotii, contact',   // single-brand shop: no Branduri / Consignație
 
 		// Company (footer + legal pages).
 		'company_name'        => 'HIGH-END EXPERT S.R.L.',
@@ -52,7 +52,7 @@ function hifiexpert_option_defaults() {
 		'rates_label'         => 'fără dobândă cu Card Avantaj',
 		'delivery_promise'    => 'Comandă până la ora 15:00 (L–V) și îl primești a doua zi lucrătoare.',
 		'pickup_promise'      => 'Sau ridicare din showroom Cotroceni, în aceeași zi.',
-		'music_cats'          => 'muzica',
+		'music_cats'          => '',   // no music (inquiry-only) category on this shop
 		'music_instock_text'  => 'Livrare în 5–7 zile lucrătoare',
 		'music_inquire_text'  => 'Întreabă de stoc',
 		'warranty_text'       => 'Garanție 2 ani, service autorizat',
@@ -60,44 +60,44 @@ function hifiexpert_option_defaults() {
 		'invoice_text'        => 'Factură fiscală, plată securizată',
 
 		// Hero.
-		'hero_eyebrow'        => 'Oferta săptămânii · în stoc, livrare în 24h',
-		'hero_title'          => 'Sunetul pe care îl meriți.',
-		'hero_text'           => 'Yamaha, Triangle și cele mai bune branduri hi‑fi, în stoc în București, livrate în 24 de ore. Până la 6 rate fără dobândă cu Card Avantaj.',
+		'hero_eyebrow'        => 'Dealer autorizat Yamaha · în stoc, livrare în 24h',
+		'hero_title'          => 'Yamaha. Ascultă diferența.',
+		'hero_text'           => 'Receivere AV, amplificatoare și receivere stereo, streamere MusicCast, boxe și căști Yamaha — în stoc în București, livrate în 24 de ore. Până la 6 rate fără dobândă cu Card Avantaj.',
 		'hero_product'        => 0,
-		'hero_cta_label'      => 'Vezi toate ofertele',
+		'hero_cta_label'      => 'Vezi ofertele Yamaha',
 		'hero_cta_url'        => '',
 		'hero_cta2_label'     => 'Vizitează showroom‑ul',
 		'hero_cta2_url'       => '#showroom',
 
 		// Categories + products.
-		'home_categories_exclude' => 'consignatie',
-		'home_products_title' => 'Oferte în stoc acum',
-		'home_products_text'  => 'Prețuri reduse față de recomandarea producătorului. Livrare gratuită din București, în 24h.',
+		'home_categories_exclude' => '',
+		'home_products_title' => 'Oferte Yamaha în stoc acum',
+		'home_products_text'  => 'Prețuri reduse față de recomandarea Yamaha. Livrare gratuită din București, în 24h.',
 		'home_products_source'=> 'sale',
 		'home_products_count' => 8,
-		'home_exclude_cats'   => 'consignatie',
-		'home_rows'           => "yamaha|Yamaha: receivere, amplificatoare, surse\ntriangle|Triangle: boxe franțuzești, de la raft la podea",
+		'home_exclude_cats'   => '',
+		'home_rows'           => '',   // product-category rows, e.g. "receivere-av|Receivere AV: de la 5.1 la Dolby Atmos" — set once the category slugs are known
 
 		// Bundle block.
-		'bundle_enabled'      => true,
+		'bundle_enabled'      => false,   // enable once a Yamaha-only bundle with current prices is configured
 		'bundle_eyebrow'      => 'Sistem complet, un singur click',
-		'bundle_title'        => 'Stereo de la 6.498 lei. Gata de ascultat în seara asta.',
-		'bundle_text'         => 'Receiver Yamaha R‑N600A cu streaming și boxe Triangle Borea BR03, potrivite de experții noștri. Cablul de boxe este inclus.',
-		'bundle_items'        => "Yamaha R‑N600A · 3.699 lei\nTriangle Borea BR03 · 2.799 lei\nCablu Supra Classic 2.5, 2 × 3 m · cadou",
+		'bundle_title'        => 'Sistem stereo Yamaha. Gata de ascultat în seara asta.',
+		'bundle_text'         => 'Receiver stereo Yamaha cu streaming MusicCast și boxe Yamaha potrivite de experții noștri. Cablul de boxe este inclus.',
+		'bundle_items'        => '',
 		'bundle_cta_label'    => 'Vezi pachetul',
 		'bundle_cta_url'      => '',
-		'bundle_price_note'   => 'sau 6 × 1.083 lei fără dobândă',
+		'bundle_price_note'   => '',
 		'bundle_image'        => 0,
 
 		// Audiophile band.
-		'audio_eyebrow'       => 'High‑End',
-		'audio_title'         => 'Sistemul tău high‑end, în 24 de ore.',
-		'audio_text'          => 'Accuphase, Luxman, Aurender, Marten, Vitus, McIntosh, Sonus faber, Siltech, HMS – în stoc în București sau la o zi distanță. Ne spui camera, muzica și bugetul; îți compunem sistemul, ți‑l livrăm în 24 de ore și îți dăm tot know‑how‑ul ca să îl pui la punct acasă.',
-		'audio_cta_label'     => 'Vreau un sistem în 24 de ore',
+		'audio_eyebrow'       => 'MusicCast',
+		'audio_title'         => 'Toată casa, un singur sistem.',
+		'audio_text'          => 'MusicCast leagă receiverul, soundbar‑ul, boxele wireless și streamerul Yamaha într‑un singur sistem multiroom, controlat din telefon. Ne spui camerele, muzica și bugetul; îți compunem sistemul, ți‑l livrăm în 24 de ore și îl punem la punct împreună.',
+		'audio_cta_label'     => 'Vreau un sistem MusicCast',
 		'audio_cta2_label'    => 'Programează o audiție',
-		'audio_brands'        => 'accuphase, luxman, aurender, marten, vitus, mcintosh, sonus-faber, siltech, hms',
-		'brands_featured'     => 'yamaha,triangle,luxman,accuphase,mcintosh,sonus-faber',
-		'brands_hidden'       => 'dali, denon, focal, marantz, ortofon, polk-audio, wilson, opera, unison-research',
+		'audio_brands'        => '',
+		'brands_featured'     => '',
+		'brands_hidden'       => '',
 
 		// Campaign / big sale mode (Black Edition, Winter Sales…).
 		// Black Edition 30 Oct → 2 Dec 2026 is baked in as the default, so deploying the theme files is enough
@@ -105,7 +105,7 @@ function hifiexpert_option_defaults() {
 		// it off by itself afterwards; the Customizer (Campanie / Sale) overrides all of this.
 		'camp_enabled'        => true,
 		'camp_name'           => 'Black Edition',
-		'camp_tagline'        => 'Reduceri reale la hi‑fi, doar câteva zile.',
+		'camp_tagline'        => 'Reduceri reale la Yamaha, doar câteva zile.',
 		'camp_style'          => 'black',
 		'camp_start'          => '2026-10-30',
 		'camp_end'            => '2026-12-02 23:59',
@@ -116,7 +116,7 @@ function hifiexpert_option_defaults() {
 		// Footer.
 		'newsletter_shortcode'=> '',
 		'newsletter_text'     => 'Primește oferte și noutăți, o dată pe săptămână. Fără spam.',
-		'company_line'        => 'High End Expert S.R.L. · Toate drepturile rezervate',
+		'company_line'        => 'Yamaha Audio · High End Expert S.R.L. · Toate drepturile rezervate',   // TODO confirm legal entity
 		'payments_line'       => 'Visa · Mastercard · Card Avantaj · Ramburs · Transfer bancar',
 	);
 }
@@ -127,7 +127,7 @@ add_action(
 		$d = hifiexpert_option_defaults();
 
 		$panel = 'hifiexpert';
-		$wp->add_panel( $panel, array( 'title' => 'HiFi Expert', 'priority' => 10 ) );
+		$wp->add_panel( $panel, array( 'title' => 'Yamaha Audio', 'priority' => 10 ) );
 
 		$sections = array(
 			'hx_contact'  => 'Contact & bară de sus',
@@ -192,7 +192,7 @@ add_action(
 			array( 'hx_products', 'home_products_source', 'Sursă produse', 'select', array( 'bestsellers' => 'Cele mai vândute', 'sale' => 'La ofertă', 'featured' => 'Recomandate (featured)', 'newest' => 'Cele mai noi' ) ),
 			array( 'hx_products', 'home_products_count', 'Număr produse (4, 8 sau 12)', 'number' ),
 			array( 'hx_products', 'home_exclude_cats', 'Categorii excluse din hero și din grile (slug-uri, separate prin virgulă)', 'text' ),
-			array( 'hx_products', 'home_rows', 'Rânduri de brand sub oferte: câte un rând pe linie, format slug-brand|Titlu afișat', 'textarea' ),
+			array( 'hx_products', 'home_rows', 'Rânduri sub oferte: câte un rând pe linie, format slug|Titlu afișat (slug de brand sau de categorie de produse)', 'textarea' ),
 
 			array( 'hx_bundle', 'bundle_enabled', 'Afișează blocul', 'checkbox' ),
 			array( 'hx_bundle', 'bundle_eyebrow', 'Text mic', 'text' ),

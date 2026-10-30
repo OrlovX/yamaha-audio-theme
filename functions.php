@@ -1,6 +1,6 @@
 <?php
 /**
- * HiFi Expert theme bootstrap.
+ * Yamaha Audio theme bootstrap (derived from the HiFi Expert theme).
  *
  * @package hifiexpert
  */

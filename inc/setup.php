@@ -101,17 +101,18 @@ add_action(
 );
 
 /**
- * One-time: prefer the tightly cropped PNG badge over the SVG with the oversized canvas.
- * Runs once per theme version; the user can still change the logo in the Customizer afterwards.
+ * One-time: when no logo is set, pick the Yamaha logo already in the media library (yamaha_purple.png,
+ * the file the previous theme used). Runs once per theme version; the Customizer can change it afterwards.
  */
 add_action( 'init', function () {
 	if ( get_option( 'hifiexpert_logo_migrated' ) === HIFIEXPERT_VERSION ) {
 		return;
 	}
-	$current = (int) get_theme_mod( 'custom_logo' );
-	$png     = get_posts( array( 'post_type' => 'attachment', 'post_mime_type' => 'image/png', 'posts_per_page' => 1, 'fields' => 'ids', 'title' => 'Logo_vector_hifiexpert-v2' ) );
-	if ( $png && ( ! $current || 'image/svg+xml' === get_post_mime_type( $current ) ) ) {
-		set_theme_mod( 'custom_logo', (int) $png[0] );
+	if ( ! (int) get_theme_mod( 'custom_logo' ) ) {
+		$png = get_posts( array( 'post_type' => 'attachment', 'post_mime_type' => 'image/png', 'posts_per_page' => 1, 'fields' => 'ids', 's' => 'yamaha_purple' ) );
+		if ( $png ) {
+			set_theme_mod( 'custom_logo', (int) $png[0] );
+		}
 	}
 	update_option( 'hifiexpert_logo_migrated', HIFIEXPERT_VERSION, false );
 } );

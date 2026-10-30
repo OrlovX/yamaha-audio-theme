@@ -22,9 +22,9 @@ defined( 'ABSPATH' ) || exit;
 	<li><strong>Client</strong> – persoana fizică (consumator) sau juridică ce plasează o comandă pe Site ori cumpără din showroom.</li>
 	<li><strong>Consumator</strong> – persoana fizică ce acționează în scopuri din afara activității sale comerciale, industriale, de producție, artizanale ori liberale (OG nr. 21/1992, OUG nr. 34/2014).</li>
 	<li><strong>Comandă</strong> – documentul electronic prin care Clientul își exprimă intenția de a cumpăra produsele din coș, la prețul și în condițiile afișate.</li>
-	<li><strong>Contract la distanță</strong> – contractul încheiat între HiFi Expert și Client prin intermediul Site‑ului, fără prezența fizică simultană a părților, în sensul OUG nr. 34/2014.</li>
+	<li><strong>Contract la distanță</strong> – contractul încheiat între <?php echo $v['site']; ?> și Client prin intermediul Site‑ului, fără prezența fizică simultană a părților, în sensul OUG nr. 34/2014.</li>
 	<li><strong>Produse noi</strong> – produse sigilate, din stocul nostru sau al distribuitorilor autorizați.</li>
-	<li><strong>Produse în consignație</strong> – produse folosite (second‑hand) sau demo, vândute de HiFi Expert în nume propriu pe baza unui contract de consignație, marcate ca atare pe Site și descrise cu starea lor reală.</li>
+	<li><strong>Produse în consignație</strong> – produse folosite (second‑hand) sau demo, vândute de <?php echo $v['site']; ?> în nume propriu pe baza unui contract de consignație, marcate ca atare pe Site și descrise cu starea lor reală.</li>
 </ul>
 
 <h2>3. Acceptarea termenilor</h2>
@@ -65,7 +65,7 @@ defined( 'ABSPATH' ) || exit;
 
 <h2>10. Produse în consignație</h2>
 <ul>
-	<li>Produsele din categoria <em>Consignație</em> sunt folosite sau demo. Le vindem în nume propriu, pe baza unui contract de consignație cu proprietarul; factura este emisă de HiFi Expert, iar obligațiile de garanție și de retur ne revin nouă.</li>
+	<li>Produsele din categoria <em>Consignație</em> sunt folosite sau demo. Le vindem în nume propriu, pe baza unui contract de consignație cu proprietarul; factura este emisă de <?php echo $v['site']; ?>, iar obligațiile de garanție și de retur ne revin nouă.</li>
 	<li>Starea produsului (cosmetică și funcțională), accesoriile și ambalajul livrate sunt descrise pe pagina produsului. Semnele normale de folosire descrise acolo nu reprezintă o neconformitate.</li>
 	<li>Prețul poate fi negociabil în limitele convenite cu proprietarul; dreptul de retragere pentru comenzile online se aplică și acestor produse.</li>
 </ul>
