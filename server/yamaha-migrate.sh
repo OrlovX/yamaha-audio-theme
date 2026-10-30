@@ -239,8 +239,8 @@ do_cert() {
 do_certbot() {
   local MYIP DNSIP WWW_IP DOMS
   MYIP="$(curl -s --max-time 5 https://checkip.amazonaws.com || true)"
-  DNSIP="$(getent ahostsv4 "${DOMAIN}" 2>/dev/null | awk 'NR==1{print $1}')"
-  WWW_IP="$(getent ahostsv4 "www.${DOMAIN}" 2>/dev/null | awk 'NR==1{print $1}')"
+  DNSIP="$(getent ahostsv4 "${DOMAIN}" 2>/dev/null | awk 'NR==1{print $1}' || true)"
+  WWW_IP="$(getent ahostsv4 "www.${DOMAIN}" 2>/dev/null | awk 'NR==1{print $1}' || true)"
   echo "   this server: ${MYIP}   ${DOMAIN} -> ${DNSIP:-unresolved}   www.${DOMAIN} -> ${WWW_IP:-unresolved}"
   if [ -z "$DNSIP" ] || [ "$DNSIP" != "$MYIP" ]; then
     echo "   ${DOMAIN} does not resolve to this server (yet) - fix DNS / wait for the cache, then rerun 'certbot'."
@@ -278,7 +278,7 @@ do_golive() {
   log "Go-live checks"
   local MYIP DNSIP
   MYIP="$(curl -s --max-time 5 https://checkip.amazonaws.com || true)"
-  DNSIP="$(getent ahostsv4 "${DOMAIN}" | awk 'NR==1{print $1}')"
+  DNSIP="$(getent ahostsv4 "${DOMAIN}" | awk 'NR==1{print $1}' || true)"
   echo "   this server: ${MYIP}   DNS ${DOMAIN} -> ${DNSIP}"
   echo "   yahfx-sync: $(${WP} plugin get yahfx-sync --field=status)   blog_public: $(${WP} option get blog_public)"
   ${WP} db query "SELECT webhook_id, name, status FROM wp_wc_webhooks"
