@@ -593,9 +593,9 @@ html[data-theme="light"] .hx-mnav__theme .hx-theme__to-dark { display: inline; }
 .hx-spot .hx-stock { font-size: 13px; }
 
 /* Shop by type: a scrollable strip of sub-categories with round thumbnails, under the hero */
-.hx-types { display: flex; gap: 8px; overflow-x: auto; padding: 22px 0 30px; scrollbar-width: none; -ms-overflow-style: none; }
+.hx-types { list-style: none; display: flex; gap: 8px; overflow-x: auto; padding: 22px 0 30px; scrollbar-width: none; -ms-overflow-style: none; }
 .hx-types::-webkit-scrollbar { display: none; }
-.hx-types__item { flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 999px; background: var(--hx-surface); border: 1px solid var(--hx-line-strong); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--hx-text); transition: border-color .15s, background .15s, color .15s; }
+.hx-types__item { flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 999px; background: var(--hx-surface); border: 1px solid var(--hx-line-strong); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--hx-text); white-space: nowrap; transition: border-color .15s, background .15s, color .15s; }
 .hx-types__item:hover { border-color: var(--hx-gold); background: var(--hx-gold); color: var(--hx-on-accent); }
 .hx-types__item:hover .hx-types__count { color: rgba(255, 255, 255, .75); }
 .hx-types__count { font-size: 11px; font-weight: 600; letter-spacing: 0; color: var(--hx-faint); }
@@ -632,6 +632,8 @@ html[data-theme="light"] .hx-mnav__theme .hx-theme__to-dark { display: inline; }
 	.hx-spot__body { padding: 0; grid-template-columns: 1fr; grid-template-areas: "kicker" "title" "price" "rate" "lead" "ctas" "stock"; justify-items: center; }
 	.hx-spot__body > .hx-spot__price, .hx-spot__body > .hx-spot__rate { justify-self: center; text-align: center; }
 	.hx-spot__ctas { justify-content: center; }
+	.hx-hero__proof { flex-direction: column; gap: 4px; }
+	.hx-hero__proof li { border-right: 0; margin-right: 0; padding: 6px 0 0; }
 	.hx-spot__title { font-size: 21px; }
 	.hx-spot__now { font-size: 26px; }
 	.hx-ribbon { padding: 18px 20px; }
