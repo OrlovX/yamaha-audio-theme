@@ -1925,8 +1925,11 @@ html[data-theme="light"] .dgwt-wcas-overlay-mobile .dgwt-wcas-sf-wrapp::before {
 .hx .woocommerce-terms-and-conditions-wrapper { font-size: 13.5px; color: var(--hx-text-2); }
 .hx .woocommerce-terms-and-conditions-wrapper a { color: var(--hx-accent); text-decoration: underline; text-underline-offset: 2px; }
 .hx .woocommerce-terms-and-conditions-checkbox-text { display: inline; }
-.hx .woocommerce-form__label-for-checkbox { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
-.hx .woocommerce-form__label-for-checkbox input { margin-top: 2px; }
+/* checkbox labels read as one sentence: box inline at the start, text wraps, the required mark follows the text */
+.hx .woocommerce-form__label-for-checkbox { display: block; cursor: pointer; line-height: 1.5; }
+.hx .woocommerce-form__label-for-checkbox input { display: inline-block; vertical-align: -3px; margin-right: 10px; }
+.hx .woocommerce-form__label-for-checkbox .required { margin-left: 3px; }
+.hx .woocommerce-shipping-fields h3 label { display: inline-flex; }
 .hx #place_order { width: 100%; min-height: 54px; font-size: 16px; }
 .hx .woocommerce-privacy-policy-text { font-size: 12.5px; color: var(--hx-faint); line-height: 1.5; }
 .hx .woocommerce-privacy-policy-text a { color: var(--hx-muted); text-decoration: underline; }

@@ -224,3 +224,16 @@ function yamaha_audio_fix_ro_gettext( $text ) {
 	}
 	return $text;
 }
+
+/**
+ * Plugin strings that reach the checkout untranslated (Extra Product Options).
+ */
+add_filter( 'gettext_woocommerce-tm-extra-product-options', function ( $translated, $text ) {
+	$map = array(
+		'Edit options'  => 'Modifică opțiunile',
+		'Edit Options'  => 'Modifică opțiunile',
+		'Options total' => 'Total opțiuni',
+		'Final total'   => 'Total final',
+	);
+	return isset( $map[ $text ] ) && $translated === $text ? $map[ $text ] : $translated;
+}, 20, 2 );
