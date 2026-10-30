@@ -936,7 +936,7 @@ html[data-theme="light"] .hx-pill--camp { box-shadow: 0 8px 22px color-mix(in sr
    Footer
    -------------------------------------------------------------------------- */
 
-.hx-footer { margin-top: 56px; background: #17102a; color: #cfc6e0; --hx-text: #ffffff; --hx-text-2: #e3dcf0; --hx-muted: #b7acd0; --hx-faint: #8f84a8; --hx-line: rgba(255, 255, 255, .1); --hx-line-strong: rgba(255, 255, 255, .2); --hx-surface-2: rgba(255, 255, 255, .06); --hx-accent: #c9b2f5; --hx-fg-rgb: 255, 255, 255; }
+.hx-footer { margin-top: 56px; background: #17102a; color: #cfc6e0; --hx-text: #ffffff; --hx-text-strong: #ffffff; --hx-on-text: #17102a; --hx-text-2: #e3dcf0; --hx-muted: #b7acd0; --hx-faint: #8f84a8; --hx-line: rgba(255, 255, 255, .1); --hx-line-strong: rgba(255, 255, 255, .2); --hx-surface-2: rgba(255, 255, 255, .06); --hx-accent: #c9b2f5; --hx-fg-rgb: 255, 255, 255; }
 html .hx-footer .hx-logo .hx-logo__img { filter: brightness(0) invert(1); } /* white wordmark on the dark-violet footer in both themes */
 .hx-footer__inner { display: flex; flex-direction: column; gap: 40px; padding-top: 56px; padding-bottom: 28px; }
 .hx-footer__grid { display: grid; grid-template-columns: 1.3fr .8fr .8fr 1.2fr; gap: 32px; }
@@ -2004,3 +2004,7 @@ html[data-theme="dark"] .hx .wc_payment_method > label::after { background-color
 	.hx .woocommerce-Addresses .col2-set, .hx .woocommerce-Addresses.col2-set, .hx #customer_login.col2-set, .hx .u-columns.col2-set { grid-template-columns: minmax(0, 1fr); }
 	.hx .woocommerce-EditAccountForm .woocommerce-form-row--first, .hx .woocommerce-EditAccountForm .woocommerce-form-row--last { display: flex; width: 100%; margin-right: 0; }
 }
+
+/* footer links: white on hover (the page's hover token is black on the light theme) */
+.hx-footer a:hover, .hx-footer .hx-footer__links a:hover, .hx-footer .hx-footer__company a:hover, .hx-footer .hx-footer__bottom a:hover, .hx-footer .hx-nl__consent a:hover { color: #ffffff; }
+.hx-footer .hx-footer__links a, .hx-footer .hx-footer__company a, .hx-footer .hx-footer__bottom a { transition: color .15s; }
