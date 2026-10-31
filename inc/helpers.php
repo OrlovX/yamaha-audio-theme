@@ -761,3 +761,24 @@ function yamaha_audio_showroom_tax_query() {
 	}
 	return array( 'taxonomy' => $tax, 'operator' => 'EXISTS' );
 }
+
+/**
+ * Social profiles set in the Customizer: [ key => [ label, url, icon class ] ]. Icons come from the
+ * Font Awesome plugin when it is active; the text label is always rendered, so nothing depends on it.
+ */
+function yamaha_audio_social_links() {
+	$all = array(
+		'facebook'  => array( 'Facebook', 'fab fa-facebook-f' ),
+		'instagram' => array( 'Instagram', 'fab fa-instagram' ),
+		'youtube'   => array( 'YouTube', 'fab fa-youtube' ),
+		'tiktok'    => array( 'TikTok', 'fab fa-tiktok' ),
+	);
+	$out = array();
+	foreach ( $all as $key => $def ) {
+		$url = trim( (string) yamaha_audio_opt( 'social_' . $key ) );
+		if ( $url && filter_var( $url, FILTER_VALIDATE_URL ) ) {
+			$out[ $key ] = array( 'label' => $def[0], 'url' => $url, 'icon' => $def[1] );
+		}
+	}
+	return apply_filters( 'yamaha_audio_social_links', $out );
+}

@@ -21,6 +21,15 @@ $hx_news  = yamaha_audio_opt( 'newsletter_shortcode' );
 				<span class="hx-footer__heading"><?php esc_html_e( 'Newsletter', 'yamaha-audio' ); ?></span>
 				<p class="hx-footer__text"><?php echo esc_html( yamaha_audio_opt( 'newsletter_text' ) ); ?></p>
 				<div class="hx-newsletter"><?php echo yamaha_audio_newsletter_form(); // phpcs:ignore ?></div>
+				<?php $hx_social = yamaha_audio_social_links(); ?>
+				<?php if ( $hx_social ) : ?>
+					<span class="hx-footer__subheading"><?php esc_html_e( 'Urmărește‑ne', 'yamaha-audio' ); ?></span>
+					<ul class="hx-social">
+						<?php foreach ( $hx_social as $hx_s ) : ?>
+							<li><a class="hx-social__link" href="<?php echo esc_url( $hx_s['url'] ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr( sprintf( __( '%1$s pe %2$s', 'yamaha-audio' ), get_bloginfo( 'name' ), $hx_s['label'] ) ); ?>"><?php if ( class_exists( 'FontAwesome' ) ) : ?><i class="<?php echo esc_attr( $hx_s['icon'] ); ?>" aria-hidden="true"></i><?php endif; ?><span><?php echo esc_html( $hx_s['label'] ); ?></span></a></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
 			</div>
 
 			<div class="hx-footer__col">

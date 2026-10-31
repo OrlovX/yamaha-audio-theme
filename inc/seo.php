@@ -211,6 +211,7 @@ function yamaha_audio_store_schema() {
 		'telephone'          => preg_replace( '/\s+/', '', (string) ( yamaha_audio_opt( 'whatsapp' ) ?: yamaha_audio_opt( 'phone' ) ) ),
 		'email'              => yamaha_audio_opt( 'topbar_email' ),
 		'brand'              => array( '@type' => 'Brand', 'name' => 'Yamaha' ),
+		'sameAs'             => array_values( wp_list_pluck( yamaha_audio_social_links(), 'url' ) ),
 		'priceRange'         => '$$$',
 		'currenciesAccepted' => 'RON',
 		'paymentAccepted'    => 'Cash, Credit Card, Bank Transfer',

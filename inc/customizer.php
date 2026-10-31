@@ -45,6 +45,10 @@ function yamaha_audio_option_defaults() {
 		'company_courier_fee' => '19 lei (TVA inclus)',
 		'legal_updated'       => '',
 		'og_image'            => 0,
+		'social_facebook'     => 'https://www.facebook.com/YamahaAudioRomania',
+		'social_instagram'    => 'https://www.instagram.com/yamahaaudioromania/',
+		'social_youtube'      => '',
+		'social_tiktok'       => '',
 		'facets_exclude'      => 'pa, pa1',
 
 		// Promises shown in the strip and on product pages.
@@ -218,6 +222,10 @@ add_action(
 			array( 'hx_campaign', 'camp_badge', 'Text pe etichetele de preț (gol = numele campaniei)', 'text' ),
 
 			array( 'hx_footer', 'newsletter_shortcode', 'Shortcode formular newsletter (ex. Contact Form 7)', 'text' ),
+			array( 'hx_footer', 'social_facebook', 'Facebook (URL pagină)', 'url' ),
+			array( 'hx_footer', 'social_instagram', 'Instagram (URL profil)', 'url' ),
+			array( 'hx_footer', 'social_youtube', 'YouTube (URL canal, opțional)', 'url' ),
+			array( 'hx_footer', 'social_tiktok', 'TikTok (URL profil, opțional)', 'url' ),
 			array( 'hx_footer', 'newsletter_text', 'Text newsletter', 'text' ),
 			array( 'hx_footer', 'company_line', 'Linie copyright', 'text' ),
 			array( 'hx_footer', 'payments_line', 'Metode de plată (text)', 'text' ),

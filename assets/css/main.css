@@ -2026,3 +2026,10 @@ html[data-theme="dark"] .hx .wc_payment_method > label::after { background-color
 /* footer links: white on hover (the page's hover token is black on the light theme) */
 .hx-footer a:hover, .hx-footer .hx-footer__links a:hover, .hx-footer .hx-footer__company a:hover, .hx-footer .hx-footer__bottom a:hover, .hx-footer .hx-nl__consent a:hover { color: #ffffff; }
 .hx-footer .hx-footer__links a, .hx-footer .hx-footer__company a, .hx-footer .hx-footer__bottom a { transition: color .15s; }
+
+
+/* footer: social profiles under the newsletter */
+.hx-social { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 0; padding: 0; }
+.hx-social__link { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--hx-line-strong); color: var(--hx-text-2); font-size: 13.5px; font-weight: 600; text-decoration: none; transition: border-color .15s, background .15s, color .15s, transform .2s var(--hx-ease); }
+.hx-social__link i { font-size: 15px; line-height: 1; width: 1em; text-align: center; }
+.hx-social__link:hover { color: #ffffff; border-color: #c9b2f5; background: rgba(255, 255, 255, .06); transform: translateY(-1px); }
