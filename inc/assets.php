@@ -137,9 +137,17 @@ add_action(
 		if ( ! $product ) {
 			return;
 		}
-		$src = wp_get_attachment_image_url( $product->get_image_id(), 'yamaha-audio-hero' );
+		$img_id = $product->get_image_id();
+		$src    = wp_get_attachment_image_url( $img_id, 'yamaha-audio-hero' );
 		if ( $src ) {
-			printf( '<link rel="preload" as="image" href="%s" fetchpriority="high">' . "\n", esc_url( $src ) );
+			// Same candidates and sizes as the <img>, so a phone preloads the small variant, not the 2000 px original.
+			$srcset = wp_get_attachment_image_srcset( $img_id, 'yamaha-audio-hero' );
+			$sizes  = '(max-width: 900px) 92vw, 560px';
+			if ( $srcset ) {
+				printf( '<link rel="preload" as="image" href="%s" imagesrcset="%s" imagesizes="%s" fetchpriority="high">' . "\n", esc_url( $src ), esc_attr( $srcset ), esc_attr( $sizes ) );
+			} else {
+				printf( '<link rel="preload" as="image" href="%s" fetchpriority="high">' . "\n", esc_url( $src ) );
+			}
 		}
 	},
 	2
@@ -157,3 +165,32 @@ add_action( 'wp_head', function () {
 		. 'var h=document.documentElement;h.setAttribute("data-theme",t);'
 		. 'var c=document.querySelector(\'meta[name="theme-color"]\');if(c){c.setAttribute("content",t==="light"?"#f5f3ee":"#121212")}})();</script>' . "\n";
 }, 1 );
+
+/**
+ * Plugin stylesheets that only style secondary UI (search overlay, wishlist widgets, consent) are loaded without
+ * blocking the first paint: media="print" until loaded, then switched to "all". The theme's own CSS covers the
+ * header search pill and the wishlist buttons, so nothing visible waits for them.
+ */
+add_filter( 'style_loader_tag', function ( $tag, $handle, $href ) {
+	if ( is_admin() || ! $href ) {
+		return $tag;
+	}
+	$async = array( 'ajax-search-for-woocommerce', 'yith-wcwl', 'jquery-selectBox', 'woocommerce-tm-extra-product-options-animate' );
+	$by_path = array( '/ajax-search-for-woocommerce/', '/yith-woocommerce-wishlist/', '/wp-consent-api/', '/animate.css' );
+	$hit = false;
+	foreach ( $by_path as $needle ) {
+		if ( false !== strpos( $href, $needle ) ) {
+			$hit = true;
+			break;
+		}
+	}
+	if ( ! $hit && ! in_array( $handle, $async, true ) ) {
+		return $tag;
+	}
+	if ( false !== strpos( $tag, 'onload=' ) ) {
+		return $tag;
+	}
+	$tag = preg_replace( '/\smedia=([\'"])[^\'"]*\1/', '', $tag );
+	$tag = str_replace( ' href=', ' media="print" onload="this.media=\'all\';this.onload=null" href=', $tag );
+	return $tag . '<noscript>' . str_replace( ' media="print" onload="this.media=\'all\';this.onload=null"', '', $tag ) . '</noscript>' . "\n";
+}, 10, 3 );
