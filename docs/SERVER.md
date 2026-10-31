@@ -59,3 +59,13 @@ SSH for both: user `admin`, key `HiFi-Expert-LS.pem` (owner's Mac: `~/Desktop/TE
   `order.created` / `order.updated` at `/webhooks/woo/yamaha`. Check its Sites screen: *Webhooks: ok*.
 - Yamaha Sync (`yahfx-sync`): yamaha-audio.ro is master, pushes SKU + prices to hifiexpert.ro.
 - DNS: Route 53. Payments: NETOPIA. Mail: WP Mail SMTP. SEO: Yoast (hifiexpert uses Rank Math).
+
+## Loopback and headers (added after the SEO audit, 2026-10-31)
+
+- The site calls itself over HTTPS (LiteSpeed purge from WP-CLI, REST/Site Health loopbacks). The VPC resolver can
+  hold a stale answer for `yamaha-audio.ro` for the record's TTL after an IP swap, so each server pins its own name
+  in `/etc/hosts`: `127.0.0.1 yamaha-audio.ro www.yamaha-audio.ro` on live (`127.0.0.1 staging.yamaha-audio.ro` on
+  staging). Check with `getent hosts yamaha-audio.ro`.
+- Browser caching + security headers: `server/apache-yamaha.conf` → `/etc/apache2/conf-available/yamaha.conf`,
+  `a2enconf yamaha`. Theme assets are versioned by file time, so the one-year `immutable` is safe.
+- Read-only audit: `cd /var/www/html && bash wp-content/themes/yamaha-audio/server/seo-check.sh`.

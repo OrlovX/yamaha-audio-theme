@@ -510,7 +510,7 @@ function yamaha_audio_clean_description( $product ) {
  * Spec rows from product attributes: visible, short values (the brand attribute is skipped). [ [label, value], … ]
  */
 function yamaha_audio_spec_rows( $product ) {
-	$skip = array( 'pa_producator', 'pa_brand', 'pa_disponibil-in-showroom' ); // the brand is always Yamaha here
+	$skip = array( 'pa_producator', 'pa_brand', 'pa_disponibil-in-showroom', 'pa_testeaza-in-showroom', 'pa_pa', 'pa_pa1' ); // brand is always Yamaha; the rest are internal
 	$rows = array();
 	foreach ( $product->get_attributes() as $attribute ) {
 		if ( ! $attribute instanceof WC_Product_Attribute || ! $attribute->get_visible() ) {
@@ -728,4 +728,36 @@ function yamaha_audio_campaign() {
  */
 function yamaha_audio_in_campaign( $product ) {
 	return $product && yamaha_audio_campaign() && $product->is_on_sale();
+}
+
+/**
+ * The "can be auditioned in the showroom" attribute, whichever slug the catalogue uses ('' when none).
+ */
+function yamaha_audio_showroom_tax() {
+	static $tax = null;
+	if ( null === $tax ) {
+		$tax = '';
+		foreach ( array( 'pa_testeaza-in-showroom', 'pa_disponibil-in-showroom' ) as $t ) {
+			if ( taxonomy_exists( $t ) ) {
+				$tax = $t;
+				break;
+			}
+		}
+	}
+	return $tax;
+}
+
+/**
+ * tax_query clause selecting products flagged for the showroom: the "yes" terms when they exist, else any term.
+ */
+function yamaha_audio_showroom_tax_query() {
+	$tax = yamaha_audio_showroom_tax();
+	if ( ! $tax ) {
+		return array();
+	}
+	$yes = get_terms( array( 'taxonomy' => $tax, 'slug' => array( 'da', 'yes', '1', 'true', 'in-showroom' ), 'hide_empty' => false, 'fields' => 'slugs' ) );
+	if ( ! is_wp_error( $yes ) && $yes ) {
+		return array( 'taxonomy' => $tax, 'field' => 'slug', 'terms' => array_values( $yes ), 'operator' => 'IN' );
+	}
+	return array( 'taxonomy' => $tax, 'operator' => 'EXISTS' );
 }

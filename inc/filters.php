@@ -26,7 +26,7 @@ function yamaha_audio_facet_map() {
 	if ( function_exists( 'wc_get_attribute_taxonomies' ) ) {
 		// Internal attributes never become filters: the brand (single-brand shop), the showroom flag and
 		// whatever the owner lists in the Customizer (price tiers like "PA"/"PA1", import codes…).
-		$exclude = array( 'producator', 'brand', 'marca', 'disponibil-in-showroom' );
+		$exclude = array( 'producator', 'brand', 'marca', 'disponibil-in-showroom', 'testeaza-in-showroom' );
 		foreach ( explode( ',', strtolower( (string) yamaha_audio_opt( 'facets_exclude' ) ) ) as $x ) {
 			$x = trim( $x );
 			if ( '' !== $x ) {
@@ -118,8 +118,8 @@ add_action( 'woocommerce_product_query', function ( WP_Query $q ) {
 	foreach ( $s['tax'] as $taxonomy => $slugs ) {
 		$tax[] = array( 'taxonomy' => $taxonomy, 'field' => 'slug', 'terms' => $slugs, 'operator' => 'IN' );
 	}
-	if ( $s['showroom'] && taxonomy_exists( 'pa_disponibil-in-showroom' ) ) {
-		$tax[] = array( 'taxonomy' => 'pa_disponibil-in-showroom', 'field' => 'slug', 'terms' => array( 'da' ), 'operator' => 'IN' );
+	if ( $s['showroom'] && yamaha_audio_showroom_tax() ) {
+		$tax[] = yamaha_audio_showroom_tax_query();
 	}
 	if ( count( $tax ) > 1 && empty( $tax['relation'] ) ) {
 		$tax['relation'] = 'AND';
@@ -185,8 +185,8 @@ function yamaha_audio_filtered_ids( $ignore_tax = '' ) {
 		}
 		$args['tax_query'][] = array( 'taxonomy' => $taxonomy, 'field' => 'slug', 'terms' => $slugs );
 	}
-	if ( $s['showroom'] && 'pa_disponibil-in-showroom' !== $ignore_tax && taxonomy_exists( 'pa_disponibil-in-showroom' ) ) {
-		$args['tax_query'][] = array( 'taxonomy' => 'pa_disponibil-in-showroom', 'field' => 'slug', 'terms' => array( 'da' ) );
+	if ( $s['showroom'] && yamaha_audio_showroom_tax() && yamaha_audio_showroom_tax() !== $ignore_tax ) {
+		$args['tax_query'][] = yamaha_audio_showroom_tax_query();
 	}
 	if ( $s['stock'] && 'stock' !== $ignore_tax ) {
 		$args['meta_query'][] = array( 'key' => '_stock_status', 'value' => 'instock' );
@@ -325,7 +325,7 @@ function yamaha_audio_render_filters() {
 		<h3 class="hx-filter__title"><?php esc_html_e( 'Disponibilitate', 'yamaha-audio' ); ?></h3>
 		<ul class="hx-filter__list">
 			<li><a class="hx-filter__opt<?php echo $state['stock'] ? ' is-on' : ''; ?>" href="<?php echo yamaha_audio_filter_url( array( 'stock' => ! $state['stock'] ) ); ?>" rel="nofollow"><span class="hx-filter__box"></span><?php esc_html_e( 'În stoc, livrare 24h', 'yamaha-audio' ); ?></a></li>
-			<?php if ( taxonomy_exists( 'pa_disponibil-in-showroom' ) ) : ?>
+			<?php if ( yamaha_audio_showroom_tax() ) : ?>
 				<li><a class="hx-filter__opt<?php echo $state['showroom'] ? ' is-on' : ''; ?>" href="<?php echo yamaha_audio_filter_url( array( 'showroom' => ! $state['showroom'] ) ); ?>" rel="nofollow"><span class="hx-filter__box"></span><?php esc_html_e( 'Poate fi ascultat în showroom', 'yamaha-audio' ); ?></a></li>
 			<?php endif; ?>
 		</ul>
