@@ -22,6 +22,7 @@ require YAMAHA_AUDIO_DIR . '/inc/newsletter.php';
 require YAMAHA_AUDIO_DIR . '/inc/legal.php';
 require YAMAHA_AUDIO_DIR . '/inc/seo.php';
 require YAMAHA_AUDIO_DIR . '/inc/redirects.php';
+require YAMAHA_AUDIO_DIR . '/inc/tech.php';
 
 if ( class_exists( 'WooCommerce' ) ) {
 	require YAMAHA_AUDIO_DIR . '/inc/woocommerce.php';

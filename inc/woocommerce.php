@@ -280,7 +280,7 @@ function yamaha_audio_highlight_items( $product ) {
 function yamaha_audio_single_sections() {
 	global $product;
 	$highlights = yamaha_audio_highlight_items( $product );
-	$desc       = apply_filters( 'the_content', yamaha_audio_clean_description( $product ) );
+	$desc       = apply_filters( 'yamaha_audio_product_description_html', apply_filters( 'the_content', yamaha_audio_clean_description( $product ) ) );
 
 	echo '<div class="hx-single__sections">';
 
@@ -297,10 +297,14 @@ function yamaha_audio_single_sections() {
 	if ( $desc ) {
 		echo '<section class="hx-section hx-section--tight hx-single__desc"><h2 class="hx-section__title">' . esc_html__( 'Descriere', 'yamaha-audio' ) . '</h2><div class="hx-prose">' . $desc . '</div></section>'; // phpcs:ignore
 	}
+	if ( function_exists( 'yamaha_audio_single_tech_strip' ) ) {
+		yamaha_audio_single_tech_strip();
+	}
 	if ( count( $specs ) >= 3 ) {
 		echo '<section class="hx-section hx-section--tight hx-single__specs"><h2 class="hx-section__title">' . esc_html__( 'Specificații', 'yamaha-audio' ) . '</h2><dl class="hx-specs hx-specs--grid">';
 		foreach ( $specs as $row ) {
-			echo '<div class="hx-specs__row"><dt>' . esc_html( $row[0] ) . '</dt><dd>' . esc_html( $row[1] ) . '</dd></div>';
+			$value = function_exists( 'yamaha_audio_link_tech_terms' ) ? yamaha_audio_link_tech_terms( esc_html( $row[1] ) ) : esc_html( $row[1] );
+			echo '<div class="hx-specs__row"><dt>' . esc_html( $row[0] ) . '</dt><dd>' . wp_kses_post( $value ) . '</dd></div>';
 		}
 		$sku = $product->get_sku();
 		if ( $sku ) {

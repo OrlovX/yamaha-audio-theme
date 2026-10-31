@@ -54,6 +54,10 @@ $hx_news  = yamaha_audio_opt( 'newsletter_shortcode' );
 					wp_nav_menu( array( 'theme_location' => 'footer-info', 'container' => false, 'menu_class' => 'hx-footer__links', 'depth' => 1, 'fallback_cb' => false ) );
 				} elseif ( function_exists( 'yamaha_audio_legal_links' ) && yamaha_audio_legal_links() ) {
 					echo '<ul class="hx-footer__links">';
+					$hx_tpage = get_page_by_path( 'tehnologii' );
+					if ( $hx_tpage && 'publish' === $hx_tpage->post_status ) {
+						printf( '<li><a href="%s">%s</a></li>', esc_url( get_permalink( $hx_tpage ) ), esc_html__( 'Tehnologii Yamaha', 'yamaha-audio' ) );
+					}
 					foreach ( yamaha_audio_legal_links() as $l ) {
 						printf( '<li><a href="%s">%s</a></li>', esc_url( $l['url'] ), esc_html( $l['title'] ) );
 					}

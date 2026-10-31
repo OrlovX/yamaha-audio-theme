@@ -2060,3 +2060,30 @@ html[data-theme="dark"] .hx .wc_payment_method > label::after { background-color
 .single-product .tm-epo-totals-form, .single-product .tc-epo-totals, .single-product .tm-extra-product-options-totals-wrapper,
 .single-product form.cart [class*="tm-final-totals"], .single-product form.cart [class*="tc-totals"], .single-product form.cart [class*="tm-epo-totals"], .single-product form.cart .tm-custom-prices-total, .single-product form.cart .tm-custom-price-total,
 .single-product .tc-epo-element-price, .single-product .tm-options-totals { display: none !important; }
+
+
+/* technology pages: inline links, cards, FAQ, overview */
+.hx-techlink { color: inherit; text-decoration: underline; text-decoration-style: dotted; text-decoration-color: var(--hx-accent); text-underline-offset: .18em; }
+.hx-techlink:hover { color: var(--hx-accent); text-decoration-style: solid; }
+.hx-techlist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.hx-techlist--grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.hx-techcard { display: flex; flex-direction: column; gap: 6px; min-height: 100%; padding: 16px 18px; border-radius: var(--hx-radius-sm); border: 1px solid var(--hx-line); background: var(--hx-surface); color: var(--hx-text-2); text-decoration: none; transition: border-color .15s, transform .2s var(--hx-ease), box-shadow .2s; }
+.hx-techcard strong { font-size: 15.5px; color: var(--hx-text); letter-spacing: -.01em; }
+.hx-techcard span { font-size: 13.5px; line-height: 1.45; color: var(--hx-muted); }
+.hx-techcard:hover { border-color: var(--hx-accent); transform: translateY(-2px); box-shadow: 0 10px 24px var(--hx-shadow); }
+.hx-techcard--guide { border-style: dashed; }
+.hx-single__tech { margin-top: 8px; }
+.hx-techfaq { margin: 40px 0 8px; }
+.hx-techfaq h2 { font-size: 24px; margin-bottom: 14px; }
+.hx-techfaq__item { border-top: 1px solid var(--hx-line); padding: 4px 0; }
+.hx-techfaq__item:last-child { border-bottom: 1px solid var(--hx-line); }
+.hx-techfaq__item summary { cursor: pointer; padding: 12px 0; font-weight: 600; color: var(--hx-text); list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.hx-techfaq__item summary::-webkit-details-marker { display: none; }
+.hx-techfaq__item summary::after { content: "+"; color: var(--hx-accent); font-weight: 500; font-size: 20px; line-height: 1; }
+.hx-techfaq__item[open] summary::after { content: "−"; }
+.hx-techfaq__item p { margin: 0 0 14px; color: var(--hx-text-2); line-height: 1.6; max-width: 70ch; }
+.hx-techproducts, .hx-techrelated { max-width: none; }
+.hx-techback { margin: 24px 0 0; }
+.hx-techpage .hx-shop__head { padding-bottom: 8px; }
+.hx-techgroup + .hx-techgroup { padding-top: 0; }
+.hx-article .hx-techproducts .hx-grid--4 { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
