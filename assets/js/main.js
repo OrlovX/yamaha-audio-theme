@@ -374,6 +374,23 @@
 		}).on('reset_data', function () {
 			priceBox.innerHTML = initialPrice; if (bar) { bar.innerHTML = initialBar; }
 		});
+		// Extra Product Options keeps a (hidden) "final total"; mirror it into the one visible price.
+		var parseLei = function (t) { t = String(t || '').replace(/[^\d.,]/g, ''); if (!t) { return 0; } t = t.replace(/\./g, '').replace(',', '.'); return parseFloat(t) || 0; };
+		var setPrice = function (n) {
+			var now = priceBox.querySelector('.hx-price__now'); if (!now || !(n > 0)) { return; }
+			now.innerHTML = lei(n);
+			var rate = priceBox.querySelector('.hx-single__rate strong');
+			if (rate && rates && n >= rates.min) { rate.textContent = rates.count + ' × ' + lei(Math.ceil(n / rates.count)); }
+			if (bar) { var sp = bar.querySelector('span'); if (sp) { sp.textContent = lei(n); } }
+		};
+		var totalsNode = function () { return $('form.cart .tm-final-totals .amount, form.cart .tc-final-totals .amount, form.cart [class*="final-totals"] .amount, form.cart .tm-final-totals'); };
+		var syncTotals = function () { var n = totalsNode(); if (!n) { return; } var v = parseLei(n.textContent); if (v > 0) { setPrice(v); } };
+		var form = $('form.cart');
+		if (form && window.MutationObserver) {
+			new MutationObserver(function () { clearTimeout(form._hxT); form._hxT = setTimeout(syncTotals, 80); }).observe(form, { childList: true, subtree: true, characterData: true });
+		}
+		if (window.jQuery) { window.jQuery(doc.body).on('tm-epo-after-update tc-epo-after-update tm-epo-update tc-epo-update tm-epo-totals-updated', function () { setTimeout(syncTotals, 50); }); }
+		setTimeout(syncTotals, 1200);
 	}
 
 	/* ---------- Availability box follows the chosen variation ---------- */

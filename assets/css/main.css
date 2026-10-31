@@ -2057,4 +2057,6 @@ html[data-theme="dark"] .hx .wc_payment_method > label::after { background-color
    its availability line and the Extra Product Options totals are not shown */
 .single-product .woocommerce-variation.single_variation, .single-product .woocommerce-variation-price, .single-product .woocommerce-variation-availability,
 .single-product .tm-extra-product-options-totals, .single-product .tm-final-totals, .single-product .tm-epo-totals, .single-product .tc-totals-form,
-.single-product .tm-epo-totals-form, .single-product .tc-epo-totals, .single-product .tm-extra-product-options-totals-wrapper { display: none !important; }
+.single-product .tm-epo-totals-form, .single-product .tc-epo-totals, .single-product .tm-extra-product-options-totals-wrapper,
+.single-product form.cart [class*="tm-final-totals"], .single-product form.cart [class*="tc-totals"], .single-product form.cart [class*="tm-epo-totals"], .single-product form.cart .tm-custom-prices-total, .single-product form.cart .tm-custom-price-total,
+.single-product .tc-epo-element-price, .single-product .tm-options-totals { display: none !important; }
