@@ -35,7 +35,7 @@ cd /var/www/html
 sudo -u www-data wp theme activate yamaha-audio
 sudo -u www-data wp rewrite flush
 sudo -u www-data wp cache flush
-sudo -u www-data wp litespeed-purge all
+sudo -u www-data wp eval 'wp_cache_clear_cache();'
 ```
 
 ## 5. DB-side setup (wp-admin)
@@ -65,7 +65,7 @@ webhooks to the stock app + e-mail), Contul meu, Promoții, Contact, a legal pag
 ## Updating later
 No auto-pull on live on purpose (staging pulls every minute; live only when you decide):
 ```bash
-cd /var/www/html/wp-content/themes/yamaha-audio && sudo -u www-data git pull --ff-only origin main && cd /var/www/html && sudo -u www-data wp litespeed-purge all
+cd /var/www/html/wp-content/themes/yamaha-audio && sudo -u www-data git pull --ff-only origin main && cd /var/www/html && sudo -u www-data wp eval 'wp_cache_clear_cache();'
 ```
 
 ## Rollback (seconds)

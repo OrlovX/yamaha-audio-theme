@@ -153,34 +153,53 @@ function yamaha_audio_active_price( $product ) {
 }
 
 /**
- * Stock state → array( class, label ).
+ * Availability of a product, the way the shop talks about it (WooCommerce's is_in_stock() is true for backorders):
+ * [ 'kind' => instock|low|backorder|outofstock, 'class' => ok|warn|muted, 'label' => …, 'qty' => int|null ].
+ * Variable products aggregate their variations: any purchasable in-stock variation wins, then backorder.
  */
-function yamaha_audio_stock_state( $product ) {
+function yamaha_audio_availability( $product ) {
 	if ( ! $product ) {
-		return array( 'muted', '' );
+		return array( 'kind' => 'outofstock', 'class' => 'muted', 'label' => '', 'qty' => null );
 	}
 	if ( $product->is_type( 'variable' ) ) {
-		$in = false;
+		$best = null;
+		$rank = array( 'instock' => 0, 'low' => 1, 'backorder' => 2, 'outofstock' => 3 );
 		foreach ( $product->get_children() as $child_id ) {
 			$child = wc_get_product( $child_id );
-			if ( $child && $child->is_in_stock() ) {
-				$in = true;
-				break;
+			if ( ! $child || ! $child->is_purchasable() ) {
+				continue;
+			}
+			$a = yamaha_audio_availability( $child );
+			if ( null === $best || $rank[ $a['kind'] ] < $rank[ $best['kind'] ] ) {
+				$best = $a;
 			}
 		}
-		return $in ? array( 'ok', __( 'În stoc', 'yamaha-audio' ) ) : array( 'warn', __( 'La comandă', 'yamaha-audio' ) );
+		if ( $best ) {
+			$best['qty'] = null; // per-variation quantities are shown once a variation is chosen
+			return $best;
+		}
+		return array( 'kind' => 'outofstock', 'class' => 'muted', 'label' => __( 'Stoc epuizat', 'yamaha-audio' ), 'qty' => null );
 	}
-	if ( $product->is_on_backorder() ) {
-		return array( 'warn', __( 'La comandă', 'yamaha-audio' ) );
+	$status = $product->get_stock_status();
+	$qty    = $product->managing_stock() ? $product->get_stock_quantity() : null;
+	if ( 'instock' === $status && ( null === $qty || $qty > 0 ) ) {
+		if ( null !== $qty && $qty <= 2 ) {
+			return array( 'kind' => 'low', 'class' => 'warn', 'label' => __( 'Ultimele bucăți', 'yamaha-audio' ), 'qty' => (int) $qty );
+		}
+		return array( 'kind' => 'instock', 'class' => 'ok', 'label' => __( 'În stoc', 'yamaha-audio' ), 'qty' => null === $qty ? null : (int) $qty );
 	}
-	if ( ! $product->is_in_stock() ) {
-		return array( 'muted', __( 'Stoc epuizat', 'yamaha-audio' ) );
+	if ( 'onbackorder' === $status || ( null !== $qty && $qty <= 0 && $product->backorders_allowed() ) ) {
+		return array( 'kind' => 'backorder', 'class' => 'warn', 'label' => __( 'La comandă', 'yamaha-audio' ), 'qty' => null );
 	}
-	$qty = $product->get_stock_quantity();
-	if ( $product->managing_stock() && null !== $qty && $qty <= 2 ) {
-		return array( 'warn', __( 'Ultimele bucăți', 'yamaha-audio' ) );
-	}
-	return array( 'ok', __( 'În stoc', 'yamaha-audio' ) );
+	return array( 'kind' => 'outofstock', 'class' => 'muted', 'label' => __( 'Stoc epuizat', 'yamaha-audio' ), 'qty' => null );
+}
+
+/**
+ * Stock state → array( class, label ). Kept for the cards and badges.
+ */
+function yamaha_audio_stock_state( $product ) {
+	$a = yamaha_audio_availability( $product );
+	return array( $a['class'], $a['label'] );
 }
 
 /**

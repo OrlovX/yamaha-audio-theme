@@ -351,6 +351,27 @@
 	setTimeout(galleryRefresh, 800);
 	setTimeout(galleryRefresh, 2500);
 
+	/* ---------- Availability box follows the chosen variation ---------- */
+	var promise = $('[data-hx-promise]');
+	if (promise && window.jQuery) {
+		var initial = { kind: promise.getAttribute('data-kind'), html: promise.innerHTML };
+		var setAvail = function (a) {
+			if (!a) { return; }
+			var stock = promise.querySelector('.hx-stock');
+			stock.className = 'hx-stock hx-stock--' + a['class'] + ' hx-promise__stock';
+			promise.querySelector('[data-hx-stock-label]').textContent = a.label;
+			promise.querySelector('[data-hx-stock-qty]').textContent = a.qty_text || '';
+			var show = a.kind === 'low' ? 'instock' : a.kind;
+			$$('[data-hx-line]', promise).forEach(function (l) { l.hidden = l.getAttribute('data-hx-line') !== show; });
+			promise.setAttribute('data-kind', a.kind);
+		};
+		window.jQuery('form.variations_form').on('found_variation', function (e, variation) {
+			if (variation && variation.hx_availability) { setAvail(variation.hx_availability); }
+		}).on('reset_data', function () {
+			promise.innerHTML = initial.html; promise.setAttribute('data-kind', initial.kind);
+		});
+	}
+
 	/* ---------- Long descriptions: clamp + "Citește tot" ---------- */
 	var prose = $('.hx-single__desc .hx-prose');
 	if (prose && prose.scrollHeight > 620) {

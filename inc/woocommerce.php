@@ -192,30 +192,42 @@ function yamaha_audio_single_price() {
 	echo '</div>';
 }
 
+function yamaha_audio_qty_text( $qty ) {
+	return sprintf( _n( '%d bucată', '%d bucăți', (int) $qty, 'yamaha-audio' ), (int) $qty );
+}
+
 function yamaha_audio_single_promises() {
 	global $product;
-	list( $state, $label ) = yamaha_audio_stock_state( $product );
-	if ( ! $label ) {
+	$a = yamaha_audio_availability( $product );
+	if ( ! $a['label'] ) {
 		return;
 	}
-	$qty = $product->managing_stock() ? $product->get_stock_quantity() : null;
-	echo '<div class="hx-promise">';
-	echo '<span class="hx-stock hx-stock--' . esc_attr( $state ) . ' hx-promise__stock"><span class="hx-stock__dot"></span>' . esc_html( $label );
-	if ( 'ok' === $state && null !== $qty && $qty > 0 && $qty <= 5 ) {
-		echo ' · ' . sprintf( esc_html( _n( '%d bucată', '%d bucăți', $qty, 'yamaha-audio' ) ), (int) $qty );
+	$kind = $a['kind'];
+	echo '<div class="hx-promise" data-hx-promise data-kind="' . esc_attr( $kind ) . '">';
+	echo '<span class="hx-stock hx-stock--' . esc_attr( $a['class'] ) . ' hx-promise__stock"><span class="hx-stock__dot"></span><span data-hx-stock-label>' . esc_html( $a['label'] ) . '</span>';
+	echo '<span data-hx-stock-qty>' . ( null !== $a['qty'] && $a['qty'] > 0 && $a['qty'] <= 5 ? ' · ' . esc_html( yamaha_audio_qty_text( $a['qty'] ) ) : '' ) . '</span></span>';
+	$in = in_array( $kind, array( 'instock', 'low' ), true );
+	echo '<span class="hx-promise__line" data-hx-line="instock"' . ( $in ? '' : ' hidden' ) . '>' . esc_html( yamaha_audio_opt( 'delivery_promise' ) ) . '</span>';
+	$pickup = yamaha_audio_opt( 'pickup_promise' );
+	if ( $pickup ) {
+		echo '<span class="hx-promise__line hx-promise__line--muted" data-hx-line="instock"' . ( $in ? '' : ' hidden' ) . '>' . esc_html( $pickup ) . '</span>';
 	}
-	echo '</span>';
-	if ( 'ok' === $state || 'warn' === $state && $product->is_in_stock() ) {
-		echo '<span class="hx-promise__line">' . esc_html( yamaha_audio_opt( 'delivery_promise' ) ) . '</span>';
-		$pickup = yamaha_audio_opt( 'pickup_promise' );
-		if ( $pickup ) {
-			echo '<span class="hx-promise__line hx-promise__line--muted">' . esc_html( $pickup ) . '</span>';
-		}
-	} elseif ( 'warn' === $state ) {
-		echo '<span class="hx-promise__line">' . esc_html__( 'Produs la comandă: te contactăm cu termenul de livrare după confirmare.', 'yamaha-audio' ) . '</span>';
-	}
+	echo '<span class="hx-promise__line" data-hx-line="backorder"' . ( 'backorder' === $kind ? '' : ' hidden' ) . '>' . esc_html( yamaha_audio_opt( 'backorder_promise' ) ) . '</span>';
+	echo '<span class="hx-promise__line" data-hx-line="outofstock"' . ( 'outofstock' === $kind ? '' : ' hidden' ) . '>' . esc_html( yamaha_audio_opt( 'outofstock_note' ) ) . '</span>';
 	echo '</div>';
 }
+
+// The variation JSON carries our availability so the box can follow the chosen variation.
+add_filter( 'woocommerce_available_variation', function ( $data, $product, $variation ) {
+	$a = yamaha_audio_availability( $variation );
+	$data['hx_availability'] = array(
+		'kind'     => $a['kind'],
+		'class'    => $a['class'],
+		'label'    => $a['label'],
+		'qty_text' => null !== $a['qty'] && $a['qty'] > 0 && $a['qty'] <= 5 ? ' · ' . yamaha_audio_qty_text( $a['qty'] ) : '',
+	);
+	return $data;
+}, 10, 3 );
 
 function yamaha_audio_single_secondary() {
 	global $product;
