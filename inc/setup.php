@@ -219,8 +219,16 @@ add_filter( 'gettext', 'yamaha_audio_fix_ro_gettext', 20 );
 add_filter( 'gettext_with_context', 'yamaha_audio_fix_ro_gettext', 20 );
 add_filter( 'ngettext', 'yamaha_audio_fix_ro_gettext', 20 );
 function yamaha_audio_fix_ro_gettext( $text ) {
-	if ( is_string( $text ) && false !== stripos( $text, 'fii' ) ) {
+	if ( ! is_string( $text ) || '' === $text ) {
+		return $text;
+	}
+	if ( false !== stripos( $text, 'fii' ) ) {
 		$text = preg_replace( '/\b([Nn]u)\s+fii\b/u', '$1 fi', $text );
+	}
+	// Plugin translations without diacritics that show up in the UI (search button, labels).
+	static $map = array( 'Cauta' => 'Caută', 'cauta' => 'caută', 'Cautare' => 'Căutare', 'cautare' => 'căutare', 'Promotii' => 'Promoții', 'promotii' => 'promoții', 'Cos' => 'Coș', 'Pret' => 'Preț', 'pret' => 'preț' );
+	if ( preg_match( '/\b(Cauta|cauta|Cautare|cautare|Promotii|promotii|Pret|pret)\b/u', $text ) || 'Cos' === $text ) {
+		$text = preg_replace_callback( '/\b(Cauta|cauta|Cautare|cautare|Promotii|promotii|Pret|pret|Cos)\b/u', function ( $m ) use ( $map ) { return $map[ $m[1] ]; }, $text );
 	}
 	return $text;
 }
