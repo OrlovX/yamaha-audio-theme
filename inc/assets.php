@@ -41,6 +41,9 @@ add_action(
 			wp_dequeue_style( 'wp-block-library-theme' );
 			wp_dequeue_style( 'classic-theme-styles' );
 			wp_dequeue_style( 'global-styles' );
+			if ( ! $keep_blocks ) {
+				wp_dequeue_style( 'wp-block-library' ); // no blocks on the theme's templates; 4 KB of inline pattern CSS otherwise
+			}
 		}
 
 		// Comments reply script only where it matters.
@@ -194,3 +197,12 @@ add_filter( 'style_loader_tag', function ( $tag, $handle, $href ) {
 	$tag = str_replace( ' href=', ' media="print" onload="this.media=\'all\';this.onload=null" href=', $tag );
 	return $tag . '<noscript>' . str_replace( ' media="print" onload="this.media=\'all\';this.onload=null"', '', $tag ) . '</noscript>' . "\n";
 }, 10, 3 );
+
+// Classic theme: WordPress prints its global-styles CSS variables (~9 KB inline) from wp_footer, not from
+// wp_enqueue_scripts, so the dequeue above never reaches it. Nothing in the theme uses --wp--preset-* tokens.
+add_action( 'init', function () {
+	remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
+	remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
+	remove_action( 'wp_enqueue_scripts', 'wp_enqueue_classic_theme_styles' );
+	remove_action( 'wp_body_open', 'wp_global_styles_render_svg_filters' );
+} );
