@@ -21,6 +21,15 @@ else
 fi
 echo "== configure"
 $WP eval-file "$W/wp-content/themes/yamaha-audio/server/wpsc-configure.php"
+# LiteSpeed may have switched WP_CACHE off on deactivation; WP Super Cache needs it on (one define, near the top).
+if [ "$($WP eval 'echo ( defined("WP_CACHE") && WP_CACHE ) ? "on" : "off";')" != "on" ]; then
+  CFG=$($WP eval 'echo file_exists( ABSPATH . "wp-config.php" ) ? ABSPATH . "wp-config.php" : dirname( ABSPATH ) . "/wp-config.php";')
+  echo "   enabling WP_CACHE in $CFG"
+  sudo sed -i "/define(\s*['\"]WP_CACHE['\"]/d" "$CFG"
+  sudo sed -i "0,/^<?php/s//<?php\ndefine( 'WP_CACHE', true ); \/\/ WP Super Cache/" "$CFG"
+  $WP eval-file "$W/wp-content/themes/yamaha-audio/server/wpsc-configure.php"
+fi
+[ -f "$W/wp-content/advanced-cache.php" ] && echo "   advanced-cache.php: $(grep -qi 'WP Super Cache\|wp-cache-phase1' "$W/wp-content/advanced-cache.php" && echo 'WP Super Cache' || echo 'UNKNOWN - check')" || echo "   !! advanced-cache.php missing"
 $WP cache flush >/dev/null
 echo "== warm + verify"
 for i in 1 2 3; do curl -s -o /dev/null -w "home:     ttfb %{time_starttransfer}s\n" "https://$D/"; done
