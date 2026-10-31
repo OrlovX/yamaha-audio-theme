@@ -351,6 +351,31 @@
 	setTimeout(galleryRefresh, 800);
 	setTimeout(galleryRefresh, 2500);
 
+	/* ---------- Price box follows the chosen variation (no second price on the page) ---------- */
+	var priceBox = $('.hx-single__pricing');
+	if (priceBox && window.jQuery) {
+		var lei = function (n) { n = Number(n) || 0; var cents = Math.abs(n - Math.round(n)) > 0.004; return n.toLocaleString('ro-RO', { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 }) + ' lei'; };
+		var initialPrice = priceBox.innerHTML;
+		var bar = $('.hx-buybar__price'); var initialBar = bar ? bar.innerHTML : '';
+		var rates = window.hxData && hxData.rates ? hxData.rates : null;
+		window.jQuery('form.variations_form').on('found_variation', function (e, v) {
+			if (!v || !(v.display_price > 0)) { return; }
+			var now = priceBox.querySelector('.hx-price__now'); if (!now) { return; }
+			now.innerHTML = lei(v.display_price);
+			var was = priceBox.querySelector('.hx-price__was'), save = priceBox.querySelector('.hx-price__save');
+			var onSale = v.display_regular_price > v.display_price;
+			if (was) { was.hidden = !onSale; if (onSale) { was.textContent = lei(v.display_regular_price); } }
+			if (save) { save.hidden = !onSale; if (onSale) { save.textContent = save.textContent.replace(/[\d.,]+\s*lei/, lei(v.display_regular_price - v.display_price)); } }
+			var camp = priceBox.querySelector('.hx-price__camp b');
+			if (camp) { camp.textContent = onSale ? '−' + Math.round(100 - v.display_price / v.display_regular_price * 100) + '%' : ''; }
+			var rate = priceBox.querySelector('.hx-single__rate strong');
+			if (rate && rates && v.display_price >= rates.min) { rate.textContent = rates.count + ' × ' + lei(Math.ceil(v.display_price / rates.count)); }
+			if (bar) { var sp = bar.querySelector('span'); if (sp) { sp.textContent = lei(v.display_price); } var sm = bar.querySelector('small'); if (sm && rates && v.display_price >= rates.min) { sm.textContent = rates.count + ' × ' + lei(Math.ceil(v.display_price / rates.count)); } }
+		}).on('reset_data', function () {
+			priceBox.innerHTML = initialPrice; if (bar) { bar.innerHTML = initialBar; }
+		});
+	}
+
 	/* ---------- Availability box follows the chosen variation ---------- */
 	var promise = $('[data-hx-promise]');
 	if (promise && window.jQuery) {

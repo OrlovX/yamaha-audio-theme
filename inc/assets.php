@@ -28,6 +28,7 @@ add_action(
 			'hxData',
 			array(
 				'cartUrl' => class_exists( 'WooCommerce' ) ? wc_get_cart_url() : home_url( '/' ),
+				'rates'   => yamaha_audio_opt( 'rates_enabled' ) ? array( 'count' => max( 2, (int) yamaha_audio_opt( 'rates_count' ) ), 'min' => (float) yamaha_audio_opt( 'rates_min_price' ) ) : null,
 			)
 		);
 

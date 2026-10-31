@@ -2052,3 +2052,9 @@ html[data-theme="dark"] .hx .wc_payment_method > label::after { background-color
 
 /* links inside running text are underlined, not colour-only (accessibility) */
 .hx-prose a, .hx-legal a, .hx-footer__company a, .hx-nl__consent a, .woocommerce-privacy-policy-text a, .hx-page__content a { text-decoration: underline; text-underline-offset: .15em; text-decoration-thickness: 1px; }
+
+/* one price on the product page: the main price box follows the chosen variation (JS); WooCommerce's second price,
+   its availability line and the Extra Product Options totals are not shown */
+.single-product .woocommerce-variation.single_variation, .single-product .woocommerce-variation-price, .single-product .woocommerce-variation-availability,
+.single-product .tm-extra-product-options-totals, .single-product .tm-final-totals, .single-product .tm-epo-totals, .single-product .tc-totals-form,
+.single-product .tm-epo-totals-form, .single-product .tc-epo-totals, .single-product .tm-extra-product-options-totals-wrapper { display: none !important; }
