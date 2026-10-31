@@ -6,9 +6,10 @@
  *   sudo -u www-data wp eval-file wp-content/themes/yamaha-audio/server/apply-product-text.php /tmp/products-text-fixed.json dry-run
  *   sudo -u www-data wp eval-file wp-content/themes/yamaha-audio/server/apply-product-text.php /tmp/products-text-fixed.json
  *
- * The JSON is a list of { id, name, short, desc, fixed: { name?, short?, desc? } } where name/short/desc are the
- * values exported before proofreading and fixed.* the corrected ones. A field is written only when the database
- * still holds the exported original (so nothing edited since the export is overwritten) and the correction differs.
+ * The JSON is a list of { id, name, short, desc, prev?: {…}, fixed: { name?, short?, desc? } } where name/short/desc
+ * are the values exported before proofreading, prev.* the values an earlier pass of this script wrote (optional) and
+ * fixed.* the new ones. A field is written only when the database still holds the exported original or the previous
+ * pass's value (so nothing edited by hand since the export is overwritten) and the new text differs.
  * Before writing anything, the current values of every touched product are saved to
  * /tmp/products-text-backup-<timestamp>.json (restore with the same script: pass that file and the word "restore").
  * Writes go straight to the posts table (exact bytes, no kses filtering), then caches/transients are cleared.
@@ -68,7 +69,15 @@ foreach ( $data as $item ) {
 		if ( $fixed === $orig ) {
 			continue;
 		}
-		if ( (string) $post->$column !== $orig ) {
+		$current  = (string) $post->$column;
+		$accepted = array( $orig );
+		if ( isset( $item['prev'][ $key ] ) ) {
+			$accepted[] = (string) $item['prev'][ $key ]; // value written by an earlier pass (e.g. the orthography run)
+		}
+		if ( $current === $fixed ) {
+			continue; // already applied
+		}
+		if ( ! in_array( $current, $accepted, true ) ) {
 			WP_CLI::warning( sprintf( '#%d %s: %s changed in the database since the export - left as is.', $id, $post->post_title, $key ) );
 			$skipped++;
 			continue;

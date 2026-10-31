@@ -2033,3 +2033,16 @@ html[data-theme="dark"] .hx .wc_payment_method > label::after { background-color
 .hx-social__link { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--hx-line-strong); color: var(--hx-text-2); font-size: 13.5px; font-weight: 600; text-decoration: none; transition: border-color .15s, background .15s, color .15s, transform .2s var(--hx-ease); }
 .hx-social__link i { font-size: 15px; line-height: 1; width: 1em; text-align: center; }
 .hx-social__link:hover { color: #ffffff; border-color: #c9b2f5; background: rgba(255, 255, 255, .06); transform: translateY(-1px); }
+
+/* product description, normalised layout: key facts chips, figures, spec tables */
+.hx-single__desc .hx-prose figure { margin: 1.4em 0; }
+.hx-single__desc .hx-prose figure img { display: block; max-width: 100%; height: auto; margin: 0; }
+.hx-single__desc .hx-prose figure + h2 { margin-top: 1.4em; }
+.hx-single__desc .hx-prose .hx-keyfacts { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0 0 1.4em; }
+.hx-single__desc .hx-prose .hx-keyfacts li { margin: 0; padding: 7px 13px; border-radius: 999px; background: var(--hx-surface-2); border: 1px solid var(--hx-line); font-size: 14px; font-weight: 600; color: var(--hx-text); }
+.hx-single__desc .hx-prose .hx-keyfacts li::marker { content: ''; }
+.hx-single__desc .hx-prose .hx-tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 1.4em; border: 1px solid var(--hx-line); border-radius: var(--hx-radius-sm); }
+.hx-single__desc .hx-prose .hx-tablewrap table { margin: 0; font-size: 14.5px; }
+.hx-single__desc .hx-prose .hx-tablewrap th { font-weight: 600; color: var(--hx-text); background: var(--hx-surface-2); width: 38%; }
+.hx-single__desc .hx-prose .hx-tablewrap tr:last-child th, .hx-single__desc .hx-prose .hx-tablewrap tr:last-child td { border-bottom: 0; }
+.hx-single__desc .hx-prose h2 + h3 { margin-top: .6em; }
