@@ -114,7 +114,7 @@ $rates    = (int) yamaha_audio_opt( 'rates_count' );
 			<?php $img_id = yamaha_audio_category_image_id( $term ); ?>
 			<a class="hx-cat<?php echo $img_id ? ' hx-cat--img' : ''; ?>" href="<?php echo esc_url( get_term_link( $term ) ); ?>">
 				<?php if ( $img_id ) : ?>
-					<span class="hx-cat__bg" aria-hidden="true"><?php echo wp_get_attachment_image( $img_id, 'yamaha-audio-card', false, array( 'loading' => 'lazy', 'alt' => '' ) ); ?></span>
+					<span class="hx-cat__bg" aria-hidden="true"><?php echo wp_get_attachment_image( $img_id, 'yamaha-audio-card', false, array( 'loading' => 'lazy', 'alt' => sprintf( __( '%s Yamaha', 'yamaha-audio' ), $term->name ) ) ); ?></span>
 				<?php endif; ?>
 				<span class="hx-cat__sub"><?php echo esc_html( yamaha_audio_category_children_label( $term ) ); ?></span>
 				<span class="hx-cat__name"><?php echo esc_html( $term->name ); ?> <span class="hx-cat__arrow" aria-hidden="true">→</span></span>
@@ -190,9 +190,9 @@ $rates    = (int) yamaha_audio_opt( 'rates_count' );
 			<?php
 			$bundle_img = (int) yamaha_audio_opt( 'bundle_image' );
 			if ( $bundle_img ) {
-				echo wp_get_attachment_image( $bundle_img, 'yamaha-audio-hero', false, array( 'loading' => 'lazy', 'alt' => '' ) );
+				echo wp_get_attachment_image( $bundle_img, 'yamaha-audio-hero', false, array( 'loading' => 'lazy', 'alt' => yamaha_audio_opt( 'bundle_title' ) ) );
 			} elseif ( $products ) {
-				echo wp_get_attachment_image( $products[0]->get_image_id(), 'yamaha-audio-hero', false, array( 'loading' => 'lazy', 'alt' => '' ) );
+				echo wp_get_attachment_image( $products[0]->get_image_id(), 'yamaha-audio-hero', false, array( 'loading' => 'lazy', 'alt' => $products[0]->get_name() ) );
 			}
 			?>
 		</figure>

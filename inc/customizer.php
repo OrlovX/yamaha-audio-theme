@@ -45,6 +45,7 @@ function yamaha_audio_option_defaults() {
 		'company_courier_fee' => '19 lei (TVA inclus)',
 		'legal_updated'       => '',
 		'og_image'            => 0,
+		'facets_exclude'      => 'pa, pa1',
 
 		// Promises shown in the strip and on product pages.
 		'free_shipping_min'   => 300,
@@ -101,7 +102,7 @@ function yamaha_audio_option_defaults() {
 		// it off by itself afterwards; the Customizer (Campanie / Sale) overrides all of this.
 		'camp_enabled'        => true,
 		'camp_name'           => 'Black Friday Sound Edition',
-		'camp_tagline'        => 'Reduceri reale la Yamaha, doar câteva zile.',
+		'camp_tagline'        => 'Reduceri reale la Yamaha, doar câteva zile',
 		'camp_style'          => 'neon',
 		'camp_start'          => '2026-10-30',
 		'camp_end'            => '2026-12-02 23:59',
@@ -162,6 +163,7 @@ add_action(
 			array( 'hx_contact', 'nav_extra', 'Doar cu meniul WordPress: elemente afișate separat de categorii, în dreapta (slug-uri sau titluri, separate prin virgulă)', 'text' ),
 
 			array( 'hx_promises', 'free_shipping_min', 'Transport gratuit peste (lei)', 'number' ),
+			array( 'hx_promises', 'facets_exclude', 'Atribute care NU devin filtre în magazin (slug-uri, separate prin virgulă; cele cu valori doar numerice sunt oricum ascunse)', 'text' ),
 			array( 'hx_promises', 'rates_enabled', 'Afișează rata lunară', 'checkbox' ),
 			array( 'hx_promises', 'rates_count', 'Număr rate', 'number' ),
 			array( 'hx_promises', 'rates_min_price', 'Rate doar peste (lei)', 'number' ),

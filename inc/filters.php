@@ -24,11 +24,31 @@ function yamaha_audio_facet_map() {
 	}
 	$default = array();
 	if ( function_exists( 'wc_get_attribute_taxonomies' ) ) {
+		// Internal attributes never become filters: the brand (single-brand shop), the showroom flag and
+		// whatever the owner lists in the Customizer (price tiers like "PA"/"PA1", import codes…).
+		$exclude = array( 'producator', 'brand', 'marca', 'disponibil-in-showroom' );
+		foreach ( explode( ',', strtolower( (string) yamaha_audio_opt( 'facets_exclude' ) ) ) as $x ) {
+			$x = trim( $x );
+			if ( '' !== $x ) {
+				$exclude[] = $x;
+			}
+		}
 		foreach ( wc_get_attribute_taxonomies() as $a ) {
-			if ( in_array( $a->attribute_name, array( 'producator', 'brand', 'marca', 'disponibil-in-showroom' ), true ) ) {
+			if ( in_array( strtolower( $a->attribute_name ), $exclude, true ) ) {
 				continue;
 			}
-			$default[ wc_attribute_taxonomy_name( $a->attribute_name ) ] = $a->attribute_label;
+			$tax = wc_attribute_taxonomy_name( $a->attribute_name );
+			// Attributes whose values are plain numbers (prices, codes) are data, not something a buyer filters by.
+			$sample = get_terms( array( 'taxonomy' => $tax, 'hide_empty' => true, 'number' => 6, 'fields' => 'names' ) );
+			if ( ! is_wp_error( $sample ) && $sample ) {
+				$words = array_filter( $sample, function ( $n ) {
+					return ! is_numeric( str_replace( array( ',', '.', ' ' ), '', (string) $n ) );
+				} );
+				if ( ! $words ) {
+					continue;
+				}
+			}
+			$default[ $tax ] = $a->attribute_label;
 		}
 	}
 	$map = apply_filters( 'yamaha_audio_facet_map', array( '_default' => $default ) );

@@ -75,7 +75,7 @@ $hx_phone   = yamaha_audio_opt( 'phone' );
 		<div class="hx-wrap hx-campbar__inner">
 			<a class="hx-campbar__name" href="<?php echo esc_url( $hx_camp['url'] ); ?>"><?php echo esc_html( $hx_camp['name'] ); ?></a>
 			<?php if ( $hx_camp['tagline'] ) : ?><span class="hx-campbar__tag"><?php echo esc_html( $hx_camp['tagline'] ); ?></span><?php endif; ?>
-			<?php if ( $hx_camp['end_ts'] ) : ?><span class="hx-campbar__timer" data-hx-countdown="<?php echo (int) $hx_camp['end_ts']; ?>"><?php printf( esc_html__( 'până pe %s', 'yamaha-audio' ), esc_html( $hx_camp['end_txt'] ) ); ?></span><?php endif; ?>
+			<?php if ( $hx_camp['end_ts'] ) : ?><span class="hx-campbar__timer" data-hx-countdown="<?php echo (int) $hx_camp['end_ts']; ?>"><?php printf( esc_html__( 'Până pe %s', 'yamaha-audio' ), esc_html( $hx_camp['end_txt'] ) ); ?></span><?php endif; ?>
 			<?php if ( ! is_page( 'promotii' ) ) : ?><a class="hx-btn hx-btn--sm hx-campbar__cta" href="<?php echo esc_url( $hx_camp['url'] ); ?>"><?php esc_html_e( 'Vezi ofertele', 'yamaha-audio' ); ?> →</a><?php endif; ?>
 		</div>
 	</div>
