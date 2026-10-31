@@ -105,9 +105,22 @@ add_filter( 'wpseo_title', function ( $title ) {
 add_filter( 'wpseo_metadesc', 'yamaha_audio_seo_pick_desc', 20 );
 add_filter( 'wpseo_opengraph_title', function ( $t ) { $m = yamaha_audio_seo_meta(); return $m['title'] ?: $t; }, 20 );
 add_filter( 'wpseo_opengraph_desc', 'yamaha_audio_seo_pick_desc', 20 );
-add_filter( 'wpseo_twitter_description', 'yamaha_audio_seo_pick_desc', 20 );
+add_filter( 'wpseo_twitter_description', function ( $d ) {
+	// Yoast builds this from the raw content (shouty product intros); use the same text as the meta description.
+	if ( function_exists( 'YoastSEO' ) ) {
+		try {
+			$meta = YoastSEO()->meta->for_current_page();
+			if ( $meta && ! empty( $meta->description ) ) {
+				return $meta->description;
+			}
+		} catch ( \Throwable $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement
+		}
+	}
+	return yamaha_audio_seo_pick_desc( $d );
+}, 20 );
 add_filter( 'wpseo_opengraph_image', function ( $img ) { return $img ? $img : yamaha_audio_og_fallback_image(); }, 20 );
-add_filter( 'wpseo_twitter_image', function ( $img ) { return $img ? $img : yamaha_audio_og_fallback_image(); }, 20 );
+// No twitter:image fallback: Yoast deliberately omits it when it would equal og:image (X reads og:image), and og:image
+// always exists now; a fallback here replaced product photos with the logo.
 // Yoast ≥14 only runs the og:image filter when it already has an image; add the fallback to its image container
 // (home, categories, pages without a featured image) so every URL carries an og:image.
 add_action( 'wpseo_add_opengraph_additional_images', function ( $images ) {
@@ -154,7 +167,6 @@ add_filter( 'rank_math/frontend/title', function ( $title ) {
 }, 20 );
 add_filter( 'rank_math/frontend/description', 'yamaha_audio_seo_pick_desc', 20 );
 add_filter( 'rank_math/opengraph/facebook/image', function ( $img ) { return $img ? $img : yamaha_audio_og_fallback_image(); }, 20 );
-add_filter( 'rank_math/opengraph/twitter/image', function ( $img ) { return $img ? $img : yamaha_audio_og_fallback_image(); }, 20 );
 add_filter( 'rank_math/opengraph/facebook/og_title', function ( $t ) { $m = yamaha_audio_seo_meta(); return $m['title'] ?: $t; }, 20 );
 add_filter( 'rank_math/opengraph/facebook/og_description', 'yamaha_audio_seo_pick_desc', 20 );
 add_filter( 'rank_math/json_ld', function ( $data, $jsonld ) {
@@ -246,3 +258,17 @@ add_filter( 'get_the_archive_title', function ( $title ) {
 	}
 	return $title;
 } );
+
+/* ---- WooCommerce Product schema: brand and MPN (single-brand shop) ---- */
+add_filter( 'woocommerce_structured_data_product', function ( $markup, $product ) {
+	if ( is_array( $markup ) ) {
+		if ( empty( $markup['brand'] ) ) {
+			$markup['brand'] = array( '@type' => 'Brand', 'name' => 'Yamaha' );
+		}
+		$sku = $product instanceof WC_Product ? $product->get_sku() : '';
+		if ( $sku && empty( $markup['mpn'] ) ) {
+			$markup['mpn'] = $sku;
+		}
+	}
+	return $markup;
+}, 10, 2 );

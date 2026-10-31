@@ -21,13 +21,13 @@ printf '%-34s' "$U/categorie/receivere"; code "$U/categorie/receivere"
 
 hr "Response headers (home)"
 curl -sI --http2 -H 'Accept-Encoding: gzip, br' --max-time 20 "$U/" \
-  | grep -iE '^(HTTP|server|content-encoding|cache-control|strict-transport|x-content-type|x-frame|referrer-policy|content-security|permissions-policy|x-litespeed|x-cache|vary|link|age):'
+  | grep -iE '^(HTTP|server|content-encoding|cache-control|strict-transport|x-content-type|x-frame|referrer-policy|content-security|permissions-policy|x-litespeed|x-cache|vary|link|age)'
 
 hr "Static asset caching"
 curl -s --max-time 20 "$U/" > /tmp/home.html
-CSS=$(grep -o 'https://[^"]*themes/[^"]*main[^"]*\.css[^"]*' /tmp/home.html | head -1)
+CSS=$(grep -oE "https://[^\"' ]*themes/[^\"' ]*main[^\"' ]*\.css[^\"' ]*" /tmp/home.html | head -1)
 echo "${CSS:-no theme css url found}"
-[ -n "$CSS" ] && curl -sI -H 'Accept-Encoding: gzip, br' "$CSS" | grep -iE '^(HTTP|cache-control|expires|content-encoding|etag|last-modified):'
+[ -n "$CSS" ] && curl -sI -H 'Accept-Encoding: gzip, br' "$CSS" | grep -iE '^(HTTP|cache-control|expires|content-encoding|etag|last-modified)'
 IMG=$(grep -o 'https://[^" ]*uploads/[^" ]*\.\(jpg\|jpeg\|png\|webp\)' /tmp/home.html | head -1)
 echo "${IMG:-no upload image found}"
 [ -n "$IMG" ] && curl -sI "$IMG" | grep -iE '^(HTTP|cache-control|expires|content-type|content-length):'
