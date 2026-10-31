@@ -4,7 +4,9 @@
 set -u
 D="${1:-${DOMAIN:-yamaha-audio.ro}}"
 U="https://$D"
-WP="wp"
+W="${WP_PATH:-/var/www/html}"
+# wp-config.php is readable by www-data only, so WP-CLI must run as www-data (DEPLOY.md).
+if [ "$(id -un)" = "www-data" ]; then WP="wp --path=$W"; else WP="sudo -u www-data /usr/local/bin/wp --path=$W"; fi
 hr()   { printf '\n== %s\n' "$1"; }
 code() { curl -s -o /dev/null -w '%{http_code} -> %{redirect_url}' --max-time 20 "$1"; echo; }
 
@@ -129,7 +131,7 @@ hr "Category names and attributes (check diacritics / internal attributes)"
 $WP eval 'foreach ( get_terms(array("taxonomy" => "product_cat", "hide_empty" => false, "orderby" => "name")) as $t ) { printf("  cat %-4d %-45s /%s/  (%d)\n", $t->term_id, $t->name, $t->slug, $t->count); } foreach ( wc_get_attribute_taxonomies() as $a ) { printf("  attr %-24s label=%s\n", $a->attribute_name, $a->attribute_label); }'
 
 hr "Apache modules & cache/security config"
-apache2ctl -M 2>/dev/null | grep -Eo '(http2|deflate|brotli|expires|headers|rewrite|ssl)_module' | sort | tr '\n' ' '; echo
+( sudo -n apache2ctl -M 2>/dev/null || apache2ctl -M 2>/dev/null ) | grep -Eo '(http2|deflate|brotli|expires|headers|rewrite|ssl)_module' | sort | tr '\n' ' '; echo
 grep -rIl 'ExpiresActive\|Cache-Control\|Strict-Transport' /etc/apache2/sites-enabled/ /etc/apache2/conf-enabled/ /var/www/html/.htaccess 2>/dev/null | sed 's/^/  /'
 grep -h 'Protocols\|ExpiresDefault\|Header always set' /etc/apache2/sites-enabled/*.conf /etc/apache2/conf-enabled/*.conf 2>/dev/null | sed 's/^/  /' | head -20
 
