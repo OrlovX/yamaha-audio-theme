@@ -1,3 +1,6 @@
+/* Plus Jakarta Sans (OFL, assets/fonts) — variable weight, split like Google Fonts; both subsets are used by Romanian text */
+@font-face { font-family: "Plus Jakarta Sans"; font-style: normal; font-weight: 200 800; font-display: swap; src: url("../fonts/plus-jakarta-sans-latin-ext.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Plus Jakarta Sans"; font-style: normal; font-weight: 200 800; font-display: swap; src: url("../fonts/plus-jakarta-sans-latin.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 /* ==========================================================================
    Yamaha Audio theme — single stylesheet (derived from the Yamaha Audio theme).
    Dark, restrained, product-led; Yamaha violet instead of gold. Tokens first, then components.
@@ -445,22 +448,22 @@ html[data-theme="light"] .hx-mnav__theme .hx-theme__to-dark { display: inline; }
 .hx-stock { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; white-space: nowrap; }
 .hx-stock__dot {
 	width: 8px; height: 8px; border-radius: 999px; background: currentColor; position: relative; flex: none;
-	box-shadow: 0 0 0 1px rgba(0, 0, 0, .35) inset, 0 0 6px 1px currentColor, 0 0 14px 2px color-mix(in srgb, currentColor 55%, transparent);
-	animation: hx-led 2.8s ease-in-out infinite;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, .35) inset;
 }
+/* the glow lives on a pseudo-element and only its opacity animates (composited, no repaint per frame) */
+.hx-stock__dot::before { content: ""; position: absolute; inset: 0; border-radius: 999px; box-shadow: 0 0 6px 1px currentColor, 0 0 14px 2px color-mix(in srgb, currentColor 55%, transparent); animation: hx-led 2.8s ease-in-out infinite; }
 .hx-stock__dot::after { content: ""; position: absolute; left: 2px; top: 1.5px; width: 3px; height: 2px; border-radius: 999px; background: rgba(255, 255, 255, .7); }
 .hx-stock--ok { color: var(--hx-ok-strong); }
 .hx-stock--warn { color: var(--hx-warn-strong); }
 .hx-stock--muted { color: var(--hx-faint); }
 .hx-stock--ask { color: var(--hx-accent); }
-.hx-stock--ask .hx-stock__dot { background: var(--hx-accent); color: var(--hx-accent); box-shadow: 0 0 0 1px rgba(0, 0, 0, .35) inset, 0 0 6px 1px currentColor; animation: none; }
-.hx-stock--muted .hx-stock__dot { background: #2a2a2a; box-shadow: 0 0 0 1px rgba(var(--hx-fg-rgb), .12) inset; animation: none; }
+.hx-stock--ask .hx-stock__dot { background: var(--hx-accent); color: var(--hx-accent); }
+.hx-stock--ask .hx-stock__dot::before { box-shadow: 0 0 6px 1px currentColor; animation: none; }
+.hx-stock--muted .hx-stock__dot { background: #2a2a2a; box-shadow: 0 0 0 1px rgba(var(--hx-fg-rgb), .12) inset; }
+.hx-stock--muted .hx-stock__dot::before { display: none; }
 .hx-stock--muted .hx-stock__dot::after { opacity: .25; }
-@keyframes hx-led {
-	0%, 100% { box-shadow: 0 0 0 1px rgba(0, 0, 0, .35) inset, 0 0 6px 1px currentColor, 0 0 14px 2px color-mix(in srgb, currentColor 55%, transparent); }
-	50% { box-shadow: 0 0 0 1px rgba(0, 0, 0, .35) inset, 0 0 4px 0 currentColor, 0 0 9px 1px color-mix(in srgb, currentColor 35%, transparent); }
-}
-@media (prefers-reduced-motion: reduce) { .hx-stock__dot { animation: none; } }
+@keyframes hx-led { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .hx-stock__dot::before { animation: none; } }
 
 /* --------------------------------------------------------------------------
    Price
@@ -826,8 +829,8 @@ html[data-theme="light"] .hx-logo--invert .hx-logo__img { filter: none; }
 /* Bar under the header */
 .hx-campbar { position: relative; background: var(--hx-camp-bg); color: #f3f1ec; border-bottom: 1px solid color-mix(in srgb, var(--hx-camp) 35%, transparent); overflow: hidden; }
 .hx-campbar::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 140% at 10% 50%, var(--hx-camp-glow), transparent 60%), radial-gradient(40% 140% at 90% 50%, color-mix(in srgb, var(--hx-camp-glow) 60%, transparent), transparent 60%); pointer-events: none; }
-.hx-campbar::after { content: ""; position: absolute; top: 0; left: -40%; width: 40%; height: 1px; background: linear-gradient(90deg, transparent, var(--hx-camp), transparent); animation: hx-camp-sweep 5s linear infinite; }
-@keyframes hx-camp-sweep { to { left: 100%; } }
+.hx-campbar::after { content: ""; position: absolute; top: 0; left: 0; width: 40%; height: 1px; background: linear-gradient(90deg, transparent, var(--hx-camp), transparent); transform: translateX(-100%); animation: hx-camp-sweep 5s linear infinite; }
+@keyframes hx-camp-sweep { to { transform: translateX(250%); } }
 /* neon: the bar is lit by a tube along its top edge; the marker is a pulsing LED; the name glows */
 .hx-camp--neon .hx-campbar { border-top: 2px solid var(--hx-camp); box-shadow: inset 0 2px 18px var(--hx-camp-glow); }
 .hx-camp--neon .hx-campbar__name { text-shadow: var(--hx-neon); letter-spacing: .22em; }
@@ -2046,3 +2049,6 @@ html[data-theme="dark"] .hx .wc_payment_method > label::after { background-color
 .hx-single__desc .hx-prose .hx-tablewrap th { font-weight: 600; color: var(--hx-text); background: var(--hx-surface-2); width: 38%; }
 .hx-single__desc .hx-prose .hx-tablewrap tr:last-child th, .hx-single__desc .hx-prose .hx-tablewrap tr:last-child td { border-bottom: 0; }
 .hx-single__desc .hx-prose h2 + h3 { margin-top: .6em; }
+
+/* links inside running text are underlined, not colour-only (accessibility) */
+.hx-prose a, .hx-legal a, .hx-footer__company a, .hx-nl__consent a, .woocommerce-privacy-policy-text a, .hx-page__content a { text-decoration: underline; text-underline-offset: .15em; text-decoration-thickness: 1px; }

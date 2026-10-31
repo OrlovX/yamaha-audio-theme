@@ -64,7 +64,7 @@ $rates    = (int) yamaha_audio_opt( 'rates_count' );
 		<div class="hx-spot">
 			<a class="hx-spot__media" href="<?php echo esc_url( $hero->get_permalink() ); ?>" tabindex="-1" aria-hidden="true">
 				<figure class="hx-stage hx-stage--spot">
-					<?php echo wp_get_attachment_image( $hero->get_image_id(), 'yamaha-audio-hero', false, array( 'class' => 'hx-hero__img', 'alt' => $hero->get_name(), 'loading' => 'eager', 'fetchpriority' => 'high' ) ); ?>
+					<?php echo wp_get_attachment_image( $hero->get_image_id(), 'yamaha-audio-hero', false, array( 'class' => 'hx-hero__img', 'alt' => $hero->get_name(), 'loading' => 'eager', 'fetchpriority' => 'high', 'sizes' => '(max-width: 900px) 92vw, 560px', 'decoding' => 'async' ) ); ?>
 				</figure>
 				<?php if ( $hero_percent && yamaha_audio_campaign() ) : ?><span class="hx-pill hx-pill--sale hx-pill--lg hx-pill--camp"><small><?php echo esc_html( yamaha_audio_campaign()['badge'] ); ?></small>−<?php echo (int) $hero_percent; ?>%</span>
 				<?php elseif ( $hero_percent ) : ?><span class="hx-pill hx-pill--sale hx-pill--lg">−<?php echo (int) $hero_percent; ?>%</span><?php endif; ?>
@@ -114,7 +114,7 @@ $rates    = (int) yamaha_audio_opt( 'rates_count' );
 			<?php $img_id = yamaha_audio_category_image_id( $term ); ?>
 			<a class="hx-cat<?php echo $img_id ? ' hx-cat--img' : ''; ?>" href="<?php echo esc_url( get_term_link( $term ) ); ?>">
 				<?php if ( $img_id ) : ?>
-					<span class="hx-cat__bg" aria-hidden="true"><?php echo wp_get_attachment_image( $img_id, 'yamaha-audio-card', false, array( 'loading' => 'lazy', 'alt' => sprintf( __( '%s Yamaha', 'yamaha-audio' ), $term->name ) ) ); ?></span>
+					<span class="hx-cat__bg" aria-hidden="true"><?php echo wp_get_attachment_image( $img_id, 'yamaha-audio-card', false, array( 'loading' => 'lazy', 'decoding' => 'async', 'sizes' => '(max-width: 640px) 50vw, 25vw', 'alt' => sprintf( __( '%s Yamaha', 'yamaha-audio' ), $term->name ) ) ); ?></span>
 				<?php endif; ?>
 				<span class="hx-cat__sub"><?php echo esc_html( yamaha_audio_category_children_label( $term ) ); ?></span>
 				<span class="hx-cat__name"><?php echo esc_html( $term->name ); ?> <span class="hx-cat__arrow" aria-hidden="true">→</span></span>

@@ -18,12 +18,8 @@ function yamaha_audio_asset_ver( $rel ) {
 add_action(
 	'wp_enqueue_scripts',
 	function () {
-		wp_enqueue_style(
-			'yamaha-audio-fonts',
-			'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap',
-			array(),
-			null
-		);
+		// Plus Jakarta Sans is self-hosted (assets/fonts, @font-face in main.css, preloaded below): no third-party
+		// stylesheet in the critical path.
 		wp_enqueue_style( 'yamaha-audio-main', YAMAHA_AUDIO_URI . '/assets/css/main.css', array(), yamaha_audio_asset_ver( '/assets/css/main.css' ) );
 
 		wp_enqueue_script( 'yamaha-audio-main', YAMAHA_AUDIO_URI . '/assets/js/main.js', array(), yamaha_audio_asset_ver( '/assets/js/main.js' ), array( 'strategy' => 'defer' ) );
@@ -74,19 +70,61 @@ add_action( 'wp_print_styles', function () {
 	}
 }, 999 );
 
-// Font preconnects before the stylesheet request.
-add_filter(
-	'wp_resource_hints',
-	function ( $urls, $relation_type ) {
-		if ( 'preconnect' === $relation_type ) {
-			$urls[] = array( 'href' => 'https://fonts.googleapis.com', 'crossorigin' );
-			$urls[] = array( 'href' => 'https://fonts.gstatic.com', 'crossorigin' );
+// Font files first: both subsets are needed for Romanian (ă â î in latin, ș ț in latin-ext).
+add_action( 'wp_head', function () {
+	foreach ( array( 'latin', 'latin-ext' ) as $sub ) {
+		$rel = '/assets/fonts/plus-jakarta-sans-' . $sub . '.woff2';
+		if ( file_exists( YAMAHA_AUDIO_DIR . $rel ) ) {
+			printf( '<link rel="preload" as="font" type="font/woff2" crossorigin href="%s">' . "\n", esc_url( YAMAHA_AUDIO_URI . $rel ) );
 		}
-		return $urls;
-	},
-	10,
-	2
-);
+	}
+}, 1 );
+
+/**
+ * Plugin assets that have no business on most pages. Matched by file path, so plugin handle names can change.
+ * - Font Awesome (official plugin, CDN): the theme uses inline SVG; nothing on the front end needs it.
+ * - Contact Form 7 + reCAPTCHA v3 (+ the GTM form tracker): only where a CF7 form is actually rendered.
+ * - prettyPhoto (YITH Wishlist): only on the wishlist page.
+ */
+add_action( 'wp_enqueue_scripts', function () {
+	global $wp_styles, $wp_scripts, $post;
+	$has_cf7 = false;
+	if ( is_singular() && $post instanceof WP_Post && has_shortcode( (string) $post->post_content, 'contact-form-7' ) ) {
+		$has_cf7 = true;
+	}
+	if ( false !== stripos( (string) yamaha_audio_opt( 'newsletter_shortcode' ), 'contact-form-7' ) ) {
+		$has_cf7 = true; // the footer newsletter is a CF7 form on every page
+	}
+	$is_wishlist = function_exists( 'yith_wcwl_is_wishlist_page' ) && yith_wcwl_is_wishlist_page();
+
+	$drop = function ( $src, $handle ) use ( $has_cf7, $is_wishlist ) {
+		$src = (string) $src;
+		if ( false !== strpos( $src, 'fontawesome.com' ) || false !== strpos( $src, '/uploads/font-awesome/' ) ) {
+			return true;
+		}
+		if ( ! $has_cf7 && ( false !== strpos( $src, '/plugins/contact-form-7/' ) || false !== strpos( $src, 'google.com/recaptcha' ) || false !== strpos( $src, 'gtm4wp-contact-form-7' ) ) ) {
+			return true;
+		}
+		if ( ! $is_wishlist && false !== stripos( $src, 'prettyphoto' ) ) {
+			return true;
+		}
+		return false;
+	};
+	foreach ( array( $wp_styles, $wp_scripts ) as $deps ) {
+		if ( ! $deps ) {
+			continue;
+		}
+		foreach ( (array) $deps->queue as $handle ) {
+			if ( isset( $deps->registered[ $handle ] ) && $drop( $deps->registered[ $handle ]->src, $handle ) ) {
+				$deps->dequeue( $handle );
+			}
+		}
+	}
+	if ( ! $has_cf7 ) {
+		add_filter( 'wpcf7_load_js', '__return_false' );
+		add_filter( 'wpcf7_load_css', '__return_false' );
+	}
+}, 100 );
 
 // Preload the hero image on the front page: it is the LCP element.
 add_action(

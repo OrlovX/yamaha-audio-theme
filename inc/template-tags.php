@@ -235,7 +235,7 @@ function yamaha_audio_product_card( $product, $args = array() ) {
 	$percent = yamaha_audio_discount_percent( $product );
 	$link    = $product->get_permalink();
 	$rate    = yamaha_audio_rate_line( $product );
-	$img_args = array( 'class' => 'hx-card__img', 'alt' => $product->get_name() );
+	$img_args = array( 'class' => 'hx-card__img', 'alt' => $product->get_name(), 'sizes' => '(max-width: 640px) 46vw, (max-width: 1100px) 30vw, 300px', 'decoding' => 'async' );
 	$img_args['loading'] = $args['lazy'] ? 'lazy' : 'eager';
 	if ( ! $args['lazy'] ) {
 		$img_args['fetchpriority'] = 'high';
