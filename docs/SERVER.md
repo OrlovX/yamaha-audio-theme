@@ -69,3 +69,14 @@ SSH for both: user `admin`, key `HiFi-Expert-LS.pem` (owner's Mac: `~/Desktop/TE
 - Browser caching + security headers: `server/apache-yamaha.conf` → `/etc/apache2/conf-available/yamaha.conf`,
   `a2enconf yamaha`. Theme assets are versioned by file time, so the one-year `immutable` is safe.
 - Read-only audit: `cd /var/www/html && bash wp-content/themes/yamaha-audio/server/seo-check.sh`.
+
+## Performance stack (2026-10-31)
+
+- PHP-FPM 8.2 + `mpm_event` + HTTP/2 (`server/perf-upgrade.sh`, run as root). Pool: dynamic, 40 children; opcache 256 MB.
+  Wordfence's `wordfence-waf.php` is prepended from the FPM pool (`php_admin_value[auto_prepend_file]`).
+  Rollback: `a2dismod mpm_event proxy_fcgi http2; a2disconf php8.2-fpm http2; a2enmod mpm_prefork php8.2; systemctl restart apache2`.
+- Page cache: WP Super Cache in simple mode (`server/page-cache-setup.sh` + `server/wpsc-configure.php`). LiteSpeed Cache
+  is deactivated (it cannot cache pages on Apache). Not cached: logged-in users, visitors with a cart/session/wishlist
+  cookie, any URL with a query string (filters, search, payment return), cart/checkout/account pages. Expiry 30 min,
+  preload every 60 min; the theme purges product + home + category + Promoții pages on stock/product changes.
+  Clear everything: `sudo -u www-data wp eval 'wp_cache_clear_cache();'` or Settings → WP Super Cache → Delete Cache.

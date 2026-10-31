@@ -367,3 +367,48 @@ add_filter( 'woocommerce_quantity_input_args', function ( $args ) {
 add_filter( 'woocommerce_demo_store', function ( $notice ) {
 	return $notice; // leave as is
 } );
+
+/* ---- Page cache (WP Super Cache): keep product, home and category pages honest ---- */
+function yamaha_audio_purge_product_cache( $product ) {
+	if ( ! function_exists( 'wp_cache_post_change' ) ) {
+		return; // no page cache active
+	}
+	$id = is_object( $product ) ? (int) ( $product->get_parent_id() ?: $product->get_id() ) : (int) $product;
+	if ( ! $id ) {
+		return;
+	}
+	static $done = array();
+	if ( isset( $done[ $id ] ) ) {
+		return;
+	}
+	$done[ $id ] = true;
+	wp_cache_post_change( $id );
+	if ( function_exists( 'wpsc_delete_url_cache' ) ) {
+		$urls = array( home_url( '/' ), home_url( '/promotii/' ), wc_get_page_permalink( 'shop' ) );
+		foreach ( (array) wp_get_post_terms( $id, 'product_cat' ) as $term ) {
+			if ( $term instanceof WP_Term ) {
+				$urls[] = get_term_link( $term );
+				foreach ( get_ancestors( $term->term_id, 'product_cat' ) as $anc ) {
+					$urls[] = get_term_link( (int) $anc, 'product_cat' );
+				}
+			}
+		}
+		foreach ( array_unique( array_filter( $urls, 'is_string' ) ) as $url ) {
+			wpsc_delete_url_cache( $url );
+		}
+	}
+}
+add_action( 'woocommerce_product_set_stock', 'yamaha_audio_purge_product_cache' );
+add_action( 'woocommerce_variation_set_stock', 'yamaha_audio_purge_product_cache' );
+add_action( 'woocommerce_product_set_stock_status', 'yamaha_audio_purge_product_cache' );
+add_action( 'woocommerce_variation_set_stock_status', 'yamaha_audio_purge_product_cache' );
+add_action( 'woocommerce_update_product', 'yamaha_audio_purge_product_cache' );
+add_action( 'woocommerce_new_product', 'yamaha_audio_purge_product_cache' );
+add_action( 'woocommerce_update_product_variation', 'yamaha_audio_purge_product_cache' );
+add_action( 'woocommerce_product_object_updated_props', 'yamaha_audio_purge_product_cache' );
+// Campaign / Customizer changes affect every page.
+add_action( 'customize_save_after', function () {
+	if ( function_exists( 'wp_cache_clear_cache' ) ) {
+		wp_cache_clear_cache();
+	}
+} );
