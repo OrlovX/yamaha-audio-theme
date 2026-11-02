@@ -50,6 +50,12 @@ function yamaha_audio_option_defaults() {
 		'social_youtube'      => '',
 		'social_tiktok'       => '',
 		'facets_exclude'      => 'pa, pa1',
+		'dealer_admin_user'   => 'admin',
+		'dealer_admin_pass'   => 'admin-pass-2025',
+		'dealer_pa_user'      => 'yamaha-dealer',
+		'dealer_pa_pass'      => 'yamaha-pa',
+		'dealer_pa1_user'     => 'yamaha-dealer1',
+		'dealer_pa1_pass'     => 'yamaha-pa1',
 
 		// Promises shown in the strip and on product pages.
 		'free_shipping_min'   => 300,
@@ -142,6 +148,7 @@ add_action(
 			'hx_campaign' => 'Campanie / Sale (Black Friday Sound Edition, Winter Sales…)',
 			'hx_footer'   => 'Footer',
 			'hx_company'  => 'Date firmă (footer & pagini legale)',
+			'hx_dealers'  => 'Liste dealeri (/pa, /pa1, /admin-products)',
 		);
 		foreach ( $sections as $id => $title ) {
 			$wp->add_section( $id, array( 'title' => $title, 'panel' => $panel ) );
@@ -244,6 +251,12 @@ add_action(
 			array( 'hx_company', 'company_courier_fee', 'Taxă curier sub pragul de transport gratuit (text)', 'text' ),
 			array( 'hx_company', 'legal_updated', 'Pagini legale: data ultimei actualizări (gol = data generării)', 'text' ),
 			array( 'hx_company', 'og_image', 'Imagine pentru distribuire pe rețele sociale (1200×630; gol = logo)', 'image' ),
+			array( 'hx_dealers', 'dealer_admin_user', 'Admin prețuri – utilizator', 'text' ),
+			array( 'hx_dealers', 'dealer_admin_pass', 'Admin prețuri – parolă', 'text' ),
+			array( 'hx_dealers', 'dealer_pa_user', 'Dealeri PA – utilizator', 'text' ),
+			array( 'hx_dealers', 'dealer_pa_pass', 'Dealeri PA – parolă', 'text' ),
+			array( 'hx_dealers', 'dealer_pa1_user', 'Dealeri PA1 – utilizator', 'text' ),
+			array( 'hx_dealers', 'dealer_pa1_pass', 'Dealeri PA1 – parolă', 'text' ),
 		);
 
 		foreach ( $fields as $f ) {

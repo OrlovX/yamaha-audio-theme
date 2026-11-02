@@ -28,4 +28,5 @@ if ( class_exists( 'WooCommerce' ) ) {
 	require YAMAHA_AUDIO_DIR . '/inc/woocommerce.php';
 	require YAMAHA_AUDIO_DIR . '/inc/filters.php';
 	require YAMAHA_AUDIO_DIR . '/inc/awards.php';
+	require YAMAHA_AUDIO_DIR . '/inc/dealer-lists.php';
 }
