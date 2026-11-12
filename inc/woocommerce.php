@@ -458,3 +458,66 @@ foreach ( array( 'billing', 'shipping' ) as $yamaha_addr_type ) {
 		return $fields;
 	}, 20 );
 }
+
+/**
+ * București: the courier only takes "Sector 1"–"Sector 6" as the locality. The checkout shows a
+ * dropdown for it (main.js); this is the server side – tidy what was typed ("sectorul 3" →
+ * "Sector 3") and refuse an address in București without a sector.
+ */
+function yamaha_sector_from_city( $city ) {
+	return preg_match( '/sect(?:or(?:ul)?)?\.?\s*([1-6])\b/iu', (string) $city, $m ) ? 'Sector ' . $m[1] : '';
+}
+function yamaha_sector_message() {
+	return 'Pentru București, alege sectorul (Sector 1–6) în câmpul Localitate.';
+}
+// Classic checkout.
+add_filter( 'woocommerce_checkout_posted_data', function ( $data ) {
+	foreach ( array( 'billing', 'shipping' ) as $type ) {
+		if ( 'B' === ( $data[ $type . '_state' ] ?? '' ) && 'RO' === ( $data[ $type . '_country' ] ?? 'RO' ) ) {
+			$sector = yamaha_sector_from_city( $data[ $type . '_city' ] ?? '' );
+			if ( $sector ) {
+				$data[ $type . '_city' ] = $sector;
+			}
+		}
+	}
+	return $data;
+} );
+add_action( 'woocommerce_after_checkout_validation', function ( $data, $errors ) {
+	$types = array( 'billing' );
+	if ( ! empty( $data['ship_to_different_address'] ) ) {
+		$types[] = 'shipping';
+	}
+	foreach ( $types as $type ) {
+		if ( 'B' === ( $data[ $type . '_state' ] ?? '' ) && 'RO' === ( $data[ $type . '_country' ] ?? 'RO' ) && ! yamaha_sector_from_city( $data[ $type . '_city' ] ?? '' ) ) {
+			$errors->add( $type . '_city_sector', yamaha_sector_message() );
+			return;
+		}
+	}
+}, 10, 2 );
+// Block checkout (Store API).
+add_action( 'woocommerce_store_api_checkout_update_order_from_request', function ( $order ) {
+	$changed = false;
+	$pickup  = false;
+	foreach ( $order->get_shipping_methods() as $method ) {
+		if ( in_array( $method->get_method_id(), array( 'pickup_location', 'local_pickup' ), true ) ) {
+			$pickup = true; // the "shipping address" is then the showroom's own.
+		}
+	}
+	foreach ( array( 'billing', 'shipping' ) as $type ) {
+		if ( ( 'shipping' === $type && $pickup ) || 'B' !== $order->{"get_{$type}_state"}() || 'RO' !== $order->{"get_{$type}_country"}() ) {
+			continue;
+		}
+		$city   = $order->{"get_{$type}_city"}();
+		$sector = yamaha_sector_from_city( $city );
+		if ( ! $sector ) {
+			throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException( 'yamaha_sector_required', yamaha_sector_message(), 400 );
+		}
+		if ( $sector !== $city ) {
+			$order->{"set_{$type}_city"}( $sector );
+			$changed = true;
+		}
+	}
+	if ( $changed ) {
+		$order->save();
+	}
+}, 10, 1 );
