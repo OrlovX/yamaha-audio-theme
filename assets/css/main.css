@@ -1198,8 +1198,12 @@ html .hx-footer .hx-logo .hx-logo__img { filter: brightness(0) invert(1); } /* w
 a.hx-award:hover { border-color: rgba(var(--hx-accent-rgb), .9); background: rgba(var(--hx-accent-rgb), .18); color: var(--hx-accent-text); }
 .hx-award__laurel { display: inline-flex; color: var(--hx-accent); }
 .hx-award--more { padding: 0 10px; color: var(--hx-muted); border-color: var(--hx-line-strong); background: transparent; }
-.hx-awards--compact { gap: 6px; margin: 0; }
-.hx-awards--compact .hx-award { min-height: 24px; padding: 0 8px 0 6px; font-size: 11px; }
+.hx-awards--compact { gap: 6px; margin: 0; flex-wrap: nowrap; max-width: 100%; min-width: 0; overflow: hidden; }
+.hx-awards--compact li { min-width: 0; flex: 0 1 auto; }
+.hx-awards--compact li:last-child:not(:first-child) { flex-shrink: 2; }
+.hx-awards--compact .hx-award { min-height: 24px; padding: 0 8px 0 6px; font-size: 11px; max-width: 100%; }
+.hx-awards--compact .hx-award__text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hx-awards--compact .hx-award--more { flex: none; }
 .hx-awards--compact .hx-award__laurel svg { width: 12px; height: 12px; }
 
 .hx-promise { display: flex; flex-direction: column; gap: 6px; padding: 16px 18px; border-radius: 16px; background: var(--hx-surface); border: 1px solid var(--hx-line); font-size: 14px; }
@@ -2170,3 +2174,10 @@ form.variations_form.hx-has-finish table.variations:not(:has(tr:not(.hx-finish-r
 .hx-loc-opt b { font-weight: 700; color: var(--hx-accent, inherit); }
 .hx-loc-opt:hover, .hx-loc-opt.is-active { background: rgba(var(--hx-fg-rgb, 128, 128, 128), .08); color: var(--hx-text, inherit); }
 .hx-loc-empty { padding: 12px; color: var(--hx-muted, #777); font-size: 14px; }
+
+/* Product cards: the awards row. Empty in most cards; when any card of a grid or rail carries
+   awards, every card of that grid keeps the same one-line row so titles, texts and prices line up. */
+.hx-card__awards { min-width: 0; }
+.hx-card__awards:empty { display: none; }
+.hx-card__awards .hx-awards--compact { height: 26px; align-items: center; }
+:has(> .hx-card .hx-awards--compact) > .hx-card .hx-card__awards:empty { display: block; height: 26px; }

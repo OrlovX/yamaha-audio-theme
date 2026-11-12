@@ -264,7 +264,8 @@ function yamaha_audio_product_card( $product, $args = array() ) {
 			<span class="hx-card__kicker" aria-hidden="true"></span>
 		<?php endif; ?>
 		<h3 class="hx-card__title"><a href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( $product->get_name() ); ?></a></h3>
-		<?php if ( function_exists( 'yamaha_audio_awards_html' ) ) { echo yamaha_audio_awards_html( $product, true ); } // phpcs:ignore ?>
+		<?php // Always printed, so cards with and without awards keep the same rows (see .hx-card__awards). ?>
+		<?php echo '<div class="hx-card__awards">' . ( function_exists( 'yamaha_audio_awards_html' ) ? yamaha_audio_awards_html( $product, true ) : '' ) . '</div>'; // phpcs:ignore ?>
 		<?php $lead = yamaha_audio_product_lead( $product, 14 ); ?>
 		<p class="hx-card__lead<?php echo $lead ? '' : ' hx-card__lead--empty'; ?>"><?php echo esc_html( $lead ); ?></p>
 		<?php yamaha_audio_price_block( $product, 'card' ); ?>
