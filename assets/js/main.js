@@ -750,8 +750,8 @@
 			city.setAttribute('role', 'combobox');
 			city.setAttribute('aria-autocomplete', 'list');
 			city.setAttribute('aria-controls', 'hx-loc-menu');
-			if (!city.dataset.hxLoc) {
-				city.dataset.hxLoc = '1';
+			if (!city.dataset.hxLocMenu) {
+				city.dataset.hxLocMenu = '1';
 				city.addEventListener('focus', function () { openMenu(city); });
 				city.addEventListener('input', function () { openMenu(city); });
 				city.addEventListener('keydown', function (e) { menuKey(e, city); });
