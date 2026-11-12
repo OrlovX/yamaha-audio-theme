@@ -428,3 +428,33 @@ add_action( 'customize_save_after', function () {
 		wp_cache_clear_cache();
 	}
 } );
+
+/**
+ * Checkout without a postcode: shipping zones go by county, so the field is only friction.
+ * Hidden + optional for every country, in both the block and the classic checkout.
+ */
+function yamaha_hide_postcode_field( $field ) {
+	return array_merge( is_array( $field ) ? $field : array(), array( 'required' => false, 'hidden' => true ) );
+}
+add_filter( 'woocommerce_default_address_fields', function ( $fields ) {
+	$fields['postcode'] = yamaha_hide_postcode_field( $fields['postcode'] ?? array() );
+	return $fields;
+}, 20 );
+add_filter( 'woocommerce_get_country_locale_default', function ( $locale ) {
+	$locale['postcode'] = yamaha_hide_postcode_field( $locale['postcode'] ?? array() );
+	return $locale;
+}, 20 );
+add_filter( 'woocommerce_get_country_locale', function ( $locales ) {
+	foreach ( $locales as $cc => $fields ) {
+		$locales[ $cc ]['postcode'] = yamaha_hide_postcode_field( $fields['postcode'] ?? array() );
+	}
+	$locales['RO']['postcode'] = yamaha_hide_postcode_field( $locales['RO']['postcode'] ?? array() );
+	return $locales;
+}, 20 );
+// Classic checkout and My account → Addresses: drop the field outright.
+foreach ( array( 'billing', 'shipping' ) as $yamaha_addr_type ) {
+	add_filter( 'woocommerce_' . $yamaha_addr_type . '_fields', function ( $fields ) use ( $yamaha_addr_type ) {
+		unset( $fields[ $yamaha_addr_type . '_postcode' ] );
+		return $fields;
+	}, 20 );
+}
