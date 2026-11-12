@@ -238,6 +238,8 @@ function yamaha_audio_fix_ro_gettext( $text ) {
  */
 add_filter( 'gettext_woocommerce-tm-extra-product-options', function ( $translated, $text ) {
 	$map = array(
+		'Reset options' => 'Resetează',
+		'Reset Options' => 'Resetează',
 		'Edit options'  => 'Modifică opțiunile',
 		'Edit Options'  => 'Modifică opțiunile',
 		'Options total' => 'Total opțiuni',

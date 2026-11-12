@@ -432,6 +432,116 @@
 		prose.insertAdjacentElement('afterend', more);
 	}
 
+	/* ---------- Finish picker for products without styled swatches ----------
+	   Extra Product Options draws image tiles only where a product has them configured; everything
+	   else falls back to a bare dropdown. Build the same tiles from the variation data instead. */
+	$$('form.variations_form').forEach(function (form) {
+		var jq = window.jQuery;
+		var variations = [];
+		try { variations = JSON.parse(form.getAttribute('data-product_variations') || '[]') || []; } catch (e) { variations = []; }
+		var epoLists = $$('.tm-extra-product-options ul.tm-extra-product-options-variations', form.parentNode || doc);
+		var built = 0;
+		$$('table.variations select', form).forEach(function (native) {
+			var attr = native.getAttribute('data-attribute_name') || native.name;
+			var values = $$('option', native).map(function (o) { return o.value; }).filter(Boolean);
+			if (!values.length) { return; }
+			// Is the plugin already drawing this attribute? Tiles: leave it. Its own dropdown: replace it.
+			var driver = native, epoHide = null, skip = false;
+			epoLists.forEach(function (ul) {
+				var sel = ul.querySelector('select.tm-epo-variation-element');
+				var radios = $$('input.tm-epo-variation-element', ul).map(function (i) { return i.value; });
+				if (sel) {
+					var v = $$('option', sel).map(function (o) { return o.value; }).filter(Boolean);
+					if (v.length && v.every(function (x) { return values.indexOf(x) > -1; })) { driver = sel; epoHide = ul.closest('.cpf-section, .tc-section-inner-wrap') || ul; }
+				} else if (radios.length && radios.every(function (x) { return values.indexOf(x) > -1; })) { skip = true; }
+			});
+			if (skip) { return; }
+			if (driver === native && getComputedStyle(native.closest('table')).display === 'none') { return; }
+
+			var imageFor = function (value) {
+				for (var i = 0; i < variations.length; i++) {
+					var v = variations[i];
+					if (v.attributes && v.attributes[attr] === value && v.image && (v.image.gallery_thumbnail_src || v.image.thumb_src)) {
+						return v.image.thumb_src || v.image.gallery_thumbnail_src;
+					}
+				}
+				return '';
+			};
+			var isColour = /culoare|color|finisaj/.test(attr);
+			var withImages = isColour && values.every(function (v) { return !!imageFor(v); });
+			var labelEl = native.closest('tr') ? native.closest('tr').querySelector('label') : null;
+			var wrap = doc.createElement('div');
+			wrap.className = 'hx-finish';
+			var title = doc.createElement('div');
+			title.className = 'hx-finish__title';
+			title.textContent = isColour ? 'Culori disponibile' : (labelEl ? labelEl.textContent.trim() : '');
+			var value = doc.createElement('span');
+			value.className = 'hx-finish__value';
+			title.appendChild(value);
+			var list = doc.createElement('div');
+			list.className = 'hx-finish__list' + (withImages ? '' : ' hx-finish__list--pills');
+			list.setAttribute('role', 'radiogroup');
+			list.setAttribute('aria-label', title.firstChild.textContent);
+			var buttons = values.map(function (val) {
+				var opt = native.querySelector('option[value="' + val.replace(/"/g, '\\"') + '"]');
+				var b = doc.createElement('button');
+				b.type = 'button';
+				b.className = withImages ? 'hx-swatch' : 'hx-pill';
+				b.setAttribute('role', 'radio');
+				b.dataset.value = val;
+				var text = opt ? opt.textContent.trim() : val;
+				if (withImages) {
+					var frame = doc.createElement('span');
+					frame.className = 'hx-swatch__frame';
+					var img = doc.createElement('img');
+					img.src = imageFor(val); img.alt = ''; img.loading = 'lazy'; img.width = 104; img.height = 104;
+					frame.appendChild(img);
+					b.appendChild(frame);
+				}
+				var name = doc.createElement('span');
+				name.className = withImages ? 'hx-swatch__name' : 'hx-pill__name';
+				name.textContent = text;
+				b.appendChild(name);
+				b.addEventListener('click', function () {
+					if (b.disabled || driver.value === val) { return; }
+					driver.value = val;
+					if (jq) { jq(driver).trigger('change'); } else { driver.dispatchEvent(new Event('change', { bubbles: true })); }
+					sync();
+				});
+				list.appendChild(b);
+				return b;
+			});
+			function sync() {
+				var cur = native.value || driver.value;
+				var curText = '';
+				buttons.forEach(function (b) {
+					var opt = native.querySelector('option[value="' + b.dataset.value.replace(/"/g, '\\"') + '"]');
+					var on = cur === b.dataset.value;
+					b.classList.toggle('is-on', on);
+					b.setAttribute('aria-checked', on ? 'true' : 'false');
+					b.disabled = !opt || opt.disabled;
+					if (on) { curText = b.lastChild.textContent; }
+				});
+				value.textContent = curText;
+				value.hidden = !curText;
+			}
+			wrap.appendChild(title);
+			wrap.appendChild(list);
+			if (epoHide) {
+				epoHide.classList.add('hx-finish-replaced');
+				epoHide.insertAdjacentElement('beforebegin', wrap);
+			} else {
+				native.closest('table').insertAdjacentElement('beforebegin', wrap);
+				native.closest('tr').classList.add('hx-finish-replaced');
+				built++;
+			}
+			sync();
+			if (jq) { jq(form).on('woocommerce_update_variation_values found_variation reset_data change', function () { setTimeout(sync, 30); }); }
+			else { form.addEventListener('change', function () { setTimeout(sync, 30); }); }
+		});
+		if (built) { form.classList.add('hx-has-finish'); }
+	});
+
 	/* ---------- Finish picker: show the chosen finish beside the section title ---------- */
 	$$('.tm-extra-product-options ul.tm-extra-product-options-variations').forEach(function (list) {
 		var section = list.closest('.tc-section-inner-wrap, .cpf-section, .tc-styled-variations') || list.closest('.tm-extra-product-options');
