@@ -452,7 +452,7 @@
 				var radios = $$('input.tm-epo-variation-element', ul).map(function (i) { return i.value; });
 				if (sel) {
 					var v = $$('option', sel).map(function (o) { return o.value; }).filter(Boolean);
-					if (v.length && v.every(function (x) { return values.indexOf(x) > -1; })) { driver = sel; epoHide = ul.closest('.cpf-section, .tc-section-inner-wrap') || ul; }
+					if (v.length && v.every(function (x) { return values.indexOf(x) > -1; })) { driver = sel; epoHide = ul.closest('.tc-element-container') || ul; }
 				} else if (radios.length && radios.every(function (x) { return values.indexOf(x) > -1; })) { skip = true; }
 			});
 			if (skip) { return; }
