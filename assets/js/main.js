@@ -529,6 +529,9 @@
 			wrap.appendChild(list);
 			if (epoHide) {
 				epoHide.classList.add('hx-finish-replaced');
+				var host = epoHide.closest('.cpf-element');
+				var epoLabel = host ? host.querySelector('.tm-epo-element-label') : null;
+				if (epoLabel) { epoLabel.classList.add('hx-finish-replaced'); }
 				epoHide.insertAdjacentElement('beforebegin', wrap);
 			} else {
 				native.closest('table').insertAdjacentElement('beforebegin', wrap);
