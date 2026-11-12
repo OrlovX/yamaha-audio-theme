@@ -2158,5 +2158,15 @@ html[data-theme="dark"] .hx .wc_payment_method > label::after { background-color
 table.variations tr.hx-finish-replaced, .tm-extra-product-options .hx-finish-replaced { display: none !important; }
 form.variations_form.hx-has-finish table.variations:not(:has(tr:not(.hx-finish-replaced))) { display: none; }
 
-/* Checkout locality: note shown when the typed name is not in the courier's list (main.js). */
+/* Checkout locality (main.js): suggestions menu + the note shown when a name is not in the courier's list. */
 .hx-loc-hint { width: 100%; flex: 1 0 100%; margin: 6px 0 2px; font-size: 13px; line-height: 1.4; color: #d9534f; }
+.hx-loc-menu {
+	position: absolute; z-index: 99990; box-sizing: border-box; max-height: 296px; overflow-y: auto; padding: 6px;
+	background: var(--hx-surface, #fff); color: var(--hx-text, #111); border: 1px solid var(--hx-line-strong, rgba(0, 0, 0, .18)); border-radius: 14px;
+	box-shadow: 0 18px 44px rgba(0, 0, 0, .28); font-size: 15px; line-height: 1.3; overscroll-behavior: contain; scrollbar-width: thin;
+}
+.hx-loc-menu[hidden] { display: none; }
+.hx-loc-opt { padding: 10px 12px; border-radius: 9px; cursor: pointer; color: var(--hx-text-2, inherit); }
+.hx-loc-opt b { font-weight: 700; color: var(--hx-accent, inherit); }
+.hx-loc-opt:hover, .hx-loc-opt.is-active { background: rgba(var(--hx-fg-rgb, 128, 128, 128), .08); color: var(--hx-text, inherit); }
+.hx-loc-empty { padding: 12px; color: var(--hx-muted, #777); font-size: 14px; }

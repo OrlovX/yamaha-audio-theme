@@ -681,7 +681,7 @@
 
 /* ---------- Checkout address: locality from the courier's own list ----------
    FAN Courier refuses an AWB whose locality is not spelled exactly as in its nomenclature
-   (assets/data/fan/<county>.json, one file per county). The locality field suggests those names,
+   (assets/data/fan/<county>.json, one file per county). The locality field suggests those names in its own menu,
    tidies what was typed to the courier's spelling and says so when there is no match.
    București has a single locality, so it is filled in. Classic and block checkout. */
 (function () {
@@ -732,16 +732,12 @@
 		if (!city || city.tagName !== 'INPUT' || !state) { return; }
 		var country = document.getElementById(countryId);
 		var holder = city.closest('.wc-block-components-text-input') || city;
-		var listId = 'hx-loc-' + cityId;
-		var datalist = document.getElementById(listId);
 		var code = (!country || !country.value || country.value === 'RO') ? state.value : '';
 		if (!code) {
-			city.removeAttribute('list');
 			hint(holder, cityId, false);
 			return;
 		}
 		if (code === 'B') {
-			city.removeAttribute('list');
 			hint(holder, cityId, false);
 			if (city.value !== 'Bucuresti') { setValue(city, 'Bucuresti'); }
 			return;
@@ -750,25 +746,16 @@
 		if (city.dataset.hxCounty === 'B' && city.value === 'Bucuresti') { setValue(city, ''); }
 		city.dataset.hxCounty = code;
 		load(code, function (data) {
-			if (!datalist) {
-				datalist = document.createElement('datalist');
-				datalist.id = listId;
-				document.body.appendChild(datalist);
-			}
-			if (datalist.dataset.county !== code) {
-				datalist.textContent = '';
-				data.names.forEach(function (n) {
-					var o = document.createElement('option');
-					o.value = n;
-					datalist.appendChild(o);
-				});
-				datalist.dataset.county = code;
-			}
-			if (city.getAttribute('list') !== listId) { city.setAttribute('list', listId); }
 			city.setAttribute('autocomplete', 'off');
+			city.setAttribute('role', 'combobox');
+			city.setAttribute('aria-autocomplete', 'list');
+			city.setAttribute('aria-controls', 'hx-loc-menu');
 			if (!city.dataset.hxLoc) {
 				city.dataset.hxLoc = '1';
-				city.addEventListener('blur', queue);
+				city.addEventListener('focus', function () { openMenu(city); });
+				city.addEventListener('input', function () { openMenu(city); });
+				city.addEventListener('keydown', function (e) { menuKey(e, city); });
+				city.addEventListener('blur', function () { setTimeout(function () { if (menuFor === city) { closeMenu(); } queue(); }, 150); });
 			}
 			var typed = city.value.trim();
 			var exact = data.index[norm(typed)];
@@ -776,6 +763,92 @@
 			hint(holder, cityId, !!typed && !exact && document.activeElement !== city);
 		});
 	}
+
+	/* The suggestions menu: one floating list shared by the locality fields. */
+	var menu = null, menuFor = null, active = -1, shown = [];
+	function escapeHtml(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+	function closeMenu() {
+		if (menu) { menu.hidden = true; }
+		if (menuFor) { menuFor.setAttribute('aria-expanded', 'false'); menuFor.removeAttribute('aria-activedescendant'); }
+		menuFor = null; active = -1; shown = [];
+	}
+	function place() {
+		if (!menu || !menuFor) { return; }
+		var r = (menuFor.closest('.wc-block-components-text-input') || menuFor).getBoundingClientRect();
+		menu.style.left = (r.left + window.pageXOffset) + 'px';
+		menu.style.top = (r.bottom + window.pageYOffset + 6) + 'px';
+		menu.style.width = r.width + 'px';
+	}
+	function setActive(i) {
+		active = i;
+		Array.prototype.forEach.call(menu.children, function (el, n) {
+			el.classList.toggle('is-active', n === i);
+			if (n === i) { el.scrollIntoView({ block: 'nearest' }); menuFor.setAttribute('aria-activedescendant', el.id); }
+		});
+	}
+	function pick(name) {
+		var input = menuFor;
+		closeMenu();
+		if (input) { setValue(input, name); queue(); }
+	}
+	function openMenu(input) {
+		var data = lists[input.dataset.hxCounty];
+		if (!data || data === 'loading') { return; }
+		if (!menu) {
+			menu = document.createElement('div');
+			menu.id = 'hx-loc-menu';
+			menu.className = 'hx-loc-menu';
+			menu.setAttribute('role', 'listbox');
+			menu.setAttribute('aria-label', 'Localități');
+			// mousedown, not click: the field must keep focus while choosing.
+			menu.addEventListener('mousedown', function (e) {
+				e.preventDefault();
+				var opt = e.target.closest('.hx-loc-opt');
+				if (opt) { pick(opt.dataset.name); }
+			});
+			document.body.appendChild(menu);
+			window.addEventListener('resize', place);
+			window.addEventListener('scroll', place, true);
+		}
+		var q = norm(input.value);
+		var starts = [], contains = [];
+		for (var i = 0; i < data.names.length && starts.length < 60; i++) {
+			var key = norm(data.names[i]);
+			if (!q || key.indexOf(q) === 0) { starts.push(data.names[i]); }
+			else if (contains.length < 20 && key.indexOf(q) > 0) { contains.push(data.names[i]); }
+		}
+		shown = starts.concat(contains).slice(0, 60);
+		menuFor = input;
+		if (shown.length === 1 && shown[0] === input.value) { closeMenu(); return; }
+		var raw = input.value.trim();
+		menu.innerHTML = shown.length ? shown.map(function (name, n) {
+			// Bold the typed part when it is a plain prefix (same letters, any case).
+			var label = escapeHtml(name);
+			if (raw && name.toLowerCase().indexOf(raw.toLowerCase()) === 0) { label = '<b>' + escapeHtml(name.slice(0, raw.length)) + '</b>' + escapeHtml(name.slice(raw.length)); }
+			return '<div class="hx-loc-opt" role="option" id="hx-loc-opt-' + n + '" data-name="' + escapeHtml(name) + '">' + label + '</div>';
+		}).join('') : '<div class="hx-loc-empty">Nicio localitate cu acest nume în județul ales.</div>';
+		menu.hidden = false;
+		menu.scrollTop = 0;
+		active = -1;
+		input.setAttribute('aria-expanded', 'true');
+		place();
+	}
+	function menuKey(e, input) {
+		if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+			if (menuFor !== input) { openMenu(input); }
+			if (!shown.length) { return; }
+			e.preventDefault();
+			setActive((active + (e.key === 'ArrowDown' ? 1 : -1) + shown.length) % shown.length);
+		} else if (e.key === 'Enter' && menuFor === input && active > -1) {
+			e.preventDefault();
+			pick(shown[active]);
+		} else if (e.key === 'Escape' && menuFor === input) {
+			closeMenu();
+		} else if (e.key === 'Tab' && menuFor === input && shown.length === 1) {
+			pick(shown[0]);
+		}
+	}
+
 	var queued = false;
 	function run() {
 		queued = false;
