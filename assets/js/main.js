@@ -678,3 +678,90 @@
 		});
 	}
 })();
+
+/* ---------- Checkout address: București → pick the sector ----------
+   The courier only accepts "Sector 1"–"Sector 6" as the locality for București, so the city
+   field becomes a dropdown there and stays a free text field for every other county.
+   Works on the classic checkout / account address forms and on the block checkout. */
+(function () {
+	'use strict';
+	var SECTORS = ['Sector 1', 'Sector 2', 'Sector 3', 'Sector 4', 'Sector 5', 'Sector 6'];
+	// [state field, city field] for the classic forms (underscore ids) and the block checkout (dash ids).
+	var PAIRS = [['billing_state', 'billing_city'], ['shipping_state', 'shipping_city'], ['billing-state', 'billing-city'], ['shipping-state', 'shipping-city']];
+	var COUNTRY = { 'billing_state': 'billing_country', 'shipping_state': 'shipping_country', 'billing-state': 'billing-country', 'shipping-state': 'shipping-country' };
+
+	function setValue(input, value) {
+		if (input.value === value) { return; }
+		var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+		setter.call(input, value);
+		input.dispatchEvent(new Event('input', { bubbles: true }));
+		input.dispatchEvent(new Event('change', { bubbles: true }));
+		if (window.jQuery) { window.jQuery(input).trigger('change'); }
+	}
+	function sectorOf(text) {
+		var m = /sect(?:or(?:ul)?)?\.?\s*([1-6])\b/i.exec(text || '');
+		return m ? 'Sector ' + m[1] : '';
+	}
+	function ensure(stateId, cityId) {
+		var state = document.getElementById(stateId);
+		var city = document.getElementById(cityId);
+		if (!city || city.tagName !== 'INPUT') { return; }
+		var country = document.getElementById(COUNTRY[stateId]);
+		var isBucharest = !!state && state.value === 'B' && (!country || !country.value || country.value === 'RO');
+		var holder = city.closest('.wc-block-components-text-input') || city;
+		var box = document.getElementById('hx-sector-' + cityId);
+		if (!isBucharest) {
+			if (box) {
+				box.remove();
+				holder.style.display = '';
+				if (sectorOf(city.value) === city.value) { setValue(city, ''); }
+			}
+			return;
+		}
+		if (!box) {
+			box = document.createElement('div');
+			box.id = 'hx-sector-' + cityId;
+			box.className = 'hx-sector';
+			var select = document.createElement('select');
+			select.className = 'hx-sector__select';
+			select.setAttribute('aria-label', 'Sector');
+			select.setAttribute('autocomplete', 'address-level2');
+			var first = document.createElement('option');
+			first.value = '';
+			first.textContent = 'Alege sectorul';
+			select.appendChild(first);
+			SECTORS.forEach(function (s) {
+				var o = document.createElement('option');
+				o.value = s;
+				o.textContent = s;
+				select.appendChild(o);
+			});
+			select.addEventListener('change', function () { setValue(city, select.value); });
+			box.appendChild(select);
+			holder.insertAdjacentElement('afterend', box);
+		}
+		holder.style.display = 'none';
+		var want = sectorOf(city.value);
+		var sel = box.querySelector('select');
+		if (sel.value !== want) { sel.value = want; }
+		// "Bucuresti" typed earlier is not a sector: clear it so the form asks for one.
+		if (city.value !== want) { setValue(city, want); }
+	}
+	var queued = false;
+	function run() {
+		queued = false;
+		PAIRS.forEach(function (p) { ensure(p[0], p[1]); });
+	}
+	function queue() {
+		if (!queued) { queued = true; setTimeout(run, 60); }
+	}
+	function start() {
+		if (!document.querySelector('form.checkout, .wc-block-checkout, .woocommerce-address-fields, .wp-block-woocommerce-checkout')) { return; }
+		run();
+		document.addEventListener('change', queue, true);
+		if (window.jQuery) { window.jQuery(document.body).on('country_to_state_changed updated_checkout', queue); }
+		var root = document.querySelector('.wp-block-woocommerce-checkout, .wc-block-checkout, form.checkout, .woocommerce-address-fields');
+		if (root && window.MutationObserver) { new MutationObserver(queue).observe(root, { childList: true, subtree: true }); }
+	}
+	if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', start); } else { start(); }
+})();
