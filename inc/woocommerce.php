@@ -460,24 +460,49 @@ foreach ( array( 'billing', 'shipping' ) as $yamaha_addr_type ) {
 }
 
 /**
- * București: the courier only takes "Sector 1"–"Sector 6" as the locality. The checkout shows a
- * dropdown for it (main.js); this is the server side – tidy what was typed ("sectorul 3" →
- * "Sector 3") and refuse an address in București without a sector.
+ * Checkout locality must be one FAN Courier knows: its nomenclature is in assets/data/fan/<county>.json
+ * (one file per county, courier spelling, no diacritics). The checkout suggests those names (main.js);
+ * this is the server side – rewrite what was typed to the courier's spelling ("cluj napoca" →
+ * "Cluj-Napoca"), fill "Bucuresti" for the county București, and refuse a locality that is not in the list.
  */
-function yamaha_sector_from_city( $city ) {
-	return preg_match( '/sect(?:or(?:ul)?)?\.?\s*([1-6])\b/iu', (string) $city, $m ) ? 'Sector ' . $m[1] : '';
+function yamaha_fan_key( $text ) {
+	return preg_replace( '/[^a-z0-9]+/', '', strtolower( remove_accents( (string) $text ) ) );
 }
-function yamaha_sector_message() {
-	return 'Pentru București, alege sectorul (Sector 1–6) în câmpul Localitate.';
+/** Courier spelling of $city in county $state, '' when unknown, null when there is no list to check against. */
+function yamaha_fan_locality( $state, $city ) {
+	static $cache = array();
+	if ( 'B' === $state ) {
+		return 'Bucuresti';
+	}
+	if ( ! preg_match( '/^[A-Z]{1,2}$/', (string) $state ) ) {
+		return null;
+	}
+	if ( ! isset( $cache[ $state ] ) ) {
+		$file  = get_theme_file_path( 'assets/data/fan/' . $state . '.json' );
+		$names = is_readable( $file ) ? json_decode( (string) file_get_contents( $file ), true ) : null; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$index = array();
+		foreach ( is_array( $names ) ? $names : array() as $name ) {
+			$index[ yamaha_fan_key( $name ) ] = $name;
+		}
+		$cache[ $state ] = $index;
+	}
+	if ( ! $cache[ $state ] ) {
+		return null;
+	}
+	return $cache[ $state ][ yamaha_fan_key( $city ) ] ?? '';
+}
+function yamaha_fan_message( $city ) {
+	return sprintf( 'Localitatea „%s” nu este în lista curierului pentru județul ales. Alege localitatea din sugestiile câmpului.', $city );
 }
 // Classic checkout.
 add_filter( 'woocommerce_checkout_posted_data', function ( $data ) {
 	foreach ( array( 'billing', 'shipping' ) as $type ) {
-		if ( 'B' === ( $data[ $type . '_state' ] ?? '' ) && 'RO' === ( $data[ $type . '_country' ] ?? 'RO' ) ) {
-			$sector = yamaha_sector_from_city( $data[ $type . '_city' ] ?? '' );
-			if ( $sector ) {
-				$data[ $type . '_city' ] = $sector;
-			}
+		if ( 'RO' !== ( $data[ $type . '_country' ] ?? 'RO' ) || empty( $data[ $type . '_state' ] ) ) {
+			continue;
+		}
+		$name = yamaha_fan_locality( $data[ $type . '_state' ], $data[ $type . '_city' ] ?? '' );
+		if ( $name ) {
+			$data[ $type . '_city' ] = $name;
 		}
 	}
 	return $data;
@@ -488,8 +513,12 @@ add_action( 'woocommerce_after_checkout_validation', function ( $data, $errors )
 		$types[] = 'shipping';
 	}
 	foreach ( $types as $type ) {
-		if ( 'B' === ( $data[ $type . '_state' ] ?? '' ) && 'RO' === ( $data[ $type . '_country' ] ?? 'RO' ) && ! yamaha_sector_from_city( $data[ $type . '_city' ] ?? '' ) ) {
-			$errors->add( $type . '_city_sector', yamaha_sector_message() );
+		$city = trim( (string) ( $data[ $type . '_city' ] ?? '' ) );
+		if ( '' === $city || 'RO' !== ( $data[ $type . '_country' ] ?? 'RO' ) || empty( $data[ $type . '_state' ] ) ) {
+			continue;
+		}
+		if ( '' === yamaha_fan_locality( $data[ $type . '_state' ], $city ) ) {
+			$errors->add( $type . '_city_fan', yamaha_fan_message( $city ) );
 			return;
 		}
 	}
@@ -504,16 +533,16 @@ add_action( 'woocommerce_store_api_checkout_update_order_from_request', function
 		}
 	}
 	foreach ( array( 'billing', 'shipping' ) as $type ) {
-		if ( ( 'shipping' === $type && $pickup ) || 'B' !== $order->{"get_{$type}_state"}() || 'RO' !== $order->{"get_{$type}_country"}() ) {
+		$city = trim( (string) $order->{"get_{$type}_city"}() );
+		if ( ( 'shipping' === $type && $pickup ) || '' === $city || 'RO' !== $order->{"get_{$type}_country"}() || ! $order->{"get_{$type}_state"}() ) {
 			continue;
 		}
-		$city   = $order->{"get_{$type}_city"}();
-		$sector = yamaha_sector_from_city( $city );
-		if ( ! $sector ) {
-			throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException( 'yamaha_sector_required', yamaha_sector_message(), 400 );
+		$name = yamaha_fan_locality( $order->{"get_{$type}_state"}(), $city );
+		if ( '' === $name ) {
+			throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException( 'yamaha_locality_unknown', yamaha_fan_message( $city ), 400 );
 		}
-		if ( $sector !== $city ) {
-			$order->{"set_{$type}_city"}( $sector );
+		if ( $name && $name !== $city ) {
+			$order->{"set_{$type}_city"}( $name );
 			$changed = true;
 		}
 	}
