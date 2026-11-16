@@ -16,7 +16,7 @@ function yamaha_audio_logo() {
 		$id   = (int) get_theme_mod( 'custom_logo' );
 		$cls  = 'hx-logo' . ( yamaha_audio_opt( 'logo_invert' ) ? ' hx-logo--invert' : '' );
 		$svg  = yamaha_audio_inline_logo_svg( $id );
-		$logo = $svg ? $svg : wp_get_attachment_image( $id, 'full', false, array( 'class' => 'hx-logo__img', 'alt' => get_bloginfo( 'name' ), 'loading' => 'eager', 'fetchpriority' => 'high' ) );
+		$logo = $svg ? $svg : wp_get_attachment_image( $id, 'full', false, array( 'class' => 'hx-logo__img', 'alt' => get_bloginfo( 'name' ), 'loading' => 'eager', 'fetchpriority' => 'high', 'sizes' => '(max-width: 900px) 170px, 220px' ) ); // drawn 30-38 px tall: no need for the full-size file.
 		printf( '<a class="%s" href="%s" rel="home" aria-label="%s">%s</a>', esc_attr( $cls ), $home, esc_attr( get_bloginfo( 'name' ) . ', prima pagină' ), $logo ); // phpcs:ignore
 		return;
 	}

@@ -371,6 +371,36 @@ function yamaha_audio_drop_assets( $deps, array $needles, $strip_deps ) {
 	}
 }
 
+/**
+ * Tiny local stylesheets are written into the page instead of being fetched: one request less before
+ * the first paint. WordPress does the inlining itself (wp_maybe_inline_styles) once it knows the file.
+ */
+function yamaha_audio_inline_small_styles( array $needles, $max_bytes = 3000 ) {
+	$base = wp_parse_url( content_url(), PHP_URL_PATH );
+	if ( ! $base ) {
+		return;
+	}
+	foreach ( wp_styles()->registered as $handle => $item ) {
+		$src = is_string( $item->src ) ? $item->src : '';
+		if ( '' === $src || ! empty( $item->extra['path'] ) ) {
+			continue;
+		}
+		foreach ( $needles as $needle ) {
+			if ( false === stripos( $src, $needle ) ) {
+				continue;
+			}
+			$rel = (string) wp_parse_url( $src, PHP_URL_PATH );
+			if ( 0 === strpos( $rel, $base . '/' ) && false === strpos( $rel, '..' ) ) {
+				$path = WP_CONTENT_DIR . substr( $rel, strlen( $base ) );
+				if ( is_file( $path ) && filesize( $path ) <= $max_bytes ) {
+					wp_style_add_data( $handle, 'path', $path );
+				}
+			}
+			break;
+		}
+	}
+}
+
 function yamaha_audio_trim_assets() {
 	if ( is_admin() || apply_filters( 'yamaha_audio_keep_all_assets', false ) ) {
 		return;
@@ -403,13 +433,18 @@ function yamaha_audio_trim_assets() {
 			$scripts[] = 'google.com/recaptcha';
 		}
 	}
-	// Extra Product Options: ~25 files it needs on a product page, none on a product list.
+	// Extra Product Options and YITH Wishlist put their controls on product pages (the wishlist also on its
+	// own page): a product list, the front page or the blog has no use for their stylesheets.
 	if ( function_exists( 'is_shop' ) && ( is_shop() || is_product_taxonomy() || is_front_page() || is_home() || is_search() || is_404() ) ) {
 		$styles[]  = '/woocommerce-tm-extra-product-options/';
 		$scripts[] = '/woocommerce-tm-extra-product-options/';
+		$styles[]  = '/yith-woocommerce-wishlist/';
 	}
 	yamaha_audio_drop_assets( wp_styles(), $styles, true );
 	yamaha_audio_drop_assets( wp_scripts(), $scripts, false );
+	if ( doing_action( 'wp_enqueue_scripts' ) ) {
+		yamaha_audio_inline_small_styles( array( '/plugins/honeypot/' ) ); // 1 KB that hides the anti-spam field.
+	}
 }
 add_action( 'wp_enqueue_scripts', 'yamaha_audio_trim_assets', 9999 );
 add_action( 'wp_print_styles', 'yamaha_audio_trim_assets', 100 ); // some plugins enqueue at the very last moment.
