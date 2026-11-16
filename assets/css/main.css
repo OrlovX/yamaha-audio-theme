@@ -553,7 +553,7 @@ html[data-theme="light"] .hx-mnav__theme .hx-theme__to-dark { display: inline; }
 .hx-hero__ctas { animation-delay: .1s; } .hx-hero__proof { animation-delay: .15s; }
 @keyframes hx-fade { to { opacity: 1; } }
 /* Sections reveal as they scroll into view */
-.hx-reveal:not(.is-in) { opacity: 0; }
+.hx-reveal:not(.is-in) { opacity: 0; transition: none; } /* hidden at once (it happens off screen), revealed with the fade below */
 .hx-reveal { transition: opacity .7s ease, transform .2s var(--hx-ease), border-color .2s, background .2s; }
 .hx-reveal.is-in { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {

@@ -100,13 +100,16 @@
 			for (var i = 0; i < kids.length; i++) { n += kids[i].offsetWidth; }
 			return n + 12 * Math.max(0, kids.length - 1);
 		};
+		var navHidden = window.matchMedia ? window.matchMedia('(max-width: 1180px)') : null;
 		var fitNav = function () {
+			if (navHidden && navHidden.matches) { return; } // phones and tablets use the menu button: the bar is not shown, nothing to measure
 			navEl.classList.remove('is-tight', 'is-tighter');
 			if (navNeed() <= navEl.clientWidth) { return; }
 			navEl.classList.add('is-tight');
 			if (navNeed() > navEl.clientWidth) { navEl.classList.add('is-tighter'); }
 		};
-		fitNav();
+		// measured with the first frame, not in the middle of start-up (reading widths there made the browser lay the whole page out early)
+		if (window.requestAnimationFrame) { window.requestAnimationFrame(fitNav); } else { fitNav(); }
 		var navTimer;
 		window.addEventListener('resize', function () { clearTimeout(navTimer); navTimer = setTimeout(fitNav, 120); });
 		if (doc.fonts && doc.fonts.ready) { doc.fonts.ready.then(fitNav); }
@@ -231,14 +234,19 @@
 	/* ---------- Scroll reveal (fade only) ---------- */
 	if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 		var revealTargets = $$('.hx-section__head, .hx-cat, .hx-card, .hx-bundle, .hx-trust__item, .hx-band__grid, .hx-postcard, .hx-ribbon, .hx-why__item');
-		revealTargets.forEach(function (el, i) {
-			// only elements below the first viewport animate; above-the-fold content paints at once
-			if (el.getBoundingClientRect().top > window.innerHeight * 0.9) { el.classList.add('hx-reveal'); }
-		});
 		var ro = new IntersectionObserver(function (entries) {
 			entries.forEach(function (en) {
+				var el = en.target;
+				if (!el.hxSeen) {
+					// First report: only elements entirely below the first screen animate; anything on screen, even
+					// partly, stays as painted. The observer supplies the positions, so nothing is measured (and no
+					// layout is forced) at start-up. rootBounds is the viewport less the 8% bottom margin set below.
+					el.hxSeen = true;
+					var fold = en.rootBounds ? en.rootBounds.height / 0.92 : window.innerHeight;
+					if (!en.isIntersecting && en.boundingClientRect.top >= fold - 1) { el.classList.add('hx-reveal'); } else { ro.unobserve(el); }
+					return;
+				}
 				if (en.isIntersecting) {
-					var el = en.target;
 					// stagger siblings slightly
 					var sib = Array.prototype.indexOf.call(el.parentNode.children, el);
 					el.style.transitionDelay = Math.min(sib, 7) * 60 + 'ms';
@@ -247,7 +255,7 @@
 				}
 			});
 		}, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
-		$$('.hx-reveal').forEach(function (el) { ro.observe(el); });
+		revealTargets.forEach(function (el) { ro.observe(el); });
 		// Belt and braces: anything in view after a scroll is shown even if the observer is late,
 		// and nothing stays hidden for more than a few seconds.
 		var revealAll = function () { $$('.hx-reveal:not(.is-in)').forEach(function (el) { el.classList.add('is-in'); ro.unobserve(el); }); };
