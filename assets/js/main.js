@@ -270,6 +270,21 @@
 		setTimeout(revealAll, 4000);
 	}
 
+	/* ---------- Classic checkout: an order box taller than the screen sticks by its bottom edge ----------
+	   The total, the payment choice and the order button stay in view while the form beside it is filled in;
+	   a box that fits keeps sticking under the menu. Only where the box is sticky (the two-column layout). */
+	var review = doc.getElementById('order_review');
+	if (review && 'ResizeObserver' in window) {
+		var fitReview = function () {
+			if (getComputedStyle(review).position !== 'sticky') { review.style.top = ''; return; }
+			var under = (parseFloat(getComputedStyle(doc.documentElement).getPropertyValue('--hx-header-h')) || 88) + 16;
+			var room = window.innerHeight - 16 - review.offsetHeight; // where its top must be for the bottom edge to show
+			review.style.top = Math.round(Math.min(under, room)) + 'px';
+		};
+		new ResizeObserver(fitReview).observe(review);
+		window.addEventListener('resize', fitReview);
+	}
+
 	/* ---------- Header shadow after scroll ---------- */
 	var header = $('#hx-header');
 	if (header) {

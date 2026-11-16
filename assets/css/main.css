@@ -2252,3 +2252,27 @@ form.variations_form.hx-has-finish table.variations:not(:has(tr:not(.hx-finish-r
 .hx-cartbar__total strong { font-size: 18px; color: var(--hx-text); font-weight: 700; white-space: nowrap; }
 .hx-cartbar .hx-btn { flex: 1; max-width: 250px; min-height: 46px; }
 @media (max-width: 720px) { .hx-cartbar.is-on { display: flex; } }
+
+/* Cookie notice on phones: the same text and the same three choices in less of the screen (it covered 40% of it). */
+@media (max-width: 600px) {
+	.cky-consent-container .cky-consent-bar { padding: 12px 0 !important; }
+	.cky-consent-container .cky-title { font-size: 15px !important; line-height: 1.3 !important; margin-bottom: 5px !important; padding: 0 44px 0 16px !important; }
+	.cky-consent-container .cky-notice-des { padding: 0 16px !important; }
+	.cky-consent-container .cky-notice-des, .cky-consent-container .cky-notice-des p { font-size: 13px !important; line-height: 1.45 !important; }
+	.cky-consent-container .cky-notice-btn-wrapper { padding: 0 16px !important; }
+	.cky-consent-container .cky-notice-btn-wrapper .cky-btn { min-height: 40px !important; height: 40px !important; padding-top: 6px !important; padding-bottom: 6px !important; margin-top: 8px !important; font-size: 13.5px !important; }
+}
+
+/* Classic checkout, two columns: a tighter order box, so the total, the payment choice and the order button fit
+   a laptop screen more often. When it is still taller than the screen, main.js makes it stick by its bottom edge. */
+@media (min-width: 1001px) {
+	.hx #order_review { padding: 18px 22px; }
+	.hx .woocommerce-checkout-review-order-table thead { display: none; } /* "Produs / Sub-total": the rows speak for themselves */
+	.hx .woocommerce-checkout-review-order-table td, .hx .woocommerce-checkout-review-order-table th { padding-top: 10px; padding-bottom: 10px; }
+	.hx .woocommerce-checkout-review-order-table .order-total th, .hx .woocommerce-checkout-review-order-table .order-total td { padding-top: 12px; }
+	.hx .woocommerce-checkout-payment { margin-top: 12px; }
+	.hx .wc_payment_methods { margin-bottom: 12px; }
+	.hx .wc_payment_method > label { padding: 11px 14px; }
+	.hx .wc_payment_method .payment_box { margin: 0 14px 12px; padding: 9px 12px; }
+	.hx .form-row.place-order { gap: 10px; }
+}
