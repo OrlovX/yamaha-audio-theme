@@ -522,17 +522,29 @@ function yamaha_audio_gtm_after_paint( $html ) {
 	return is_string( $out ) ? $out : $html;
 }
 add_action( 'wp_head', function () {
-	$fn   = 'gtm4wp_wp_header_begin';
-	$prio = function_exists( $fn ) ? has_action( 'wp_head', $fn ) : false;
-	if ( false === $prio || is_admin() ) {
+	global $wp_filter;
+	if ( is_admin() || empty( $wp_filter['wp_head'] ) || empty( $wp_filter['wp_head']->callbacks ) ) {
 		return;
 	}
-	remove_action( 'wp_head', $fn, $prio );
-	add_action( 'wp_head', function () use ( $fn ) {
-		ob_start();
-		call_user_func( $fn );
-		echo yamaha_audio_gtm_after_paint( (string) ob_get_clean() ); // phpcs:ignore WordPress.Security.EscapeOutput
-	}, $prio );
+	// The snippet is printed by GTM4WP: a class method in 2.x (GTM4WP\Frontend\ContainerCode::header_begin),
+	// a plain function in 1.x. Found by name; if the plugin changes it, nothing is wrapped and it loads as before.
+	foreach ( $wp_filter['wp_head']->callbacks as $prio => $callbacks ) {
+		foreach ( (array) $callbacks as $cb ) {
+			$fn  = $cb['function'] ?? null;
+			$hit = ( is_string( $fn ) && 'gtm4wp_wp_header_begin' === $fn )
+				|| ( is_array( $fn ) && isset( $fn[0], $fn[1] ) && is_object( $fn[0] ) && 'header_begin' === $fn[1] && false !== stripos( get_class( $fn[0] ), 'gtm4wp' ) );
+			if ( ! $hit || $prio < 1 ) {
+				continue;
+			}
+			remove_action( 'wp_head', $fn, $prio );
+			add_action( 'wp_head', function () use ( $fn ) {
+				ob_start();
+				call_user_func( $fn );
+				echo yamaha_audio_gtm_after_paint( (string) ob_get_clean() ); // phpcs:ignore WordPress.Security.EscapeOutput
+			}, $prio );
+			return;
+		}
+	}
 }, 0 );
 
 /* =====================================================================================
