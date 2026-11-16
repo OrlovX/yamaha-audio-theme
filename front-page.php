@@ -124,6 +124,11 @@ $rates    = (int) yamaha_audio_opt( 'rates_count' );
 </section>
 <?php endif; ?>
 
+<?php
+/** A place right after the categories for a short invitation (the system configurator plugin uses it). */
+do_action( 'hx_home_after_categories' );
+?>
+
 <?php if ( $products ) : ?>
 <section class="hx-section hx-wrap" id="promotii">
 	<?php yamaha_audio_section_head( yamaha_audio_opt( 'home_products_title' ), yamaha_audio_opt( 'home_products_text' ), add_query_arg( 'orderby', 'popularity', wc_get_page_permalink( 'shop' ) ), __( 'Vezi toate', 'yamaha-audio' ) ); ?>

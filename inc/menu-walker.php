@@ -19,6 +19,8 @@ function yamaha_audio_nav_extra_slugs() {
 	static $slugs = null;
 	if ( null === $slugs ) {
 		$slugs = array_values( array_filter( array_map( 'sanitize_title', preg_split( '/[,\n]+/', (string) yamaha_audio_opt( 'nav_extra' ) ) ) ) );
+		// Plugins can add their own pages to this group (the system configurator does).
+		$slugs = array_values( array_filter( array_map( 'sanitize_title', (array) apply_filters( 'hx_nav_extra_slugs', $slugs ) ) ) );
 	}
 	return $slugs;
 }
