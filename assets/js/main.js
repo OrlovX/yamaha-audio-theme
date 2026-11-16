@@ -942,7 +942,7 @@
 		return n;
 	}
 
-	// Consent withdrawn: remove what Google's tags already stored (they stop writing, but don't clean up).
+	// Consent refused or withdrawn: remove what Google's tags already stored (they stop writing, but don't clean up).
 	function purge(analytics, marketing) {
 		var host = location.hostname.replace(/^www\./, ''), domains = ['', host, '.' + host];
 		doc.cookie.split('; ').forEach(function (c) {
@@ -954,7 +954,7 @@
 	}
 
 	// Everything outside Google's own tags that has to follow the choice.
-	function apply(s, prev) {
+	function apply(s) {
 		var a = !!(s && s.a), m = !!(s && s.m);
 		try {
 			window.wp_consent_type = 'optin';
@@ -970,7 +970,6 @@
 				window.wc_order_attribution.setOrderTracking(m);
 			}
 		} catch (e) { /* not on this page */ }
-		if (prev && ((prev.a && !a) || (prev.m && !m))) { purge(prev.a && !a, prev.m && !m); }
 	}
 
 	function announce(s) {
@@ -978,13 +977,15 @@
 	}
 
 	function choose(a, m) {
-		var prev = api.state, s = { a: !!a, m: !!m, t: Math.floor(Date.now() / 1000) };
+		var s = { a: !!a, m: !!m, t: Math.floor(Date.now() / 1000) };
 		try {
 			doc.cookie = 'hx_consent=' + [api.v, s.a ? 1 : 0, s.m ? 1 : 0, s.t].join('.') + '; path=/; max-age=' + (cfg.days || 180) * 86400 + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
 		} catch (e) { /* cookies off: the choice lasts for this page */ }
 		api.state = s;
 		api.signal(s);
-		apply(s, prev);
+		apply(s);
+		// Refused or withdrawn: also remove what was stored earlier, under this notice or the one before it.
+		if (!s.a || !s.m) { purge(!s.a, !s.m); }
 		announce(s);
 		close();
 	}
@@ -1082,7 +1083,7 @@
 	function start() {
 		// Left behind by the notice this one replaced.
 		try { if (doc.cookie.indexOf('cookieyes-consent=') > -1) { ['', location.hostname, '.' + location.hostname.replace(/^www\./, '')].forEach(function (dm) { doc.cookie = 'cookieyes-consent=; path=/; max-age=0' + (dm ? '; domain=' + dm : ''); }); } } catch (e) { /* cookies off */ }
-		apply(api.state, null);
+		apply(api.state);
 		if (api.state) {
 			announce(api.state);
 		} else {
