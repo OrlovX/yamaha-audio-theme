@@ -2242,6 +2242,9 @@ form.variations_form.hx-has-finish table.variations:not(:has(tr:not(.hx-finish-r
 }
 /* The cookie-settings bubble sat on top of the order button on phones: not on cart and checkout. */
 .woocommerce-cart .cky-btn-revisit-wrapper, .woocommerce-checkout .cky-btn-revisit-wrapper { display: none !important; }
+/* The reminders card (HX Reminders) sits above the round cookie-settings button instead of under it. */
+body:has(.cky-btn-revisit-wrapper.cky-revisit-bottom-left) .hxr-card--left { bottom: 72px; }
+@media (max-width: 600px) { body:has(.cky-btn-revisit-wrapper) .hxr-card { bottom: 72px; } }
 /* Terms checkbox (classic checkout): the text wraps beside the box, not under it. */
 .hx .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox { display: flex; align-items: flex-start; gap: 10px; }
 .hx .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox input { margin: 3px 0 0; flex: none; }
