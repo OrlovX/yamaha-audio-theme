@@ -956,7 +956,7 @@ html .hx-footer .hx-logo .hx-logo__img { filter: brightness(0) invert(1); } /* w
 .hx-footer__company { display: flex; align-items: flex-start; gap: 10px; padding: 18px 0; border-top: 1px solid var(--hx-line); font-size: 13px; line-height: 1.7; color: var(--hx-muted); }
 .hx-footer__company .hx-icon { color: var(--hx-accent); flex: none; margin-top: 3px; }
 .hx-footer__company p { margin: 0; }
-.hx-footer__company a { color: var(--hx-text-2); text-decoration: underline; text-decoration-color: var(--hx-line-strong); text-underline-offset: 3px; } /* links inside a line of text: recognisable by more than colour */
+.hx-footer__company a { color: var(--hx-text-2); text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); text-underline-offset: 3px; } /* links inside a line of text: recognisable by more than colour */
 .hx-footer__company a:hover { color: var(--hx-text); }
 .hx-footer__dot { margin: 0 8px; color: var(--hx-faint); }
 .hx-footer__bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 20px; border-top: 1px solid var(--hx-line); font-size: 13px; color: var(--hx-faint); }
