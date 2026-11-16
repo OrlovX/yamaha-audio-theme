@@ -340,53 +340,79 @@ add_filter( 'the_content', function ( $content ) {
  * Speed: do not load what the page does not use
  * ================================================================================== */
 
+/**
+ * Leave assets out of the page by a part of their URL (plugin handles change, paths do not).
+ * $strip_deps: also remove them from other assets' dependency lists, or WordPress prints them anyway.
+ * Only safe for styles: a script that lists a dependency usually calls it.
+ */
+function yamaha_audio_drop_assets( $deps, array $needles, $strip_deps ) {
+	if ( ! $deps || ! $needles ) {
+		return;
+	}
+	$gone = array();
+	foreach ( $deps->registered as $handle => $item ) {
+		$src = is_string( $item->src ) ? $item->src : '';
+		foreach ( $needles as $needle ) {
+			if ( '' !== $src && false !== stripos( $src, $needle ) ) {
+				$gone[] = $handle;
+				break;
+			}
+		}
+	}
+	foreach ( $gone as $handle ) {
+		$deps->dequeue( $handle );
+	}
+	if ( $strip_deps && $gone ) {
+		foreach ( $deps->registered as $item ) {
+			if ( ! empty( $item->deps ) ) {
+				$item->deps = array_values( array_diff( $item->deps, $gone ) );
+			}
+		}
+	}
+}
+
 function yamaha_audio_trim_assets() {
 	if ( is_admin() || apply_filters( 'yamaha_audio_keep_all_assets', false ) ) {
 		return;
 	}
 	$post    = is_singular() ? get_queried_object() : null;
 	$content = $post instanceof WP_Post ? (string) $post->post_content : '';
+	$styles  = array();
+	$scripts = array();
 
-	// Font Awesome (official plugin): the theme draws its own icons; only content that uses it needs it.
+	// Font Awesome (official plugin, from its CDN): the theme draws its own icons; only content that uses it needs it.
 	if ( false === strpos( $content, 'fa-' ) && false === strpos( $content, '[icon' ) ) {
-		foreach ( array( 'font-awesome-official', 'font-awesome-official-v4shim', 'font-awesome-svg-styles' ) as $handle ) {
-			wp_dequeue_style( $handle );
-			wp_dequeue_script( $handle );
-		}
+		$styles[]  = 'fontawesome.com/';
+		$styles[]  = '/uploads/font-awesome/';
+		$scripts[] = 'fontawesome.com/';
 	}
-
+	// YITH Wishlist's lightbox and select styles: only its own page uses them.
+	if ( ! ( function_exists( 'yith_wcwl_is_wishlist_page' ) && yith_wcwl_is_wishlist_page() ) ) {
+		$styles[] = 'prettyPhoto';
+		$styles[] = 'selectBox';
+	}
 	// Contact Form 7: its stylesheet where a form is expected, its script only where one was built.
 	if ( defined( 'WPCF7_VERSION' ) ) {
 		$expects_form = has_shortcode( $content, 'contact-form-7' ) || is_page_template( 'page-contact.php' ) || is_page( 'contact' )
 			|| false !== stripos( (string) yamaha_audio_opt( 'newsletter_shortcode' ), 'contact-form-7' ); // the footer newsletter can be a CF7 form.
 		if ( ! $expects_form && ! did_action( 'wpcf7_contact_form' ) ) {
-			wp_dequeue_style( 'contact-form-7' );
+			$styles[] = '/plugins/contact-form-7/';
 		}
 		if ( doing_action( 'wp_footer' ) && ! did_action( 'wpcf7_contact_form' ) ) {
-			wp_dequeue_script( 'contact-form-7' );
-			wp_dequeue_script( 'wpcf7-recaptcha' );
+			$scripts[] = '/plugins/contact-form-7/';
+			$scripts[] = 'google.com/recaptcha';
 		}
 	}
-
-	// YITH Wishlist's lightbox and select styles: only its own page uses them.
-	if ( ! ( function_exists( 'yith_wcwl_is_wishlist_page' ) && yith_wcwl_is_wishlist_page() ) ) {
-		wp_dequeue_style( 'woocommerce_prettyPhoto_css' );
-		wp_dequeue_style( 'jquery-selectBox' );
-	}
-
 	// Extra Product Options: ~25 files it needs on a product page, none on a product list.
 	if ( function_exists( 'is_shop' ) && ( is_shop() || is_product_taxonomy() || is_front_page() || is_home() || is_search() || is_404() ) ) {
-		$epo = array( 'spectrum', 'nouislider', 'owl-carousel2', 'owl-carousel2-theme', 'sortablejs' );
-		foreach ( array( wp_scripts(), wp_styles() ) as $deps ) {
-			foreach ( (array) $deps->queue as $handle ) {
-				if ( 0 === strpos( $handle, 'themecomplete-' ) || in_array( $handle, $epo, true ) ) {
-					$deps->dequeue( $handle );
-				}
-			}
-		}
+		$styles[]  = '/woocommerce-tm-extra-product-options/';
+		$scripts[] = '/woocommerce-tm-extra-product-options/';
 	}
+	yamaha_audio_drop_assets( wp_styles(), $styles, true );
+	yamaha_audio_drop_assets( wp_scripts(), $scripts, false );
 }
 add_action( 'wp_enqueue_scripts', 'yamaha_audio_trim_assets', 9999 );
+add_action( 'wp_print_styles', 'yamaha_audio_trim_assets', 100 ); // some plugins enqueue at the very last moment.
 add_action( 'wp_footer', 'yamaha_audio_trim_assets', 1 );
 add_action( 'wp_print_footer_scripts', 'yamaha_audio_trim_assets', 1 );
 
