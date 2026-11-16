@@ -4,7 +4,8 @@
  *
  * - A small inline script at the very top of <head>, before Google Tag Manager, tells Google's tags what
  *   this visitor allowed (Consent Mode v2). Everything optional is "denied" until a choice is stored in the
- *   hx_consent cookie; a stored choice is sent as an update on every page.
+ *   hx_consent cookie. The current state is sent on every page both as the default and as an update: a tag
+ *   inside the Tag Manager container that sets its own, looser default can then never win over it.
  * - The notice and the settings panel are drawn by assets/js/main.js and styled in main.css. The footer
  *   link "Setări cookie-uri" (and any element with data-hx-consent-open) opens the panel again.
  * - WooCommerce order attribution (the sbjs_* cookies) starts switched off; the script turns it on only
@@ -68,7 +69,7 @@ add_action(
 			. 'function rd(){var m=d.cookie.match(/(?:^|; )hx_consent=([^;]*)/);if(!m){return null}var p=decodeURIComponent(m[1]).split(".");return p[0]===String(V)?{a:p[1]==="1",m:p[2]==="1",t:+p[3]||0}:null}'
 			. 'function st(s){var a=s&&s.a?"granted":"denied",k=s&&s.m?"granted":"denied";return{ad_storage:k,ad_user_data:k,ad_personalization:k,analytics_storage:a,personalization_storage:k,functionality_storage:"granted",security_storage:"granted"}}'
 			. 'var s=null;try{s=rd()}catch(e){}'
-			. 'g("consent","default",st(null));g("set","ads_data_redaction",!(s&&s.m));if(s){g("consent","update",st(s))}'
+			. 'g("consent","default",st(null));g("set","ads_data_redaction",!(s&&s.m));g("consent","update",st(s));'
 			. 'w.hxConsent={v:V,state:s,signal:function(n){g("consent","update",st(n));g("set","ads_data_redaction",!n.m)}};'
 			. 'if(B.length){var P=w.HTMLScriptElement&&w.HTMLScriptElement.prototype,D=P&&Object.getOwnPropertyDescriptor(P,"src"),no=function(u){u=String(u||"");for(var i=0;i<B.length;i++){if(u.indexOf("//"+B[i]+"/")>-1){return true}}return false};'
 			. 'if(D&&D.set){Object.defineProperty(P,"src",{configurable:true,enumerable:D.enumerable,get:function(){return D.get.call(this)},set:function(u){if(no(u)){this.setAttribute("data-hx-blocked",u);return}D.set.call(this,u)}});'
