@@ -71,7 +71,24 @@ function yamaha_audio_nav_links() {
 		}
 		$out[] = array( 'label' => $label, 'url' => $url, 'sale' => (bool) preg_match( '/promo|ofert|reduc|sale/i', $label . ' ' . $url ) );
 	}
-	return $out;
+	// The system configurator (HX Configurator plugin), while its links are switched on: before Contact, or last.
+	if ( function_exists( 'hxc_links_on' ) && hxc_links_on() ) {
+		$at = count( $out );
+		foreach ( $out as $i => $l ) {
+			if ( false !== stripos( $l['url'], 'configurator' ) ) {
+				$at = -1; // already listed by hand
+				break;
+			}
+			if ( preg_match( '/contact/i', $l['label'] . ' ' . $l['url'] ) ) {
+				$at = $i;
+				break;
+			}
+		}
+		if ( $at >= 0 ) {
+			array_splice( $out, $at, 0, array( array( 'label' => 'Configurator', 'url' => hxc_page_url(), 'sale' => false ) ) );
+		}
+	}
+	return apply_filters( 'hx_nav_links', $out );
 }
 
 /**

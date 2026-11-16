@@ -42,6 +42,9 @@ $hx_news  = yamaha_audio_opt( 'newsletter_shortcode' );
 					foreach ( yamaha_audio_home_categories( 6 ) as $term ) {
 						printf( '<li><a href="%s">%s</a></li>', esc_url( get_term_link( $term ) ), esc_html( $term->name ) );
 					}
+					if ( function_exists( 'hxc_links_on' ) && hxc_links_on() ) {
+						printf( '<li><a href="%s">%s</a></li>', esc_url( hxc_page_url() ), esc_html__( 'Configurator de sistem', 'yamaha-audio' ) );
+					}
 					echo '</ul>';
 				}
 				?>
