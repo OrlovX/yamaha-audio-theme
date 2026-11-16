@@ -2200,3 +2200,44 @@ form.variations_form.hx-has-finish table.variations:not(:has(tr:not(.hx-finish-r
    would stretch the one-column mobile layout past the screen and leave the gallery oversized). */
 .hx-single__top > * { min-width: 0; max-width: 100%; }
 .hx-single__summary > * { min-width: 0; max-width: 100%; }
+
+/* --------------------------------------------------------------------------
+   Audit polish (November 2026): mobile header, checkout notices, small flow fixes
+   -------------------------------------------------------------------------- */
+/* Phones: burger + logo + five header icons need about 440px. Under that the burger was crushed to
+   a sliver and the cart icon hung off the edge of the screen. */
+.hx-burger { flex: none; }
+@media (max-width: 480px) {
+	.hx-header__inner { padding-left: 12px; padding-right: 12px; gap: 4px; }
+	.hx-burger { margin-left: -4px; }
+	.hx-header__right, .hx-actions { gap: 0; }
+	.hx-header .hx-iconbtn { width: 40px; height: 40px; }
+	.hx-header .hx-logo__img { max-width: 112px; }
+}
+@media (max-width: 389px) {
+	.hx-header .hx-iconbtn.hx-theme { display: none; } /* the wordmark is wide: under 390px the switch moves to the menu, which carries the same one */
+}
+/* Checkout: "Ești client care se întoarce? Dă clic aici…". Text and link are separate grid items
+   there, and on a phone the text ended up in a zero-width column, one word per line under the link. */
+.hx .woocommerce-form-coupon-toggle .woocommerce-info,
+.hx .woocommerce-form-login-toggle .woocommerce-info { display: block; position: relative; padding-left: 68px; min-height: 66px; align-content: center; line-height: 1.45; }
+.hx .woocommerce-form-coupon-toggle .woocommerce-info::before,
+.hx .woocommerce-form-login-toggle .woocommerce-info::before { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); }
+.hx .woocommerce-form-coupon-toggle .woocommerce-info a,
+.hx .woocommerce-form-login-toggle .woocommerce-info a { display: inline; }
+/* Product page on phones: the two secondary buttons side by side, with room for their labels. */
+@media (max-width: 900px) {
+	.hx-single__secondary .hx-btn { padding: 8px 12px; font-size: 14px; gap: 8px; }
+}
+/* The cookie-settings bubble sat on top of the order button on phones: not on cart and checkout. */
+.woocommerce-cart .cky-btn-revisit-wrapper, .woocommerce-checkout .cky-btn-revisit-wrapper { display: none !important; }
+/* Terms checkbox (classic checkout): the text wraps beside the box, not under it. */
+.hx .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox { display: flex; align-items: flex-start; gap: 10px; }
+.hx .woocommerce-terms-and-conditions-wrapper .woocommerce-form__label-for-checkbox input { margin: 3px 0 0; flex: none; }
+/* Cart on phones: the order button is more than a screen down, below coupon and totals. A bar with
+   the total and the same button stays at the bottom until the real one is on screen (main.js). */
+.hx-cartbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; display: none; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--hx-surface); border-top: 1px solid var(--hx-line); box-shadow: 0 -10px 30px rgba(0, 0, 0, .12); }
+.hx-cartbar__total { display: flex; flex-direction: column; font-size: 12px; line-height: 1.25; color: var(--hx-muted); }
+.hx-cartbar__total strong { font-size: 18px; color: var(--hx-text); font-weight: 700; white-space: nowrap; }
+.hx-cartbar .hx-btn { flex: 1; max-width: 250px; min-height: 46px; }
+@media (max-width: 720px) { .hx-cartbar.is-on { display: flex; } }

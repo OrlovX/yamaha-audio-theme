@@ -881,3 +881,26 @@
 		}
 	} catch (e) { /* cookies off: the gate page explains */ }
 })();
+
+/* ---------- Classic cart on phones: total + order button always within reach (see .hx-cartbar) ---------- */
+(function () {
+	'use strict';
+	if (!document.querySelector('.woocommerce-cart-form') || !('IntersectionObserver' in window)) { return; }
+	var bar = document.createElement('div');
+	bar.className = 'hx-cartbar';
+	bar.innerHTML = '<span class="hx-cartbar__total">Total<strong></strong></span><a class="hx-btn hx-btn--primary hx-btn--sm" href="#">Finalizează comanda</a>';
+	document.body.appendChild(bar);
+	var io = null;
+	function refresh() {
+		var btn = document.querySelector('.wc-proceed-to-checkout .checkout-button');
+		var total = document.querySelector('.cart_totals .order-total .amount');
+		if (io) { io.disconnect(); io = null; }
+		if (!btn || !total) { bar.classList.remove('is-on'); return; }
+		bar.querySelector('strong').textContent = total.textContent.trim();
+		bar.querySelector('a').href = btn.href;
+		io = new IntersectionObserver(function (entries) { bar.classList.toggle('is-on', !entries[0].isIntersecting); }, { threshold: 0 });
+		io.observe(btn);
+	}
+	refresh();
+	if (window.jQuery) { window.jQuery(document.body).on('updated_cart_totals updated_wc_div', refresh); }
+})();

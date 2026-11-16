@@ -27,12 +27,13 @@ function yamaha_audio_seo_meta() {
 	$rates = (int) yamaha_audio_opt( 'rates_count' );
 
 	if ( is_front_page() ) {
-		$meta['title'] = sprintf( '%s – Receivere, amplificatoare, boxe și MusicCast Yamaha · Showroom București', $site );
-		$meta['desc']  = sprintf( 'Dealer autorizat Yamaha: receivere AV, amplificatoare și receivere stereo, streamere MusicCast, boxe, pick‑up‑uri și căști. În stoc în București, livrare în 24h, transport gratuit peste %s lei, până la %d rate fără dobândă. Ascultă‑le în showroom‑ul din Cotroceni.', $free, $rates );
+		// Titles: ~60 characters fit in a search result; the site's name in capitals took 20 of them.
+		$meta['title'] = 'Yamaha Audio România – receivere, amplificatoare, boxe Hi‑Fi';
+		$meta['desc']  = sprintf( 'Dealer autorizat Yamaha: receivere AV și stereo, amplificatoare, MusicCast, boxe și căști. Showroom în București, livrare în 24h, %d rate fără dobândă.', $rates );
 	} elseif ( class_exists( 'WooCommerce' ) && is_product_category() ) {
 		$term = get_queried_object();
 		if ( $term ) {
-			$meta['title'] = sprintf( '%1$s Yamaha – modele în stoc, prețuri și oferte | %2$s', $term->name, $site );
+			$meta['title'] = sprintf( '%s Yamaha – prețuri și oferte | Yamaha Audio', $term->name );
 			if ( empty( $term->description ) ) {
 				// What the page actually lists (children included), not the term's own count.
 				$count = isset( $GLOBALS['wp_query']->found_posts ) ? (int) $GLOBALS['wp_query']->found_posts : 0;
@@ -56,11 +57,11 @@ function yamaha_audio_seo_meta() {
 	} elseif ( is_page( 'promotii' ) ) {
 		$camp          = function_exists( 'yamaha_audio_campaign' ) ? yamaha_audio_campaign() : null;
 		$meta['title'] = $camp && ! empty( $camp['name'] )
-			? sprintf( '%1$s – promoții Yamaha în stoc | %2$s', $camp['name'], $site )
-			: sprintf( 'Promoții Yamaha – oferte în stoc, livrare în 24h | %s', $site );
+			? sprintf( '%s – promoții Yamaha | Yamaha Audio', $camp['name'] )
+			: 'Promoții Yamaha – oferte în stoc | Yamaha Audio';
 		$meta['desc'] = sprintf( 'Toate produsele Yamaha la ofertă, în stoc: reduceri reale față de cel mai mic preț din ultimele 30 de zile, livrare în 24h, până la %d rate fără dobândă.', $rates );
 	} elseif ( is_page( 'contact' ) ) {
-		$meta['title'] = sprintf( 'Contact – showroom Yamaha Cotroceni, București | %s', $site );
+		$meta['title'] = 'Contact – showroom Yamaha în București | Yamaha Audio';
 		$meta['desc'] = sprintf( 'Showroom %5$s, %1$s. Program: %2$s. Telefon/WhatsApp %3$s, e‑mail %4$s. Programează o audiție sau scrie‑ne pentru o recomandare.', yamaha_audio_opt( 'topbar_address' ), yamaha_audio_opt( 'topbar_hours' ), yamaha_audio_opt( 'phone' ), yamaha_audio_opt( 'topbar_email' ), $site );
 	}
 	return $meta;

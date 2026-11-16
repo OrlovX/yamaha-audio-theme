@@ -420,6 +420,9 @@ function yamaha_audio_render_applied_chips() {
  * Filtered pages shouldn't be indexed as separate URLs.
  */
 add_action( 'wp_head', function () {
+	if ( class_exists( 'RankMath' ) || defined( 'WPSEO_VERSION' ) ) {
+		return; // the SEO plugin prints the robots tag; inc/polish.php tells it what to say.
+	}
 	if ( ( is_shop() || is_product_taxonomy() ) && yamaha_audio_filters_active() ) {
 		echo '<meta name="robots" content="noindex,nofollow">' . "\n";
 	}

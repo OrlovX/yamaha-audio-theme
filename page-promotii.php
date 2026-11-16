@@ -167,7 +167,7 @@ $rates = (int) yamaha_audio_opt( 'rates_count' );
 			foreach ( $page_ids as $i => $id ) {
 				$p = wc_get_product( $id );
 				if ( $p ) {
-					yamaha_audio_product_card( $p, array( 'lazy' => $i > 5 ) );
+					yamaha_audio_product_card( $p, array( 'lazy' => $i > 5, 'priority' => $i < 2 ) );
 				}
 			}
 			if ( $wa ) :

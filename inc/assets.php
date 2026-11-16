@@ -147,6 +147,10 @@ add_action(
 			// Same candidates and sizes as the <img>, so a phone preloads the small variant, not the 2000 px original.
 			$srcset = wp_get_attachment_image_srcset( $img_id, 'yamaha-audio-hero' );
 			$sizes  = '(max-width: 900px) 92vw, 560px';
+			if ( function_exists( 'yamaha_audio_webp_url' ) ) {
+				$src    = yamaha_audio_webp_url( $src );
+				$srcset = $srcset ? yamaha_audio_webp_srcset( $srcset ) : $srcset;
+			}
 			if ( $srcset ) {
 				printf( '<link rel="preload" as="image" href="%s" imagesrcset="%s" imagesizes="%s" fetchpriority="high">' . "\n", esc_url( $src ), esc_attr( $srcset ), esc_attr( $sizes ) );
 			} else {
