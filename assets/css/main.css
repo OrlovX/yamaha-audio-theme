@@ -1688,6 +1688,15 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible { outlin
 .hx-checkout-flow .wc-block-components-form .wc-block-components-text-input input:focus, .hx-checkout-flow .wc-block-components-select select:focus { border-color: var(--hx-accent) !important; box-shadow: 0 0 0 1px var(--hx-accent) !important; }
 .hx-checkout-flow .wc-block-components-sidebar .wc-block-components-order-summary .wc-block-components-panel__button { font-size: 18px; }
 .hx-checkout-flow .wc-block-cart__sidebar .wc-block-components-sidebar { position: sticky; top: calc(var(--hx-topbar-h) + var(--hx-header-h) + 16px); }
+/* Checkout: the order summary follows the page under the sticky top bar and menu, not behind them (WooCommerce's
+   own offset is 24 px from the top of the window). If it is taller than the space left, it scrolls on its own,
+   so the total and the coupon field can always be reached. Only in the two-column layout. */
+.hx-checkout-flow .wc-block-checkout.is-large .wc-block-checkout__sidebar.is-sticky,
+.hx-checkout-flow .wc-block-checkout__sidebar.is-sticky.is-large {
+	top: calc(var(--hx-topbar-h) + var(--hx-header-h) + 16px);
+	max-height: calc(100vh - var(--hx-topbar-h) - var(--hx-header-h) - 32px);
+	overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;
+}
 /* phones: the line-items table must not grow past the column */
 .hx-checkout-flow .wc-block-cart.is-mobile .wc-block-cart-items, .hx-checkout-flow .wc-block-cart.is-small .wc-block-cart-items { table-layout: fixed; width: 100%; }
 .hx-checkout-flow .wc-block-cart.is-mobile .wc-block-cart-item__image { width: 64px; padding-right: 10px !important; }
