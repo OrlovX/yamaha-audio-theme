@@ -1486,7 +1486,7 @@ form.cart .wpa_hidden_field, form.cart .wpa-admin-notice, form.cart .wpa-test-ms
 
 @media (max-width: 900px) {
 	.hx-single { gap: 36px; }
-	.hx-single__top { grid-template-columns: 1fr; gap: 24px; }
+	.hx-single__top { grid-template-columns: minmax(0, 1fr); gap: 24px; }
 	.hx-single__summary { position: static; }
 	.hx-why { grid-template-columns: 1fr; }
 	.hx-buybar__name { display: none; }
@@ -2195,3 +2195,8 @@ form.variations_form.hx-has-finish table.variations:not(:has(tr:not(.hx-finish-r
 @media (max-width: 380px) {
 	.hx-card__cta .hx-btn { font-size: 12.5px; padding: 8px 8px; }
 }
+
+/* Product page: neither column may be widened by its content (a non-wrapping element in the buy box
+   would stretch the one-column mobile layout past the screen and leave the gallery oversized). */
+.hx-single__top > * { min-width: 0; max-width: 100%; }
+.hx-single__summary > * { min-width: 0; max-width: 100%; }
