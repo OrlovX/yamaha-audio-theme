@@ -2181,3 +2181,17 @@ form.variations_form.hx-has-finish table.variations:not(:has(tr:not(.hx-finish-r
 .hx-card__awards:empty { display: none; }
 .hx-card__awards .hx-awards--compact { height: 26px; align-items: center; }
 :has(> .hx-card .hx-awards--compact) > .hx-card .hx-card__awards:empty { display: block; height: 26px; }
+
+/* Small screens: a button never clips its label. Long labels ("Scrie pe WhatsApp", "Întreabă de
+   termen") wrap onto a second line inside the pill instead of being cut off, and the buttons in
+   the two-column product cards get tighter padding and type so most labels still fit on one line. */
+.hx-btn { max-width: 100%; }
+@media (max-width: 900px) {
+	.hx-btn { white-space: normal; text-align: center; line-height: 1.2; padding-top: 10px; padding-bottom: 10px; text-wrap: balance; }
+	.hx-btn .hx-icon, .hx-btn svg { flex: none; }
+	.hx-card__cta .hx-btn { min-height: 44px; padding: 8px 10px; font-size: 13.5px; gap: 6px; }
+	.hx-card__cta .hx-btn svg { width: 14px; height: 14px; }
+}
+@media (max-width: 380px) {
+	.hx-card__cta .hx-btn { font-size: 12.5px; padding: 8px 8px; }
+}
