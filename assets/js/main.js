@@ -872,3 +872,12 @@
 	}
 	if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', start); } else { start(); }
 })();
+
+/* Marks a real browser (see the filter gate in inc/filters.php): scrapers that don't run scripts never get it. */
+(function () {
+	try {
+		if (document.cookie.indexOf('hx_h=1') === -1) {
+			document.cookie = 'hx_h=1; path=/; max-age=31536000; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+		}
+	} catch (e) { /* cookies off: the gate page explains */ }
+})();
