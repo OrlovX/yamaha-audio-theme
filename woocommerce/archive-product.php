@@ -56,6 +56,11 @@ $total = (int) wc_get_loop_prop( 'total' );
 		</div>
 	<?php endif; ?>
 
+	<?php
+	/** A place for a short invitation above the products (the system configurator plugin uses it). */
+	do_action( 'hx_shop_after_head' );
+	?>
+
 	<div class="hx-shop__layout">
 
 		<aside class="hx-rail" id="hx-rail" aria-label="<?php esc_attr_e( 'Filtre', 'yamaha-audio' ); ?>">
