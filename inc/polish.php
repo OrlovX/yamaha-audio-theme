@@ -16,7 +16,9 @@ function yamaha_audio_polish_cfg() {
 		'blog_desc'  => 'Articole despre tehnologiile și produsele Yamaha: receivere, MusicCast, sunet surround și ghiduri de alegere.',
 		'flat_rate'  => 0,        // rate under the free-shipping threshold not published: left out of the markup.
 		'brand'      => 'Yamaha', // single-brand shop.
-		'defer'      => array(), // HTTP/2 here: nothing to gain, and the consent integration expects order attribution to load first.
+		// Footer scripts that only attach handlers once the page is ready: safe to load with "defer". Order attribution
+		// and the consent scripts stay as they are: the cookie banner may call into them the moment it loads.
+		'defer'      => array( '/gtm4wp-woocommerce', '/ajax-search-for-woocommerce' ),
 	);
 }
 
