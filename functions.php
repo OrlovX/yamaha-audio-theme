@@ -23,6 +23,7 @@ require YAMAHA_AUDIO_DIR . '/inc/legal.php';
 require YAMAHA_AUDIO_DIR . '/inc/seo.php';
 require YAMAHA_AUDIO_DIR . '/inc/webp.php';
 require YAMAHA_AUDIO_DIR . '/inc/polish.php';
+require YAMAHA_AUDIO_DIR . '/inc/consent.php';
 require YAMAHA_AUDIO_DIR . '/inc/redirects.php';
 require YAMAHA_AUDIO_DIR . '/inc/tech.php';
 

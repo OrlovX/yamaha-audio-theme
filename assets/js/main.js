@@ -927,3 +927,167 @@
 	refresh();
 	if (window.jQuery) { window.jQuery(document.body).on('updated_cart_totals updated_wc_div', refresh); }
 })();
+
+/* ---------- Cookie consent: the notice, the settings panel and what follows a choice (see inc/consent.php) ---------- */
+(function () {
+	'use strict';
+	var api = window.hxConsent, cfg = window.hxConsentCfg, doc = document;
+	if (!api || !cfg || !cfg.text) { return; }
+	var T = cfg.text, box = null, lastFocus = null;
+
+	function el(tag, cls, text) {
+		var n = doc.createElement(tag);
+		if (cls) { n.className = cls; }
+		if (text) { n.textContent = text; }
+		return n;
+	}
+
+	// Consent withdrawn: remove what Google's tags already stored (they stop writing, but don't clean up).
+	function purge(analytics, marketing) {
+		var host = location.hostname.replace(/^www\./, ''), domains = ['', host, '.' + host];
+		doc.cookie.split('; ').forEach(function (c) {
+			var n = c.split('=')[0];
+			if ((analytics && /^_ga($|_)|^_gid$|^_gat/.test(n)) || (marketing && /^_gcl_|^_gac_/.test(n))) {
+				domains.forEach(function (dm) { doc.cookie = n + '=; path=/; max-age=0' + (dm ? '; domain=' + dm : ''); });
+			}
+		});
+	}
+
+	// Everything outside Google's own tags that has to follow the choice.
+	function apply(s, prev) {
+		var a = !!(s && s.a), m = !!(s && s.m);
+		try {
+			window.wp_consent_type = 'optin';
+			doc.dispatchEvent(new CustomEvent('wp_consent_type_defined'));
+			if (typeof window.wp_set_consent === 'function' && typeof window.wp_has_consent === 'function') {
+				[['functional', true], ['preferences', true], ['statistics-anonymous', true], ['statistics', a], ['marketing', m]].forEach(function (c) {
+					if (!!window.wp_has_consent(c[0]) !== c[1]) { window.wp_set_consent(c[0], c[1] ? 'allow' : 'deny'); }
+				});
+			}
+		} catch (e) { /* plugin not there */ }
+		try {
+			if (window.wc_order_attribution && typeof window.wc_order_attribution.setOrderTracking === 'function') {
+				window.wc_order_attribution.setOrderTracking(m);
+			}
+		} catch (e) { /* not on this page */ }
+		if (prev && ((prev.a && !a) || (prev.m && !m))) { purge(prev.a && !a, prev.m && !m); }
+	}
+
+	function announce(s) {
+		(window.dataLayer = window.dataLayer || []).push({ event: 'cookie_consent_update', hx_consent_analytics: !!s.a, hx_consent_marketing: !!s.m });
+	}
+
+	function choose(a, m) {
+		var prev = api.state, s = { a: !!a, m: !!m, t: Math.floor(Date.now() / 1000) };
+		try {
+			doc.cookie = 'hx_consent=' + [api.v, s.a ? 1 : 0, s.m ? 1 : 0, s.t].join('.') + '; path=/; max-age=' + (cfg.days || 180) * 86400 + '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+		} catch (e) { /* cookies off: the choice lasts for this page */ }
+		api.state = s;
+		api.signal(s);
+		apply(s, prev);
+		announce(s);
+		close();
+	}
+
+	function close() {
+		if (!box) { return; }
+		var b = box;
+		box = null;
+		b.classList.remove('is-open');
+		setTimeout(function () { if (b.parentNode) { b.parentNode.removeChild(b); } }, 280);
+		if (lastFocus && lastFocus.focus) { try { lastFocus.focus(); } catch (e) { /* gone */ } }
+		lastFocus = null;
+	}
+
+	function open(settings) {
+		if (box) {
+			if (settings) { box.classList.add('is-settings'); }
+			return;
+		}
+		var s = api.state;
+		box = el('div', 'hx-consent cc-window' + (settings ? ' is-settings' : ''));
+		box.setAttribute('role', 'dialog');
+		box.setAttribute('aria-modal', 'false');
+		box.setAttribute('aria-labelledby', 'hx-consent-title');
+
+		var title = el('p', 'hx-consent__title', T.title);
+		title.id = 'hx-consent-title';
+		title.tabIndex = -1;
+		var text = el('p', 'hx-consent__text', T.text + ' ');
+		if (cfg.policy) {
+			var link = el('a', '', T.policy);
+			link.href = cfg.policy;
+			text.appendChild(link);
+		}
+
+		var opts = el('div', 'hx-consent__opts');
+		function opt(id, label, desc, checked, locked) {
+			var row = el('label', 'hx-consent__opt' + (locked ? ' is-locked' : ''));
+			var input = el('input');
+			input.type = 'checkbox';
+			input.id = 'hx-consent-' + id;
+			input.checked = !!checked;
+			input.disabled = !!locked;
+			row.appendChild(input);
+			row.appendChild(el('b', '', label));
+			row.appendChild(el('small', '', desc));
+			opts.appendChild(row);
+			return input;
+		}
+		opt('need', T.need, T.need_d, true, true);
+		var inA = opt('stats', T.stats, T.stats_d, s && s.a, false);
+		var inM = opt('mkt', T.mkt, T.mkt_d, s && s.m, false);
+
+		var btns = el('div', 'hx-consent__btns');
+		function btn(label, cls, fn) {
+			var b = el('button', cls, label);
+			b.type = 'button';
+			b.addEventListener('click', fn);
+			btns.appendChild(b);
+			return b;
+		}
+		btn(T.save, 'hx-btn hx-btn--primary hx-btn--sm hx-consent__save', function () { choose(inA.checked, inM.checked); });
+		// "Accept" and "only necessary" always look the same: neither choice is pushed.
+		btn(T.all, 'hx-btn hx-btn--sm hx-consent__pick', function () { choose(true, true); });
+		btn(T.none, 'hx-btn hx-btn--sm hx-consent__pick', function () { choose(false, false); });
+		btn(T.more, 'hx-consent__more', function () { box.classList.add('is-settings'); inA.focus(); });
+
+		box.appendChild(title);
+		box.appendChild(text);
+		box.appendChild(opts);
+		box.appendChild(btns);
+		if (s) {
+			// A choice already exists: the panel can simply be closed again.
+			var x = el('button', 'hx-consent__x', '×');
+			x.type = 'button';
+			x.setAttribute('aria-label', T.close);
+			x.addEventListener('click', close);
+			box.appendChild(x);
+			box.addEventListener('keydown', function (e) { if (e.key === 'Escape') { close(); } });
+		}
+		doc.body.insertBefore(box, doc.body.firstChild);
+		// Painted once at opacity 0, then shown: it fades in and never counts as the page's largest paint.
+		requestAnimationFrame(function () { requestAnimationFrame(function () { if (box) { box.classList.add('is-open'); } }); });
+		if (settings) { setTimeout(function () { if (box) { title.focus(); } }, 60); }
+	}
+
+	doc.addEventListener('click', function (e) {
+		var t = e.target && e.target.closest ? e.target.closest('[data-hx-consent-open], a[href$="#setari-cookie"]') : null;
+		if (!t) { return; }
+		e.preventDefault();
+		lastFocus = t;
+		open(true);
+	});
+
+	function start() {
+		// Left behind by the notice this one replaced.
+		try { if (doc.cookie.indexOf('cookieyes-consent=') > -1) { ['', location.hostname, '.' + location.hostname.replace(/^www\./, '')].forEach(function (dm) { doc.cookie = 'cookieyes-consent=; path=/; max-age=0' + (dm ? '; domain=' + dm : ''); }); } } catch (e) { /* cookies off */ }
+		apply(api.state, null);
+		if (api.state) {
+			announce(api.state);
+		} else {
+			setTimeout(function () { open(false); }, 900);
+		}
+	}
+	if (doc.readyState === 'loading') { doc.addEventListener('DOMContentLoaded', start); } else { start(); }
+})();

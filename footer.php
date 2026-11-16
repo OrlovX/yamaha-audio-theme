@@ -113,6 +113,7 @@ $hx_news  = yamaha_audio_opt( 'newsletter_shortcode' );
 		<?php endif; ?>
 		<div class="hx-footer__bottom">
 			<span>© <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php echo esc_html( yamaha_audio_opt( 'company_line' ) ); ?></span>
+			<button type="button" class="hx-footer__cookie" data-hx-consent-open>Setări cookie-uri</button>
 			<span class="hx-footer__payments"><?php echo esc_html( yamaha_audio_opt( 'payments_line' ) ); ?></span>
 		</div>
 	</div>
