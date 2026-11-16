@@ -103,10 +103,18 @@
 		var navHidden = window.matchMedia ? window.matchMedia('(max-width: 1180px)') : null;
 		var fitNav = function () {
 			if (navHidden && navHidden.matches) { return; } // phones and tablets use the menu button: the bar is not shown, nothing to measure
-			navEl.classList.remove('is-tight', 'is-tighter');
+			var optional = navEl.querySelector('.hx-nav__extra a[href$="/configurator/"]');
+			optional = optional && optional.closest ? optional.closest('li') : null;
+			navEl.classList.remove('is-tight', 'is-tighter', 'is-tightest');
+			if (optional) { optional.hidden = false; }
 			if (navNeed() <= navEl.clientWidth) { return; }
 			navEl.classList.add('is-tight');
-			if (navNeed() > navEl.clientWidth) { navEl.classList.add('is-tighter'); }
+			if (navNeed() <= navEl.clientWidth) { return; }
+			navEl.classList.add('is-tighter');
+			if (navNeed() <= navEl.clientWidth) { return; }
+			navEl.classList.add('is-tightest');
+			// Still too wide: the configurator link leaves the bar (it stays in the menu panel, the footer and on the pages).
+			if (optional && navNeed() > navEl.clientWidth) { optional.hidden = true; }
 		};
 		// measured with the first frame, not in the middle of start-up (reading widths there made the browser lay the whole page out early)
 		if (window.requestAnimationFrame) { window.requestAnimationFrame(fitNav); } else { fitNav(); }

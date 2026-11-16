@@ -353,14 +353,14 @@ html.dgwt-wcas-overlay-mobile-on { overflow: hidden; }
 .hx-nav.is-tighter .hx-nav__link { padding: 0 6px; font-size: 11.5px; letter-spacing: .04em; }
 .hx-nav.is-tighter .hx-nav__extra { padding-left: 8px; }
 .hx-nav.is-tighter .hx-nav__extra .hx-nav__link { font-size: 10.5px; padding: 0 5px; }
-/* Just above the burger breakpoint the bar is at its fullest (five categories + Promoții, Configurator, Contact): a little less air. */
-@media (min-width: 1181px) and (max-width: 1240px) {
-	.hx-header__inner { gap: 12px; }
-	.hx-nav { gap: 6px; }
-	.hx-nav.is-tighter .hx-nav__link { padding: 0 5px; letter-spacing: .02em; }
-	.hx-nav.is-tighter .hx-nav__extra { padding-left: 6px; }
-	.hx-nav.is-tighter .hx-nav__extra .hx-nav__link { padding: 0 4px; }
-}
+/* A third step for a bar at its fullest. If even that is not enough, the script takes the configurator link out of the bar. */
+.hx-nav.is-tightest { gap: 6px; }
+.hx-nav.is-tightest .hx-nav__link { padding: 0 3px; letter-spacing: .02em; }
+.hx-nav.is-tightest .hx-nav__link::after { left: 3px; right: 3px; }
+.hx-nav.is-tightest .hx-nav__extra { padding-left: 6px; }
+.hx-nav.is-tightest .hx-nav__extra .hx-nav__link { padding: 0 3px; }
+.hx-header__inner:has(.hx-nav.is-tightest) { gap: 12px; }
+.hx-nav__extra > li[hidden] { display: none; }
 .hx-nav__item:hover > .hx-nav__link, .hx-nav__item.is-open > .hx-nav__link, .hx-nav__item.is-current > .hx-nav__link { color: var(--hx-text); }
 .hx-nav__item:hover > .hx-nav__link::after, .hx-nav__item.is-open > .hx-nav__link::after, .hx-nav__item.is-current > .hx-nav__link::after { opacity: 1; }
 .hx-nav__item.is-current > .hx-nav__link { color: var(--hx-accent); }
