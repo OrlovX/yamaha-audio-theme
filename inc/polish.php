@@ -16,6 +16,7 @@ function yamaha_audio_polish_cfg() {
 		'blog_desc'  => 'Articole despre tehnologiile și produsele Yamaha: receivere, MusicCast, sunet surround și ghiduri de alegere.',
 		'flat_rate'  => 0,        // rate under the free-shipping threshold not published: left out of the markup.
 		'brand'      => 'Yamaha', // single-brand shop.
+		'defer'      => array(), // HTTP/2 here: nothing to gain, and the consent integration expects order attribution to load first.
 	);
 }
 
@@ -467,6 +468,29 @@ add_action( 'wp_enqueue_scripts', 'yamaha_audio_trim_assets', 9999 );
 add_action( 'wp_print_styles', 'yamaha_audio_trim_assets', 1000 ); // some plugins enqueue at the very last moment; after the theme lists plugin styles as its dependencies (999).
 add_action( 'wp_footer', 'yamaha_audio_trim_assets', 1 );
 add_action( 'wp_print_footer_scripts', 'yamaha_audio_trim_assets', 1 );
+
+/**
+ * Plugin scripts at the end of the page that only attach handlers once the page is ready are loaded with
+ * "defer", in their original order. Printed without it the browser fetches them as page-blocking, and
+ * PageSpeed counts them as such whenever they arrive before the first paint: on a phone the score swung
+ * between about 65 and 90 from one run to the next. Cart, checkout and account pages are left untouched.
+ */
+function yamaha_audio_defer_scripts( $tag, $handle, $src ) {
+	$paths = (array) ( yamaha_audio_polish_cfg()['defer'] ?? array() );
+	if ( ! $paths || is_admin() || ! is_string( $tag ) || preg_match( '/<script\b[^>]*\s(?:defer|async|type=["\']module)/i', $tag ) ) {
+		return $tag;
+	}
+	if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() ) ) {
+		return $tag;
+	}
+	foreach ( $paths as $needle ) {
+		if ( false !== stripos( (string) $src, $needle ) ) {
+			return preg_replace( '/<script\b(?=[^>]*\ssrc=)/i', '<script defer', $tag, 1 );
+		}
+	}
+	return $tag;
+}
+add_filter( 'script_loader_tag', 'yamaha_audio_defer_scripts', 20, 3 );
 
 /* =====================================================================================
  * Buying flow
