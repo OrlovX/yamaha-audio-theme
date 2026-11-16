@@ -494,6 +494,47 @@ function yamaha_audio_defer_scripts( $tag, $handle, $src ) {
 }
 add_filter( 'script_loader_tag', 'yamaha_audio_defer_scripts', 20, 3 );
 
+/**
+ * Google Tag Manager starts right after the first paint instead of racing it.
+ *
+ * The standard snippet (printed by the GTM4WP plugin) begins downloading ~500 KB of tag scripts while the
+ * page is still being put on screen. On a fast connection they arrive and run before the first paint,
+ * holding it back; PageSpeed then counts the whole tag-manager chain as part of the first paint (mobile
+ * first paint 2 s in one run, 5 s in the next). Same snippet, same container, same data layer: it is only
+ * started by the browser's "first contentful paint" signal, or after 3.5 s if that never comes (a tab
+ * opened in the background), or at once where the browser cannot report paints.
+ */
+function yamaha_audio_gtm_after_paint( $html ) {
+	if ( ! is_string( $html ) || false === strpos( $html, 'googletagmanager.com/gtm.js' ) || apply_filters( 'yamaha_audio_gtm_immediately', false ) ) {
+		return $html;
+	}
+	$out = preg_replace_callback( '#(<script\b[^>]*>)(.*?)(</script>)#s', function ( $m ) {
+		if ( false === strpos( $m[2], 'googletagmanager.com/gtm.js' ) ) {
+			return $m[0];
+		}
+		$js = "\n(function(){var hxStarted=0,hxGo=function(){if(hxStarted){return}hxStarted=1;\n" . trim( $m[2] ) . "\n};"
+			. "var po=window.PerformanceObserver,ok=po&&po.supportedEntryTypes&&po.supportedEntryTypes.indexOf('paint')>-1;"
+			. "if(!ok||document.visibilityState==='hidden'){hxGo();return}"
+			. "try{new po(function(l){if(l.getEntriesByName('first-contentful-paint').length){setTimeout(hxGo,0)}}).observe({type:'paint',buffered:true})}catch(e){hxGo()}"
+			. "setTimeout(hxGo,3500)})();\n";
+		return $m[1] . $js . $m[3];
+	}, $html );
+	return is_string( $out ) ? $out : $html;
+}
+add_action( 'wp_head', function () {
+	$fn   = 'gtm4wp_wp_header_begin';
+	$prio = function_exists( $fn ) ? has_action( 'wp_head', $fn ) : false;
+	if ( false === $prio || is_admin() ) {
+		return;
+	}
+	remove_action( 'wp_head', $fn, $prio );
+	add_action( 'wp_head', function () use ( $fn ) {
+		ob_start();
+		call_user_func( $fn );
+		echo yamaha_audio_gtm_after_paint( (string) ob_get_clean() ); // phpcs:ignore WordPress.Security.EscapeOutput
+	}, $prio );
+}, 0 );
+
 /* =====================================================================================
  * Buying flow
  * ================================================================================== */
