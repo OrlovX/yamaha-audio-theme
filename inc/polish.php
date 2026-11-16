@@ -401,6 +401,23 @@ function yamaha_audio_inline_small_styles( array $needles, $max_bytes = 3000 ) {
 	}
 }
 
+/** Font Awesome icons only appear where an editor put them in the page content. */
+function yamaha_audio_page_uses_fa() {
+	$post    = is_singular() ? get_queried_object() : null;
+	$content = $post instanceof WP_Post ? (string) $post->post_content : '';
+	return false !== strpos( $content, 'fa-' ) || false !== strpos( $content, '[icon' );
+}
+// ...and without its stylesheet there is no reason to open a connection to its CDN.
+add_filter( 'wp_resource_hints', function ( $urls ) {
+	if ( is_admin() || ! is_array( $urls ) || yamaha_audio_page_uses_fa() ) {
+		return $urls;
+	}
+	return array_values( array_filter( $urls, function ( $url ) {
+		$href = is_array( $url ) ? (string) ( $url['href'] ?? '' ) : (string) $url;
+		return false === stripos( $href, 'fontawesome.com' );
+	} ) );
+}, 99 );
+
 function yamaha_audio_trim_assets() {
 	if ( is_admin() || apply_filters( 'yamaha_audio_keep_all_assets', false ) ) {
 		return;
@@ -411,7 +428,7 @@ function yamaha_audio_trim_assets() {
 	$scripts = array();
 
 	// Font Awesome (official plugin, from its CDN): the theme draws its own icons; only content that uses it needs it.
-	if ( false === strpos( $content, 'fa-' ) && false === strpos( $content, '[icon' ) ) {
+	if ( ! yamaha_audio_page_uses_fa() ) {
 		$styles[]  = 'fontawesome.com/';
 		$styles[]  = '/uploads/font-awesome/';
 		$scripts[] = 'fontawesome.com/';
@@ -447,7 +464,7 @@ function yamaha_audio_trim_assets() {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'yamaha_audio_trim_assets', 9999 );
-add_action( 'wp_print_styles', 'yamaha_audio_trim_assets', 100 ); // some plugins enqueue at the very last moment.
+add_action( 'wp_print_styles', 'yamaha_audio_trim_assets', 1000 ); // some plugins enqueue at the very last moment; after the theme lists plugin styles as its dependencies (999).
 add_action( 'wp_footer', 'yamaha_audio_trim_assets', 1 );
 add_action( 'wp_print_footer_scripts', 'yamaha_audio_trim_assets', 1 );
 
