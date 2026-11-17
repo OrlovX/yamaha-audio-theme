@@ -172,7 +172,7 @@ def allow_blocks():
             except Exception:
                 pass
         got = list(ipaddress.collapse_addresses(got))
-        if len(got) > 400:
+        if len(got) > 3000:  # Amazon publishes about 800 single addresses
             notes.append('%s IGNORED (%d blocks looks wrong)' % (name, len(got)))
             continue
         nets += got
