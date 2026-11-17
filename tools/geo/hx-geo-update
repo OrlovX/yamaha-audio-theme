@@ -8,7 +8,8 @@ millions of requests. The owner's rule: nobody outside Europe has a reason to vi
 What it writes, in /etc/apache2/hx-geo/:
   europe.inc  every IPv4 block registered in a European country (DB-IP "IP to Country Lite", CC BY 4.0, db-ip.com)
   allow.inc   machines outside Europe that must still get in: Google (search, ads landing-page checks,
-              Merchant feed), Bing, Meta, Apple, Jetpack/WordPress.com, and the shop's own servers
+              Merchant feed), Bing, Meta, Apple, Jetpack/WordPress.com, the AI assistants (OpenAI, Perplexity,
+              Anthropic, Amazon, DuckDuckGo: published addresses only), and the shop's own servers
 
 Run as root:
   hx-geo-update              rebuild the lists, test the Apache config, reload Apache
@@ -31,6 +32,15 @@ GOOGLE = ['https://www.gstatic.com/ipranges/goog.json',
           'https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers-google.json']
 OTHER_JSON = {'bing': 'https://www.bing.com/toolbox/bingbot.json', 'apple': 'https://search.developer.apple.com/applebot.json'}
 JETPACK = 'https://jetpack.com/ips-v4.txt'
+# AI assistants that read pages to answer questions (the owner asked for "the usual assistants", 17 Nov 2026).
+# Only addresses each company publishes itself: a name in the user agent proves nothing.
+ASSISTANTS = {
+    'openai': ['https://openai.com/searchbot.json', 'https://openai.com/chatgpt-user.json', 'https://openai.com/gptbot.json', 'https://openai.com/adsbot.json'],
+    'perplexity': ['https://www.perplexity.com/perplexitybot.json', 'https://www.perplexity.com/perplexity-user.json'],
+    'anthropic': ['https://docs.claude.com/en/api/ip-addresses.md', 'https://docs.claude.com/en/api/ip-addresses'],
+    'amazon': ['https://developer.amazon.com/amazonbot/ip-addresses/', 'https://developer.amazon.com/amazonbot/searchbot-ip-addresses/', 'https://developer.amazon.com/amazonbot/live-ip-addresses/'],
+    'duckduckgo': ['https://duckduckgo.com/duckduckgo-help-pages/results/duckassistbot'],
+}
 META_AS = ['AS32934', 'AS63293', 'AS54115']  # Facebook: link previews, catalogue fetches
 
 
@@ -85,6 +95,15 @@ def europe_blocks():
 def json_prefixes(url):
     data = json.loads(fetch(url))
     return v4(p.get('ipv4Prefix', '') for p in data.get('prefixes', []) if p.get('ipv4Prefix'))
+
+
+def text_prefixes(url, bare=False):
+    """IPv4 blocks written anywhere in a page or a JSON file. Nothing wider than a /16 is taken from free text."""
+    text = fetch(url).decode('utf-8', 'replace')
+    found = re.findall(r'(?<![\d.])(\d{1,3}(?:\.\d{1,3}){3}/\d{1,2})(?![\d.])', text)
+    if bare:
+        found += re.findall(r'(?<![\d./])(\d{1,3}(?:\.\d{1,3}){3})(?![\d./])', text)
+    return [n for n in v4(found) if n.prefixlen >= 16 and not n.is_private and not n.is_loopback]
 
 
 def meta_blocks():
@@ -145,6 +164,19 @@ def allow_blocks():
         notes.append('meta %d' % len(got))
     except Exception as e:
         notes.append('meta FAILED (%s)' % e)
+    for name, urls in ASSISTANTS.items():
+        got = []
+        for url in urls:
+            try:
+                got += text_prefixes(url, bare=(name == 'duckduckgo'))
+            except Exception:
+                pass
+        got = list(ipaddress.collapse_addresses(got))
+        if len(got) > 400:
+            notes.append('%s IGNORED (%d blocks looks wrong)' % (name, len(got)))
+            continue
+        nets += got
+        notes.append('%s %d' % (name, len(got)) if got else '%s NONE FOUND' % name)
     nets += v4(OWN)
     return list(ipaddress.collapse_addresses(nets)), notes
 
@@ -206,7 +238,7 @@ def build(reload_apache):
         p = os.path.join(OUT, name)
         keep[p] = open(p).read() if os.path.exists(p) else None
     write_inc(os.path.join(OUT, 'europe.inc'), eu, 'IPv4 blocks registered in Europe (DB-IP Lite, CC BY 4.0)')
-    write_inc(os.path.join(OUT, 'allow.inc'), al, 'Outside Europe but let in: Google, Bing, Apple, Jetpack, Meta, own servers')
+    write_inc(os.path.join(OUT, 'allow.inc'), al, 'Outside Europe but let in: Google, Bing, Apple, Jetpack, Meta, AI assistants, own servers')
     print('europe.inc: %d blocks; allow.inc: %d blocks (%s)' % (len(eu), len(al), '; '.join(notes)))
     if not reload_apache:
         return
