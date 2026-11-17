@@ -904,13 +904,40 @@
 	if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', start); } else { start(); }
 })();
 
-/* Marks a real browser (see the filter gate in inc/filters.php): scrapers that don't run scripts never get it. */
+/* Marks a visitor who touched the page: the gate in front of filtered lists asks for it (inc/filter-guard.php).
+   Crawlers run scripts too, but they don't move a mouse, touch the screen or press a key, so the mark is
+   written on the first such event that the browser itself reports as real. It carries the time, and is
+   renewed once a day. The gate page writes the same mark: keep the two recipes identical.
+   Not counted: scroll and wheel (crawlers scroll to load images), and a mousemove that stays on one spot
+   (Chrome makes one up after a scroll or a layout change, at the last known position). */
 (function () {
-	try {
-		if (document.cookie.indexOf('hx_h=1') === -1) {
-			document.cookie = 'hx_h=1; path=/; max-age=31536000; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+	var doc = document, names = ['pointerdown', 'touchstart', 'mousemove', 'keydown', 'click'], done = false, mx = null, my = null;
+	function hash(s) { // FNV-1a, 32 bit: PHP's hash('fnv1a32')
+		var x = 0x811c9dc5, i;
+		for (i = 0; i < s.length; i++) { x ^= s.charCodeAt(i); x = Math.imul(x, 0x01000193) >>> 0; }
+		return ('0000000' + x.toString(16)).slice(-8);
+	}
+	function recent() {
+		var m = doc.cookie.match(/(?:^|; )hx_h=([0-9a-z]{5,8})\.[0-9a-f]{8}(?:;|$)/);
+		return !!m && Math.abs(Date.now() / 1000 - parseInt(m[1], 36)) < 86400;
+	}
+	function mark(e) {
+		if (done || !e || e.isTrusted !== true) { return; }
+		if (e.type === 'mousemove') {
+			if (mx === null) { mx = e.clientX; my = e.clientY; return; }
+			if (e.clientX === mx && e.clientY === my) { return; }
 		}
-	} catch (e) { /* cookies off: the gate page explains */ }
+		done = true;
+		names.forEach(function (n) { doc.removeEventListener(n, mark, true); });
+		try {
+			var t = Math.floor(Date.now() / 1000).toString(36);
+			doc.cookie = 'hx_h=' + t + '.' + hash(t + '|hx-filter') + '; path=/; max-age=31536000; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+		} catch (err) { /* cookies off: the gate page explains */ }
+	}
+	try {
+		if (recent()) { return; }
+		names.forEach(function (n) { doc.addEventListener(n, mark, { capture: true, passive: true }); });
+	} catch (e) { /* nothing to do */ }
 })();
 
 /* ---------- Classic cart on phones: total + order button always within reach (see .hx-cartbar) ---------- */

@@ -429,44 +429,22 @@ add_action( 'wp_head', function () {
 }, 1 );
 
 /**
- * Bots that ignore rel="nofollow" walk every combination of filter options (carbon,negru,alb… in
- * every order) and each one is an uncached page: thousands of addresses doing that kept the server
- * at full load. Three defences:
+ * Crawlers that ignore rel="nofollow" walk every combination of filter options (carbon,negru,alb… in
+ * every order) and each one is an uncached page: thousands of addresses doing that can stall the shop.
+ * Three defences:
  *  - robots.txt tells well-behaved crawlers to stay out of filtered and sorted lists;
  *  - filtered pages are noindex,nofollow;
- *  - a request combining two or more filter options must come from a real browser: main.js sets a
- *    small cookie on any page view, and a visitor without it gets a tiny page that sets the cookie
- *    and reloads (status 429, so repeat offenders can be banned from the access log). People never
- *    notice it; scrapers that don't run JavaScript never reach the expensive query.
+ *  - a filtered list is only built for a visitor who has touched the page, and never more than a
+ *    set number a minute for the whole shop. That gate, and what was learned about the crawlers, is
+ *    in inc/filter-guard.php. It runs here on init, and earlier too when
+ *    tools/mu-plugins/hx-filter-guard.php is installed.
  */
 add_filter( 'robots_txt', function ( $output ) {
 	return rtrim( $output ) . "\n\n# Filtered and sorted product lists: endless combinations, nothing to index.\nUser-agent: *\nDisallow: /*?*f%5B\nDisallow: /*?*f[\nDisallow: /*?*orderby=\nDisallow: /*?*stock=\nDisallow: /*?*showroom=\n";
 }, 20 );
 
+require_once __DIR__ . '/filter-guard.php';
+
 add_action( 'init', function () {
-	// phpcs:disable WordPress.Security.NonceVerification
-	if ( empty( $_GET['f'] ) || ! is_array( $_GET['f'] ) || is_admin() || wp_doing_ajax() || wp_doing_cron() || is_user_logged_in() || isset( $_COOKIE['hx_h'] ) ) {
-		return;
-	}
-	$options = 0;
-	foreach ( wp_unslash( $_GET['f'] ) as $value ) {
-		$options += count( array_filter( explode( ',', (string) $value ) ) );
-	}
-	// phpcs:enable
-	if ( $options < 2 ) {
-		return; // a single option is an ordinary link, open to everyone.
-	}
-	defined( 'DONOTCACHEPAGE' ) || define( 'DONOTCACHEPAGE', true );
-	status_header( 429 );
-	nocache_headers();
-	header( 'Retry-After: 5' );
-	header( 'X-Robots-Tag: noindex, nofollow' );
-	header( 'Content-Type: text/html; charset=utf-8' );
-	$shop = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
-	echo '<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>' . esc_html( wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) ) . '</title>'
-		. '<style>body{font:16px/1.5 -apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;padding:64px 20px;text-align:center;background:#f6f5f3;color:#1a1a1a}a{color:inherit}</style></head><body>'
-		. '<p id="m">Se încarcă filtrele…</p>'
-		. '<script>(function(){try{document.cookie="hx_h=1; path=/; max-age=31536000; SameSite=Lax";var ok=document.cookie.indexOf("hx_h=1")>-1,tried=false;try{tried=!!sessionStorage.getItem("hx_h_try");sessionStorage.setItem("hx_h_try","1")}catch(e){tried=/[?&]hxh=1/.test(location.search)}if(ok&&!tried){location.replace(location.href);return}}catch(e){}document.getElementById("m").innerHTML=\'Filtrele au nevoie de cookie-uri active. <a href="' . esc_url( $shop ) . '">Înapoi la produse</a>\'})();</script>'
-		. '<noscript><p>Filtrele au nevoie de JavaScript. <a href="' . esc_url( $shop ) . '">Înapoi la produse</a></p></noscript></body></html>';
-	exit;
+	hx_filter_guard( false );
 }, 1 );
