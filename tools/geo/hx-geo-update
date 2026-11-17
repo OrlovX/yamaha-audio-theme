@@ -1,0 +1,257 @@
+#!/usr/bin/env python3
+"""
+Europe-only access for the shop: builds the address lists that /etc/apache2/conf-available/hx-geo.conf reads.
+
+Why: in November 2026 crawlers on rented servers in Asia and on home connections worldwide sent
+millions of requests. The owner's rule: nobody outside Europe has a reason to visit.
+
+What it writes, in /etc/apache2/hx-geo/:
+  europe.inc  every IPv4 block registered in a European country (DB-IP "IP to Country Lite", CC BY 4.0, db-ip.com)
+  allow.inc   machines outside Europe that must still get in: Google (search, ads landing-page checks,
+              Merchant feed), Bing, Meta, Apple, Jetpack/WordPress.com, and the shop's own servers
+
+Run as root:
+  hx-geo-update              rebuild the lists, test the Apache config, reload Apache
+  hx-geo-update --no-reload  rebuild only (first install, before the conf is enabled)
+  hx-geo-update --report F   read access log F and say what the current lists would refuse
+
+If a download fails or a list looks wrong, nothing is replaced. Switch the whole thing off with:
+  a2disconf hx-geo && systemctl reload apache2
+"""
+import csv, datetime, gzip, io, ipaddress, json, os, re, socket, subprocess, sys, urllib.request
+
+OUT = '/etc/apache2/hx-geo'
+EUROPE = set('''AD AL AT AX BA BE BG BY CH CY CZ DE DK EE ES FI FO FR GB GG GI GR HR HU IE IM IS IT JE LI LT LU LV
+MC MD ME MK MT NL NO PL PT RO RS RU SE SI SJ SK SM UA VA XK EU'''.split())
+OWN = ['52.58.8.91', '3.76.240.143', '3.124.222.37', '172.16.0.0/12']  # hifiexpert, yamaha-audio, stock app, private network
+GOOGLE = ['https://www.gstatic.com/ipranges/goog.json',
+          'https://developers.google.com/static/search/apis/ipranges/googlebot.json',
+          'https://developers.google.com/static/search/apis/ipranges/special-crawlers.json',
+          'https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers.json',
+          'https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers-google.json']
+OTHER_JSON = {'bing': 'https://www.bing.com/toolbox/bingbot.json', 'apple': 'https://search.developer.apple.com/applebot.json'}
+JETPACK = 'https://jetpack.com/ips-v4.txt'
+META_AS = 'AS32934'
+
+
+def fetch(url, timeout=60):
+    req = urllib.request.Request(url, headers={'User-Agent': 'hx-geo-update (shop access lists)'})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.read()
+
+
+def v4(items):
+    out = []
+    for x in items:
+        try:
+            n = ipaddress.ip_network(x.strip(), strict=False)
+        except ValueError:
+            continue
+        if n.version == 4:
+            out.append(n)
+    return out
+
+
+def europe_blocks():
+    today = datetime.date.today()
+    months = [today, today.replace(day=1) - datetime.timedelta(days=1)]
+    raw = None
+    for d in months:
+        try:
+            raw = fetch('https://download.db-ip.com/free/dbip-country-lite-%04d-%02d.csv.gz' % (d.year, d.month), 180)
+            break
+        except Exception as e:  # the new month's file appears a day or two late
+            err = e
+    if raw is None:
+        raise RuntimeError('DB-IP download failed: %s' % err)
+    spans = []
+    for row in csv.reader(io.TextIOWrapper(gzip.GzipFile(fileobj=io.BytesIO(raw)), encoding='utf-8')):
+        if len(row) < 3 or ':' in row[0] or row[2].upper() not in EUROPE:
+            continue
+        spans.append((int(ipaddress.IPv4Address(row[0])), int(ipaddress.IPv4Address(row[1]))))
+    spans.sort()
+    merged = []
+    for a, b in spans:
+        if merged and a <= merged[-1][1] + 1:
+            merged[-1][1] = max(merged[-1][1], b)
+        else:
+            merged.append([a, b])
+    nets = []
+    for a, b in merged:
+        nets.extend(ipaddress.summarize_address_range(ipaddress.IPv4Address(a), ipaddress.IPv4Address(b)))
+    return nets
+
+
+def json_prefixes(url):
+    data = json.loads(fetch(url))
+    return v4(p.get('ipv4Prefix', '') for p in data.get('prefixes', []) if p.get('ipv4Prefix'))
+
+
+def meta_blocks():
+    s = socket.create_connection(('whois.radb.net', 43), timeout=60)
+    s.sendall(('-i origin %s\n' % META_AS).encode())
+    buf = b''
+    while True:
+        chunk = s.recv(65536)
+        if not chunk:
+            break
+        buf += chunk
+    s.close()
+    return v4(re.findall(r'^route:\s+(\S+)', buf.decode('latin-1'), re.M))
+
+
+def allow_blocks():
+    nets, notes, google = [], [], []
+    for url in GOOGLE:
+        try:
+            got = json_prefixes(url)
+            google += got
+            notes.append('%s %d' % (url.rsplit('/', 1)[-1], len(got)))
+        except Exception as e:
+            notes.append('%s FAILED (%s)' % (url.rsplit('/', 1)[-1], e))
+    if len(google) < 50:
+        raise RuntimeError('Google lists too short (%d): refusing to continue' % len(google))
+    nets += google
+    for name, url in OTHER_JSON.items():
+        try:
+            got = json_prefixes(url)
+            nets += got
+            notes.append('%s %d' % (name, len(got)))
+        except Exception as e:
+            notes.append('%s FAILED (%s)' % (name, e))
+    try:
+        got = v4(fetch(JETPACK).decode().split())
+        nets += got
+        notes.append('jetpack %d' % len(got))
+    except Exception as e:
+        notes.append('jetpack FAILED (%s)' % e)
+    try:
+        got = meta_blocks()
+        nets += got
+        notes.append('meta %d' % len(got))
+    except Exception as e:
+        notes.append('meta FAILED (%s)' % e)
+    nets += v4(OWN)
+    return list(ipaddress.collapse_addresses(nets)), notes
+
+
+def write_inc(path, nets, title):
+    lines = ['# %s. Written by hx-geo-update on %s. Do not edit: it is rebuilt every week.' % (title, datetime.date.today())]
+    nets = [str(n) for n in nets]
+    for i in range(0, len(nets), 80):
+        lines.append('Require ip ' + ' '.join(nets[i:i + 80]))
+    with open(path, 'w') as f:
+        f.write('\n'.join(lines) + '\n')
+
+
+def read_inc(path):
+    nets = []
+    with open(path) as f:
+        for line in f:
+            if line.startswith('Require ip '):
+                nets += v4(line.split()[2:])
+    return nets
+
+
+class Table:
+    """Fast 'is this address in one of these blocks' for the checks and the report."""
+    def __init__(self, nets):
+        self.by_len = {}
+        for n in nets:
+            self.by_len.setdefault(n.prefixlen, set()).add(int(n.network_address))
+        self.lens = sorted(self.by_len)
+
+    def has(self, ip):
+        try:
+            x = int(ipaddress.IPv4Address(ip))
+        except ValueError:
+            return False
+        for l in self.lens:
+            if (x >> (32 - l) << (32 - l) if l else 0) in self.by_len[l]:
+                return True
+        return False
+
+
+def checks(eu, al):
+    e, a = Table(eu), Table(al)
+    must_eu = ['193.231.0.1', '86.120.0.1', '5.2.128.1', '52.58.8.91', '194.25.0.1', '81.2.69.1']   # RO, RO, RO, Frankfurt, DE, GB
+    must_not = ['43.173.10.10', '8.8.4.4', '1.1.1.1', '202.12.27.33', '200.160.2.3', '47.74.1.1']  # Tencent SG, US, AU, JP, BR, Alibaba
+    must_allow = ['66.249.66.1', '66.249.64.10']                                                    # Googlebot
+    bad = [ip for ip in must_eu if not e.has(ip)] + [ip for ip in must_not if e.has(ip)] + [ip for ip in must_allow if not a.has(ip)]
+    if bad or len(eu) < 8000:
+        raise RuntimeError('lists fail the sanity checks (%d European blocks; wrong: %s)' % (len(eu), ', '.join(bad) or 'none'))
+
+
+def build(reload_apache):
+    eu = europe_blocks()
+    al, notes = allow_blocks()
+    checks(eu, al)
+    os.makedirs(OUT, exist_ok=True)
+    keep = {}
+    for name in ('europe.inc', 'allow.inc'):
+        p = os.path.join(OUT, name)
+        keep[p] = open(p).read() if os.path.exists(p) else None
+    write_inc(os.path.join(OUT, 'europe.inc'), eu, 'IPv4 blocks registered in Europe (DB-IP Lite, CC BY 4.0)')
+    write_inc(os.path.join(OUT, 'allow.inc'), al, 'Outside Europe but let in: Google, Bing, Apple, Jetpack, Meta, own servers')
+    print('europe.inc: %d blocks; allow.inc: %d blocks (%s)' % (len(eu), len(al), '; '.join(notes)))
+    if not reload_apache:
+        return
+    test = subprocess.run(['apache2ctl', 'configtest'], capture_output=True, text=True)
+    if test.returncode != 0:
+        for p, old in keep.items():
+            if old is not None:
+                open(p, 'w').write(old)
+        raise RuntimeError('Apache refused the new lists, the old ones are back: ' + test.stderr.strip()[-300:])
+    subprocess.run(['systemctl', 'reload', 'apache2'], check=True)
+    print('Apache reloaded')
+
+
+LOG = re.compile(r'^(\S+) \S+ \S+ \[[^\]]+\] "(?:\S+) (\S+)[^"]*" (\d{3}) \S+ "[^"]*" "([^"]*)"')
+NAMED = re.compile(r'(Googlebot|AdsBot-Google|Google-InspectionTool|Storebot-Google|GoogleOther|Mediapartners-Google|FeedFetcher-Google|Google-Read-Aloud|APIs-Google|Google-Site-Verification|Chrome-Lighthouse|bingbot|facebookexternalhit|facebookcatalog|meta-externalagent|Applebot|Jetpack|WordPress|WhatsApp|Pinterest|YandexBot|AhrefsBot|SemrushBot|GPTBot|ClaudeBot|PerplexityBot|Amazonbot|TikTokSpider|PetalBot|curl|python-requests|GuzzleHttp|Go-http-client)', re.I)
+
+
+def report(logfile):
+    e, a = Table(read_inc(os.path.join(OUT, 'europe.inc'))), Table(read_inc(os.path.join(OUT, 'allow.inc')))
+    total = blocked = 0
+    ips_all, ips_blocked, named, kinds = set(), set(), {}, {'pages': 0, 'filter links': 0, 'files': 0, 'admin, ajax, api': 0}
+    with open(logfile, errors='replace') as f:
+        for line in f:
+            m = LOG.match(line)
+            if not m:
+                continue
+            ip, uri, status, ua = m.groups()
+            total += 1
+            ips_all.add(ip)
+            if ip in ('127.0.0.1', '::1') or uri.startswith('/.well-known/acme-challenge/') or e.has(ip) or a.has(ip):
+                continue
+            blocked += 1
+            ips_blocked.add(ip)
+            n = NAMED.search(ua)
+            key = n.group(1) if n else 'says it is a browser, or says nothing'
+            named[key] = named.get(key, 0) + 1
+            if 'f%5B' in uri or 'f[' in uri:
+                kinds['filter links'] += 1
+            elif re.search(r'/wp-admin/|/wp-json/|wc-ajax=|/wp-login|xmlrpc', uri):
+                kinds['admin, ajax, api'] += 1
+            elif re.search(r'\.(css|js|png|jpe?g|webp|avif|gif|svg|woff2?|ico|mp4|pdf)(\?|$)', uri, re.I):
+                kinds['files'] += 1
+            else:
+                kinds['pages'] += 1
+    pct = lambda x, y: '%.1f%%' % (100.0 * x / y) if y else '0%'
+    print('requests %d, would be refused %d (%s)' % (total, blocked, pct(blocked, total)))
+    print('addresses %d, would be refused %d (%s)' % (len(ips_all), len(ips_blocked), pct(len(ips_blocked), len(ips_all))))
+    print('refused by kind: ' + ', '.join('%s %d' % kv for kv in kinds.items()))
+    print('refused by who they say they are:')
+    for k, v in sorted(named.items(), key=lambda kv: -kv[1])[:14]:
+        print('  %7d  %s' % (v, k))
+
+
+if __name__ == '__main__':
+    try:
+        if '--report' in sys.argv:
+            report(sys.argv[sys.argv.index('--report') + 1])
+        else:
+            build('--no-reload' not in sys.argv)
+    except Exception as exc:
+        print('hx-geo-update: ' + str(exc), file=sys.stderr)
+        sys.exit(1)

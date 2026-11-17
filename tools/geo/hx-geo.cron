@@ -1,0 +1,2 @@
+# Rebuild the Europe and allow lists every Monday at 04:17 (server time). Source: the theme, tools/geo/.
+17 4 * * 1 root /usr/local/sbin/hx-geo-update >> /var/log/hx-geo-update.log 2>&1
