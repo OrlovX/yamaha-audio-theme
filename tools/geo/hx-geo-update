@@ -31,7 +31,7 @@ GOOGLE = ['https://www.gstatic.com/ipranges/goog.json',
           'https://developers.google.com/static/search/apis/ipranges/user-triggered-fetchers-google.json']
 OTHER_JSON = {'bing': 'https://www.bing.com/toolbox/bingbot.json', 'apple': 'https://search.developer.apple.com/applebot.json'}
 JETPACK = 'https://jetpack.com/ips-v4.txt'
-META_AS = 'AS32934'
+META_AS = ['AS32934', 'AS63293', 'AS54115']  # Facebook: link previews, catalogue fetches
 
 
 def fetch(url, timeout=60):
@@ -88,16 +88,30 @@ def json_prefixes(url):
 
 
 def meta_blocks():
-    s = socket.create_connection(('whois.radb.net', 43), timeout=60)
-    s.sendall(('-i origin %s\n' % META_AS).encode())
-    buf = b''
-    while True:
-        chunk = s.recv(65536)
-        if not chunk:
-            break
-        buf += chunk
-    s.close()
-    return v4(re.findall(r'^route:\s+(\S+)', buf.decode('latin-1'), re.M))
+    """What Meta's networks announce right now (RIPEstat); the routing registry (RADB) as well, in case one is down."""
+    nets = []
+    for asn in META_AS:
+        try:
+            data = json.loads(fetch('https://stat.ripe.net/data/announced-prefixes/data.json?resource=' + asn, 90))
+            nets += v4(p.get('prefix', '') for p in data.get('data', {}).get('prefixes', []))
+        except Exception:
+            pass
+        try:
+            s = socket.create_connection(('whois.radb.net', 43), timeout=60)
+            s.sendall(('-i origin %s\n' % asn).encode())
+            buf = b''
+            while True:
+                chunk = s.recv(65536)
+                if not chunk:
+                    break
+                buf += chunk
+            s.close()
+            nets += v4(re.findall(r'^route:\s+(\S+)', buf.decode('latin-1'), re.M))
+        except Exception:
+            pass
+    if not nets:
+        raise RuntimeError('no source answered')
+    return nets
 
 
 def allow_blocks():
