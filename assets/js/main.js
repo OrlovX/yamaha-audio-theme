@@ -1127,3 +1127,25 @@
 	}
 	if (doc.readyState === 'loading') { doc.addEventListener('DOMContentLoaded', start); } else { start(); }
 })();
+
+/*
+ * A tap on the phone number or on a WhatsApp link is reported to Tag Manager as a lead
+ * (event "hx_contact", once per method per page view). Tag Manager sends it on to Google Ads as the
+ * secondary action "Contact - telefon / WhatsApp" and to Analytics. It is a lead, not a sale: nothing
+ * here knows whether the call took place.
+ */
+(function () {
+	'use strict';
+	var sent = {};
+	document.addEventListener('click', function (e) {
+		if (!e || e.isTrusted !== true || !e.target || !e.target.closest) { return; }
+		var a = e.target.closest('a[href]');
+		if (!a) { return; }
+		var href = a.getAttribute('href') || '';
+		var method = /^tel:/i.test(href) ? 'phone' : (/^https?:\/\/(wa\.me|api\.whatsapp\.com|web\.whatsapp\.com)\//i.test(href) || /^whatsapp:/i.test(href) ? 'whatsapp' : '');
+		if (!method || sent[method]) { return; }
+		sent[method] = true;
+		window.dataLayer = window.dataLayer || [];
+		window.dataLayer.push({ event: 'hx_contact', contact_method: method });
+	}, true);
+})();
